@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--©  Crown copyright
+ 
+You may use and re-use this code free of charge under the terms of the Open Government Licence
+ 
+http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
+<html xmlns="http://www.w3.org/1999/xhtml" IdURI="gaz: https://www.thegazette.co.uk/id/notice/undefined" prefix="gaz: https://www.thegazette.co.uk/def/publication#   dc11: http://purl.org/dc/elements/1.1/   person: https://www.thegazette.co.uk/def/person#          personal-legal: https://www.thegazette.co.uk/def/personal-legal#          court: https://www.thegazette.co.uk/def/court#          org: http://www.w3.org/ns/org#          gazorg: https://www.thegazette.co.uk/def/organisation#      gzw: https://www.thegazette.co.uk/def/working#        loc: https://www.thegazette.co.uk/def/location#          this: https://www.thegazette.co.uk/id/notice/undefined#   noticeid: https://www.thegazette.co.uk/id/notice/undefined   issue: https://www.thegazette.co.uk/id/edition/undefined/issue/undefined   edition: https://www.thegazette.co.uk/id/edition/undefined   vcard: http://www.w3.org/2006/vcard/ns#   prov: http://www.w3.org/ns/prov#">
+   
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      
+      <title>Place a Deceased Estates Notice</title>
+      
+   </head>
+   
+   <body>
+      
+      <article>
+         
+         <!-- header>
+        <h1>Place a deceased estate notice</h1>
+        </header -->
+         
+         <div class="rdfa-data">
+            <span about="noticeid:" property="dc11:publisher" content="TSO (The Stationery Office), St Crispins, Duke Street, Norwich, NR3 1PD, 01603 622211, customer.services@tso.co.uk"></span>
+            <span about="noticeid:" property="gaz:isAbout" resource="this:notifiableThing"></span>
+            <span about="noticeid:" property="prov:has_provenance" resource="provenance:"></span>
+            <span about="noticeid:" property="prov:hasAnchor" resource="noticeid:"></span>
+            <span about="noticeid:" property="gaz:isInIssue" resource="issue:"></span>
+            <span about="noticeid:" property="gaz:hasNoticeCode" datatype="xsd:integer" content="2903"></span>
+            <span resource="noticeid:" typeof="gaz:Notice gaz:WillsAndProbateNotice"></span>
+            <span resource="issue:" typeof="gaz:Issue"></span>
+            <span about="issue:" property="gaz:hasEdition" resource="edition:"></span>
+            <span about="issue:" property="gaz:hasIssueNumber" datatype="xsd:string" content="0"></span>
+            <span resource="edition:" typeof="gaz:Edition"></span>
+            <span about="noticeid:" property="gaz:hasNoticeNumber" datatype="xsd:integer" content="0"></span>
+            
+            <!-- span about="noticeid:" property="owl:sameAs" resource="https://www.thegazette.co.uk/id/edition/99999/issue/99999/notice/1556160" typeof="gaz:Notice"></span -->
+            
+            <!--Notice Classes-->
+            <span resource="issue:" typeof="gaz:Issue"></span>
+            
+            <!--Notifiable Thing-->
+            <span resource="this:notifiableThing" typeof="personal-legal:NoticeForClaimsAgainstEstate"></span>
+            
+            <!-- court related details -->
+            
+         </div>
+         
+         <dl class="metadata">
+            
+            <dt>Notice category:</dt>
+            
+            <dd data-ui-class="category">Personal Legal</dd>
+            
+            <dt>Notice type:</dt>
+            
+            <dd data-ui-class="notice-type">Deceased Estates</dd>
+            
+            <dt data-gazettes="earliestpublicationdate">Earliest publication date:</dt>
+            
+            <dd><span about="noticeid:" property="gaz:earliestPublicationDate" datatype="xsd:dateTime" data-required="true"></span></dd>
+            
+            <dt>Claim expires:</dt>
+            
+            <dd about="this:notifiableThing" property="personal-legal:hasClaimDeadline" datatype="xsd:date"></dd>
+            
+            <dt>Edition:</dt>
+            
+            <dd about="issue:" property="gaz:hasEdition" datatype="xsd:string"></dd>
+            
+            <dt>Notice ID:</dt>
+            
+            <dd data-gazettes="noticeid"></dd>
+            
+            <dt>Notice code:</dt>
+            
+            <dd about="noticeid:" datatype="xsd:integer" property="gaz:hasNoticeCode">2903</dd>
+            
+         </dl>
+         
+         <div class="content" about="this:notifiableThing" data-gazettes="Notice" data-gazettes-type="2903">
+            
+            <div class="full-form">
+               
+               <div class="error-list"></div>
+               
+               <!-- div data-gazettes="Before you start">
+            <div class="fileupload">
+              <span data-option="PROBATE" data-label="Grant of Probate"></span>
+              <span data-option="ADMIN" data-label="Letters of Admin"></span>
+            </div>
+          </div -->
+               
+               <dl data-gazettes="Notice Details">
+                  
+                  <dt>Claim number:</dt>
+                  
+                  <dd about="this:notifiableThing" property="gaz:claimNumber" datatype="xsd:string"></dd>
+                  
+               </dl>
+               
+               <div data-gazettes="Details of deceased" about="this:notifiableThing" property="personal-legal:hasEstateOf" resource="this:deceasedPerson">
+                  <span resource="this:deceasedPerson" typeof="gaz:Person" data-hide="true"></span>
+                  <span about="this:deceasedPerson" property="person:hasEmployment" resource="this:occupationOfDeceased" data-hide="true"></span>
+                  <span resource="this:occupationOfDeceased" typeof="person:Employment" data-hide="true"></span>
+                  
+                  <dl>
+                     
+                     <dt>Surname:</dt>
+                     
+                     <dd about="this:deceasedPerson" property="foaf:familyName" datatype="xsd:string" data-required="true"></dd>
+                     
+                     
+                     <dt>First name:</dt>
+                     
+                     <dd about="this:deceasedPerson" property="foaf:firstName" datatype="xsd:string" data-required="true"></dd>
+                     
+                     <dt>Middle name(s):</dt>
+                     
+                     <dd about="this:deceasedPerson" property="foaf:givenName"></dd>
+                     
+                     <dt>Maiden name:</dt>
+                     
+                     <dd about="this:deceasedPerson" property="person:hasMaidenName" datatype="xsd:string"></dd>
+                     
+                     <dt>Alternative names they may have been known by:</dt>
+                     
+                     <dd about="this:deceasedPerson" property="person:alsoKnownAs" datatype="xsd:string" data-button="true" data-name="add-more-names" data-title="Add more names" data-class-inner="add-names more" data-class-outer="add-names-link"></dd>
+                     
+                     <dt>Date of Death:</dt>
+                     
+                     <dd about="this:deceasedPerson" property="personal-legal:dateOfDeath" datatype="xsd:date"></dd>
+                     
+                     <dt>(If exact date unknown) Between dates of</dt>
+                     
+                     <dd><span about="this:deceasedPerson" property="personal-legal:startDateOfDeath" datatype="xsd:date" data-control="nobreak"></span> and <span about="this:deceasedPerson" property="personal-legal:endDateOfDeath" datatype="xsd:date"></span></dd>
+                     
+                     <dt>Occupation:</dt>
+                     
+                     <dd about="this:occupationOfDeceased" property="person:jobTitle" datatype="xsd:string" data-required="true"></dd>
+                     
+                  </dl>
+                  
+               </div>
+               
+               <div about="this:deceasedPerson" property="person:hasAddress" resource="this:deceased-address-1" data-container="address" data-gazettes="Last address of deceased" data-duplicable="true">
+                  
+                  <dl>
+                     
+                     <dt>Address 1:</dt>
+                     
+                     <dd about="this:deceased-address-1" typeof="vcard:Address" property="vcard:street-address" data-required="true" data-ui-class="addressLine1"></dd>
+                     
+                     <dt>Address 2:</dt>
+                     
+                     <dd about="this:deceased-address-1" property="vcard:extended-address" data-ui-class="addressLine2"></dd>
+                     
+                     <dt>City:</dt>
+                     
+                     <dd about="this:deceased-address-1" property="vcard:locality" data-ui-class="locality"></dd>
+                     
+                     <dt>County:</dt>
+                     
+                     <dd about="this:deceased-address-1" property="vcard:region" data-ui-class="region"></dd>
+                     
+                     <dt>Country:</dt>
+                     
+                     <dd about="this:deceased-address-1" property="vcard:country-name" data-ui-class="country"></dd>
+                     
+                     <dt>Postcode:</dt>
+                     
+                     <dd about="this:deceased-address-1" property="vcard:postal-code" data-required="true" data-ui-class="postcode"></dd>
+                     
+                  </dl>
+                  
+               </div>
+               
+               <div about="this:notifiableThing" property="personal-legal:hasPersonalRepresentative" resource="this:estateExecutor" data-gazettes="Details of the persons claims are made to">
+                  <span resource="this:estateExecutor" typeof="person:Person" data-hide="true"></span>
+                  
+                  <dl>
+                     
+                     <dt>Surname: </dt>
+                     
+                     <dd about="this:estateExecutor" property="foaf:familyName" datatype="xsd:string" data-required="true"></dd>
+                     
+                     <dt>First name: </dt>
+                     
+                     <dd about="this:estateExecutor" property="foaf:firstName" datatype="xsd:string" data-required="true"></dd>
+                     
+                     <dt>Middle name(s): </dt>
+                     
+                     <dd about="this:estateExecutor" property="foaf:givenName"></dd>
+                     
+                  </dl>
+                  
+                  <div about="this:estateExecutor" property="vcard:adr" resource="this:addressOfExecutor-1" data-container="address" data-gazettes="Address to be displayed for notice responses">
+                     
+                     <dl>
+                        
+                        <dt>Address 1:</dt>
+                        
+                        <dd about="this:addressOfExecutor-1" typeof="vcard:Address" property="vcard:street-address"></dd>
+                        
+                        <dt>Address 2:</dt>
+                        
+                        <dd about="this:addressOfExecutor-1" property="vcard:extended-address"></dd>
+                        
+                        <dt>City:</dt>
+                        
+                        <dd about="this:addressOfExecutor-1" property="vcard:locality"></dd>
+                        
+                        <dt>County:</dt>
+                        
+                        <dd about="this:addressOfExecutor-1" property="vcard:region"></dd>
+                        
+                        <dt>Country:</dt>
+                        
+                        <dd about="this:addressOfExecutor-1" property="vcard:country-name"></dd>
+                        
+                        <dt>Postcode:</dt>
+                        
+                        <dd about="this:addressOfExecutor-1" property="vcard:postal-code"></dd>
+                        
+                     </dl>
+                     
+                  </div>
+                  
+               </div>
+               
+            </div>
+            
+         </div>
+         
+      </article>
+      
+   </body>
+   
+</html>
