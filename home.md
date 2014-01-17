@@ -52,5 +52,12 @@ Gazettes have the following resources. Click on a link to read the API documenta
 
 
 
+## License ##
 
+All content is available under the Open Government Licence v2.0 except where otherwise stated
+	
+	(c) Crown copyright
+	You may use and re-use the code in this repository free of charge under the terms of the Open Government Licence
+	http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
 
+For more information on the please visit [the national archives open government licence explanation](http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2) page
