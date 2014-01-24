@@ -4,7 +4,6 @@
 
 Notice content can be retrieved using following uris, content will be for a particular notice (notice-id).
  
-
 <table>
 <tr>
 	<th>Representation URI</th>
@@ -281,37 +280,38 @@ Above tables contain representation URIs, the Gazette API also performs content 
 ##Example##
 
 ###	java ###
-	package uk.co.gazettes.dao.rest;
-	
-	import org.springframework.http.HttpEntity;
-	import org.springframework.http.HttpHeaders;
-	import org.springframework.http.HttpMethod;
-	import org.springframework.http.MediaType;
-	import org.springframework.web.client.RestTemplate;
-	
-	import uk.co.gazettes.dao.exceptions.DataNotFoundException;
-	import uk.co.gazettes.dao.utils.RestCookiesHelper;
-	
+	// with accept header
+	import com.jayway.restassured.RestAssured;
+	import com.jayway.restassured.response.Response;
 	public class RestClient {
-	
-	    private static RestTemplate restTemplate;
-	
-	    public static void main(String args[]) {
-		HttpHeaders httpHeaders = RestCookiesHelper.setTxCookie(null);
-		httpHeaders.setContentType(MediaType.TEXT_HTML);
-		HttpEntity<String> httpEntity = new HttpEntity<String>(httpHeaders);
-		String uri = String.format("%s%s", "end-point", "context uri");
-	
-		try {
-		    restTemplate.exchange(uri, HttpMethod.GET, httpEntity, String.class).getBody();
-		} catch (IllegalArgumentException e) {
-		    // This is thrown when there is no data. ML should fix this and
-		    // throw correct exception. In the meantime catch this exception and
-		    // throw DataNotFoundException
-		    throw new DataNotFoundException("No data found for " + "context uri");
-		}
+	public static void main(String args[])
+	{
+	// get the access token via POST explained in Sign-in document.
+	   RestAssured.baseURI = "https://www.thegazette.co.uk";
+	   	
+	   Response response = given().header("Authorization", "Bearer " + accessToken).header("Accept", "application/rdf+xml").expect().statusCode(200).get("/notice/{notice-id}");
+		String asString = response.getBody().asString();
 	    }
+	
 	}
+	
+	// without accept header
+	import com.jayway.restassured.RestAssured;
+	import com.jayway.restassured.response.Response;
+	public class RestClient {
+	public static void main(String args[])
+	{
+	// get the access token via POST explained in Sign-in document.
+		   RestAssured.baseURI = "https://www.thegazette.co.uk";
+
+    Response response = given().expect().statusCode(200).get("/notice/{notice-id}");
+	String asString = response.getBody().asString();
+
+    }
+
+}
+
+
 
 ### php ###
 	<?php
