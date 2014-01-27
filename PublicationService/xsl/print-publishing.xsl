@@ -15,7 +15,7 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
 <!-- This transformation is used for displaying dynamic contents for single notice -->
 
 
-   <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:xdt="http://www.w3.org/2005/xpath-datatypes" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:f="http://www.gazettes.co.uk/facets" xmlns:tax="http://www.gazettes.co.uk/assets/taxonomy" xmlns:m="http://www.gazettes.co.uk/metadata" xmlns="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" version="2.0" exclude-result-prefixes="#all">
+  <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:xdt="http://www.w3.org/2005/xpath-datatypes" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:f="http://www.gazettes.co.uk/facets" xmlns:tax="http://www.gazettes.co.uk/assets/taxonomy" xmlns:m="http://www.gazettes.co.uk/metadata" xmlns="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" version="2.0" exclude-result-prefixes="#all">
 
 
   <xsl:output indent="no" method="xhtml" encoding="ascii" omit-xml-declaration="yes"/>
