@@ -32,79 +32,75 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
 	<xsl:param name="organisationId" as="xs:string" required="no">0</xsl:param>
 	<xsl:param name="debug">false</xsl:param>
 	<xsl:param name="updates" as="node()">
-<form draftTitle="Draft 5897" draftURI="/my-gazette/draft/5897" noticeTypeCode="2451">
-<entry about="this:IP1-address-1" property="vcard:street-address">10 RYLSTONE CLOSE</entry>
-<entry about="this:IP1-address-1" property="vcard:locality">MILTON KEYNES</entry>
-<entry about="this:company-1" property="gazorg:partnershipNumber">registeredNumbervalue</entry>
+	<form draftTitle="Draft 6075" draftURI="/my-gazette/draft/6075" noticeTypeCode="2441">
+<entry about="this:company-1" property="gazorg:companyNumber">3455</entry>
+<entry about="this:IP1-address-1" property="vcard:locality">SOUTH CROYDON</entry>
+<entry about="this:IP1-address-1" property="vcard:street-address">21 CHAPEL VIEW</entry>
 <entry about="this:company-registered-office-1" property="vcard:region"/>
-<entry about="this:notifiableThing" property="corp-insolvency:nameOfPlaceOfHearing">hearingCourtName</entry>
+<entry about="this:legislation-1" property="legislation:legislationSection">legislationSectionValue</entry>
 <entry about="this:legislation-1" property="legislation:legislationTitle">LegislationValue</entry>
-<entry about="this:IP1-address-1" property="vcard:extended-address">HEELANDS</entry>
-<entry about="this:IP1" property="person:additionalInformationIP">additionalInformation</entry>
-<entry about="this:company-previous-registered-office-1" property="vcard:postal-code">CR2 8LG</entry>
+<entry about="this:notifiableThing" property="corp-insolvency:meetingTimeWITHtime">14:00</entry>
+<entry about="this:IP1-address-1" property="vcard:extended-address"/>
+<entry about="this:additional-contact-1" property="gaz:fax">01234567890</entry>
+<entry about="this:IP2" property="gaz:telephone">01234567890</entry>
+<entry about="this:IP2-address-1" property="vcard:postal-code">MK13 7QT</entry>
 <entry about="this:company-1" property="gazorg:previouslyTradingAs">previouslyTradingAsValue</entry>
-<entry about="noticeid:" property="gaz:earliestPublicationDateWITHtime">13:00</entry>
-<entry about="this:notifiableThing" property="corp-insolvency:presentedBy">creditor</entry>
+<entry about="this:IP2-address-1" property="vcard:locality">MILTON KEYNES</entry>
+<entry about="noticeid:" property="gaz:earliestPublicationDateWITHtime">00:00</entry>
+<entry about="this:IP2" property="foaf:name">secondIPName</entry>
 <entry about="this:IP1" property="gaz:fax">03242123231</entry>
-<entry about="this:IP-company-1" property="gazorg:name">repOrgName</entry>
-<entry about="this:notifiableThing" property="corp-insolvency:dateOfHearingWITHtime">16:00</entry>
+<entry about="this:meetingAddress-1" property="vcard:locality">SOUTH CROYDON</entry>
+<entry about="this:authoriser-1" property="gaz:dateAuthorisationSigned">2014-01-22</entry>
+<entry about="this:IP-company-1" property="gazorg:name">ipOrganisation</entry>
+<entry about="this:additional-contact-address-1" property="vcard:street-address">10 MAYFIELD ROAD</entry>
+<entry about="this:IP2" property="person:hasIPnum">secondIPNumber</entry>
 <entry about="this:company-principal-trading-address-1" property="vcard:locality">SOUTH CROYDON</entry>
-<entry about="this:hearingAddress" property="vcard:street-address">5 RYLSTONE CLOSE</entry>
-<entry about="this:court-case-1" property="court:caseNumber">caseNumber</entry>
-<entry about="this:company-registered-office-1" property="vcard:postal-code">CR2 9LG</entry>
-<entry about="this:company-principal-trading-address-1" property="vcard:street-address">21 CHAPEL VIEW</entry>
-<entry about="this:IP1-address-1" property="vcard:postal-code">MK13 7QT</entry>
-<entry about="this:court-1" property="court:courtName">courtNameValue</entry>
+<entry about="this:company-registered-office-1" property="vcard:postal-code">CR2 0BE</entry>
+<entry about="this:signatory-1" property="foaf:name">signedByValue</entry>
+<entry about="this:IP1-address-1" property="vcard:postal-code">CR2 7LG</entry>
+<entry about="this:company-principal-trading-address-1" property="vcard:street-address">FLAT 3</entry>
+<entry about="this:IP-company-2" property="gazorg:name">secondIPFirm</entry>
 <entry about="this:company-principal-trading-address-1" property="vcard:country-name"/>
-<entry about="this:hearingAddress" property="vcard:extended-address">HEELANDS</entry>
-<entry about="this:hearingAddress" property="vcard:region"/>
-<entry about="this:company-registered-office-1" property="vcard:extended-address">133 LIMPSFIELD ROAD</entry>
+<entry about="this:notifiableThing" property="corp-insolvency:typeOfLiquidation">typeOfLiquidationValue</entry>
+<entry about="this:additional-contact-address-1" property="vcard:locality">SOUTH CROYDON</entry>
+<entry about="this:additional-contact-1" property="gaz:email">swq@qw.com</entry>
+<entry about="this:company-registered-office-1" property="vcard:extended-address"/>
 <entry about="this:IP1" property="gaz:telephone">03242123231</entry>
-<entry about="this:hearingAddress" property="vcard:locality">MILTON KEYNES</entry>
-<entry about="this:company-1" property="gazorg:name">partnershipNamevalue</entry>
-<entry about="this:court-1" property="court:courtDistrict">courtDistrictValue</entry>
-<entry about="this:hearingAddress" property="vcard:postal-code">MK13 7QT</entry>
+<entry about="this:IP2-address-1" property="vcard:extended-address">HEELANDS</entry>
+<entry about="this:company-1" property="gazorg:name">companyNameValue</entry>
+<entry about="this:meetingAddress-1" property="vcard:region"/>
 <entry about="this:IP1" property="gaz:email">sdwe@wwq.com</entry>
-<entry about="this:company-1" property="gazorg:natureOfBusiness">natureOfBusinessValue</entry>
+<entry about="this:IP2-address-1" property="vcard:street-address">10 RYLSTONE CLOSE</entry>
 <entry about="this:company-registered-office-1" property="vcard:country-name"/>
-<entry about="this:previous-trading-address-1" property="vcard:country-name"/>
-<entry about="this:petitioner-address-1" property="vcard:postal-code">MK5 6EE</entry>
-<entry about="this:company-previous-registered-office-1" property="vcard:locality">SOUTH CROYDON</entry>
-<entry about="this:IP1" property="person:noticeDated">2014-01-30</entry>
-<entry about="this:company-principal-trading-address-1" property="vcard:extended-address"/>
-<entry about="this:hearingAddress" property="vcard:country-name"/>
-<entry about="noticeid:" property="gaz:earliestPublicationDate">2014-01-28</entry>
-<entry about="this:IP1" property="foaf:name">repName</entry>
-<entry about="this:IP1" property="person:hasIPReferenceNumber">refNoValue</entry>
+<entry about="this:company-principal-trading-address-1" property="vcard:extended-address">133 LIMPSFIELD ROAD</entry>
+<entry about="this:additional-contact-address-1" property="vcard:region"/>
+<entry about="this:IP1" property="person:hasIPReferenceNumber">ipRefNo</entry>
+<entry about="noticeid:" property="gaz:earliestPublicationDate">2014-01-27</entry>
+<entry about="this:IP1" property="foaf:name">ipName</entry>
+<entry about="this:additional-contact-address-1" property="vcard:extended-address"/>
 <entry about="this:company-registered-office-1" property="vcard:locality">SOUTH CROYDON</entry>
-<entry about="this:previous-trading-address-1" property="vcard:street-address">10 MAYFIELD ROAD</entry>
-<entry about="this:petitioner-address-1" property="vcard:locality">MILTON KEYNES</entry>
-<entry about="this:petitioner-address-1" property="vcard:street-address">25 LOWNDES GROVE</entry>
+<entry about="this:IP2" property="gaz:fax">01234567890</entry>
 <entry about="this:company-principal-trading-address-1" property="vcard:region"/>
-<entry about="this:company-registered-office-1" property="vcard:street-address">FLAT 3</entry>
-<entry about="this:petitioner-address-1" property="vcard:country-name"/>
+<entry about="this:company-registered-office-1" property="vcard:street-address">10 MAYFIELD ROAD</entry>
 <entry about="issue:" property="gaz:hasEdition">london</entry>
-<entry about="this:petitioner-address-1" property="vcard:extended-address">SHENLEY CHURCH END</entry>
-<entry about="this:previous-trading-address-1" property="vcard:locality">SOUTH CROYDON</entry>
-<entry about="this:petitioner-address-1" property="vcard:region"/>
-<entry about="this:notifiableThing" property="corp-insolvency:dateInsolvencyRule">2014-01-31</entry>
-<entry about="this:previous-trading-address-1" property="vcard:region"/>
+<entry about="this:meetingAddress-1" property="vcard:postal-code">CR2 7LG</entry>
+<entry about="this:additional-contact-1" property="gaz:telephone">01234567890</entry>
+<entry about="this:IP2" property="gaz:email">awdw@sao.com</entry>
+<entry about="this:meetingAddress-1" property="vcard:country-name"/>
+<entry about="this:notifiableThing" property="corp-insolvency:meetingTime">2014-01-31</entry>
 <entry about="this:company-1" property="gazorg:tradingAs">tradingAsValue</entry>
-<entry about="this:notifiableThing" property="corp-insolvency:dateOfHearing">2014-01-31</entry>
-<entry about="this:company-1" property="gazorg:previousCompanyName">previousPartnershipNameValue</entry>
+<entry about="this:additional-contact-address-1" property="vcard:country-name"/>
+<entry about="this:company-1" property="gazorg:previousCompanyName">previousCompanyNameValue</entry>
 <entry about="this:IP1-address-1" property="vcard:country-name"/>
-<entry about="this:company-previous-registered-office-1" property="vcard:region"/>
-<entry about="this:company-previous-registered-office-1" property="vcard:country-name"/>
-<entry about="this:court-case-1" property="court:caseYear">2012</entry>
-<entry about="this:company-previous-registered-office-1" property="vcard:extended-address"/>
-<entry about="this:company-previous-registered-office-1" property="vcard:street-address">93 ADDINGTON ROAD</entry>
-<entry about="this:previous-trading-address-1" property="vcard:extended-address"/>
+<entry about="this:meetingAddress-1" property="vcard:street-address">15 CHAPEL VIEW</entry>
+<entry about="this:meetingAddress-1" property="vcard:extended-address"/>
+<entry about="this:role-signatory-1" property="person:roleName">capacityInWhichSignedValue</entry>
+<entry about="this:additional-contact-address-1" property="vcard:postal-code">CR2 0BE</entry>
 <entry about="this:IP1-address-1" property="vcard:region"/>
-<entry about="this:company-principal-trading-address-1" property="vcard:postal-code">CR2 7LG</entry>
-<entry about="this:previous-trading-address-1" property="vcard:postal-code">CR2 0BE</entry>
-<entry about="this:notifiableThing" property="corp-insolvency:dateOfPetitionPresentation">2014-01-19</entry>
-<entry about="gzw:repDetails" property="gzw:repType">solicitor</entry>
-<entry about="this:petitioner-1" property="foaf:name">petitionerNameValue</entry>
+<entry about="this:company-principal-trading-address-1" property="vcard:postal-code">CR2 9LG</entry>
+<entry about="this:IP2-address-1" property="vcard:region"/>
+<entry about="this:IP2-address-1" property="vcard:country-name"/>
+<entry about="this:IP1" property="person:hasIPnum">ipNumber</entry>
 </form>
 	</xsl:param>
 	<!-- local functions -->
@@ -610,6 +606,21 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
 					<xsl:with-param name="updates" select="$updates"/>
 				</xsl:call-template> 
 			</xsl:when>
+			<xsl:when test="$noticeCode = '2451' and ($edition='edinburgh')">
+				<xsl:call-template name="boilerPlateText2451Edinburgh">
+					<xsl:with-param name="updates" select="$updates"/>
+				</xsl:call-template> 
+			</xsl:when>
+				<xsl:when test="$noticeCode = '2441'">
+				<xsl:call-template name="boilerPlateText2441">
+					<xsl:with-param name="updates" select="$updates"/>
+				</xsl:call-template> 
+			</xsl:when>
+				<xsl:when test="$noticeCode = '2442'">
+				<xsl:call-template name="boilerPlateText2442">
+					<xsl:with-param name="updates" select="$updates"/>
+				</xsl:call-template> 
+			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
 	<xsl:template name="boilerPlateText2450">
@@ -1037,8 +1048,8 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
       <xsl:variable name="dateOfInterlocutor">
 				<xsl:value-of select="$updates//*[@about='this:notifiableThing' and @property='corp-insolvency:dateOfInterlocutor']/text()"/>
 			</xsl:variable>
-			<span about="this:notifiableThing" property="corp-insolvency:dateOfInterlocutor" datatype="xsd:date" content="{dateOfInterlocutor}">
-				<xsl:value-of select="format-date(xs:date(dateOfInterlocutor), '[D01] [MNn] [Y0001]')"/>
+			<span about="this:notifiableThing" property="corp-insolvency:dateOfInterlocutor" datatype="xsd:date" content="{$dateOfInterlocutor}">
+				<xsl:value-of select="format-date(xs:date($dateOfInterlocutor), '[D01] [MNn] [Y0001]')"/>
 			</span>
       appointed all persons having an interest, if they intend to show cause why the prayer of the petition should not be granted, to lodge Answers in the hands of 
       <span about="this:notifiableThing" property="corp-insolvency:nameOfPlaceOfHearing" datatype="xsd:string">
@@ -1409,4 +1420,541 @@ on 	<span about="this:notifiableThing" datatype="xsd:dateTime" property="corp-in
 </xsl:if>
 </xsl:if>
 	</xsl:template>
+<xsl:template name="boilerPlateText2451Edinburgh">
+		<xsl:param name="updates"/>
+			<p>Petitions to Wind Up (Partnerships)</p>
+				<p>In the Matter of <span about="this:legislation-1" property="legislation:legislationTitle"><xsl:value-of select="$updates//*[@about='this:legislation-1' and @property='legislation:legislationTitle']/text()"/></span></p>
+				<p><span about="this:company-1" property="gazorg:name"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:name']/text()"/></span></p> 
+				<p><span about="this:company-1" property="gazorg:partnershipNumber" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:partnershipNumber']/text()"/></span></p> 
+				<xsl:if test="$updates//*[@about='this:company-1' and @property='gazorg:previousCompanyName']/text() != ''">
+			<p>
+(Previously known as <span about="this:company-1" property="gazorg:previousCompanyName" datatype="xsd:string">
+					<xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:previousCompanyName']/text()"/>
+				</span>
+				
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:street-address']/text() != ''">
+of <span about="this:company-previous-registered-office-1" property="vcard:street-address" typeof="vcard:Address">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:street-address']/text()"/>
+					</span>, </xsl:if>
+					
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:extended-address']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:extended-address">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:extended-address']/text()"/>
+					</span>, 
+</xsl:if>
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:locality']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:locality">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:locality']/text()"/>
+					</span>, </xsl:if>
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:region']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:region">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:region']/text()"/>
+					</span>
+				</xsl:if>
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:postal-code']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:postal-code">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:postal-code']/text()"/>
+					</span>
+				</xsl:if>
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:country-name']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:country-name">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:country-name']/text()"/>
+					</span>
+				</xsl:if>) 
+</p>
+		</xsl:if>	
+		
+		<xsl:if test="$updates//*[@about='this:company-1' and @property='gazorg:tradingAs']/text() != ''">	
+			<p>
+		(Trading as <span about="this:company-1" property="gazorg:tradingAs"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:tradingAs']/text()"/></span>
+		
+<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:street-address']/text() != ''">		
+of <span about="this:company-principal-trading-address-1" property="vcard:street-address" typeof="vcard:Address"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:street-address']/text()"/></span>, 
+</xsl:if>
+
+<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:extended-address']/text() != ''">
+<span about="this:company-principal-trading-address-1" property="vcard:extended-address"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:extended-address']/text()"/></span>, 
+</xsl:if>
+
+<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:locality']/text() != ''">
+<span about="this:company-principal-trading-address-1" property="vcard:locality"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:locality']/text()"/></span>, 
+</xsl:if>
+
+<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:region']/text() != ''">
+<span about="this:company-principal-trading-address-1" property="vcard:region"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:region']/text()"/></span>
+</xsl:if>
+
+<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:postal-code']/text() != ''">
+ <span about="this:company-principal-trading-address-1" property="vcard:postal-code"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:postal-code']/text()"/></span> 
+ </xsl:if>
+ 
+ <xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:country-name']/text() != ''"> 
+ <span about="this:company-principal-trading-address-1" property="vcard:country-name"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:country-name']/text()"/></span>
+ </xsl:if>)</p>
+ </xsl:if>
+		
+		<xsl:if test="$updates//*[@about='this:company-1' and @property='gazorg:previouslyTradingAs']/text() != ''">
+		<p>
+	(Previously trading as <span about="this:company-1" property="gazorg:previouslyTradingAs"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:previouslyTradingAs']/text()"/></span>
+	
+	<xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:street-address']/text() != ''">
+	 of <span about="this:previous-trading-address-1" property="vcard:street-address" typeof="vcard:Address"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:street-address']/text()"/></span>, 
+	 </xsl:if>
+	 
+	 <xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:extended-address']/text() != ''">
+	 <span about="this:previous-trading-address-1" property="vcard:extended-address"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:extended-address']/text()"/></span>, 
+	 </xsl:if>
+	
+	<xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:locality']/text() != ''">
+	 <span about="this:previous-trading-address-1" property="vcard:locality"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:locality']/text()"/></span>, 
+	 </xsl:if>
+	 
+	 <xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:region']/text() != ''">
+	 <span about="this:previous-trading-address-1" property="vcard:region"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:region']/text()"/></span>
+	 </xsl:if>
+	 
+	 <xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:postal-code']/text() != ''">
+	  <span about="this:previous-trading-address-1" property="vcard:postal-code"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:postal-code']/text()"/></span>
+	  </xsl:if>
+	  
+	  <xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:country-name']/text() != ''">
+	  <span about="this:previous-trading-address-1" property="vcard:country-name"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:country-name']/text()"/></span>
+	  </xsl:if>)
+	  </p>
+	</xsl:if>
+	
+	<xsl:if test="$updates//*[@about='this:company-1' and @property='gazorg:natureOfBusiness']/text() != ''">
+	<p>Nature of Business: <span about="this:company-1" property="gazorg:natureOfBusiness" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:natureOfBusiness']/text()"/></span></p>
+	</xsl:if>
+			
+			<p>Notice is hereby given that on 
+      <xsl:variable name="dateOfPetitionPresentation">
+				<xsl:value-of select="$updates//*[@about='this:notifiableThing' and @property='corp-insolvency:dateOfPetitionPresentation']/text()"/>
+			</xsl:variable>
+			<span about="this:notifiableThing" property="corp-insolvency:dateOfPetitionPresentation" datatype="xsd:date" content="{$dateOfPetitionPresentation}">
+				<xsl:value-of select="format-date(xs:date($dateOfPetitionPresentation), '[D01] [MNn] [Y0001]')"/>
+			</span>
+      a Petition was presented to 
+      <span about="this:notifiableThing" property="corp-insolvency:nameOfPlaceOfHearing" datatype="xsd:string">
+				<xsl:value-of select="$updates//*[@about='this:notifiableThing' and @property='corp-insolvency:nameOfPlaceOfHearing']/text()"/>
+			</span> by 
+      <span about="this:petitioner-1" property="foaf:name" datatype="xsd:string">
+				<xsl:value-of select="$updates//*[@about='this:petitioner-1' and @property='foaf:name']/text()"/>
+			</span>, <span about="this:petitioner-address-1" property="vcard:street-address" typeof="vcard:Address">
+				<xsl:value-of select="$updates//*[@about='this:petitioner-address-1' and @property='vcard:street-address']/text()"/>
+			</span>, <xsl:if test="$updates//*[@about='this:petitioner-address-1' and @property='vcard:extended-addresse']/text() != ''">
+				<span about="this:petitioner-address-1" property="vcard:extended-address">
+					<xsl:value-of select="$updates//*[@about='this:petitioner-address-1' and @property='vcard:extended-address']/text()"/>
+				</span>, </xsl:if>
+			<span about="this:petitioner-address-1" property="vcard:locality">
+				<xsl:value-of select="$updates//*[@about='this:petitioner-address-1' and @property='vcard:locality']/text()"/>
+			</span>, <xsl:if test="$updates//*[@about='this:petitioner-address-1' and @property='vcard:region']/text() != ''">
+				<span about="this:petitioner-address-1" property="vcard:region">
+					<xsl:value-of select="$updates//*[@about='this:petitioner-address-1' and @property='vcard:region']/text()"/>
+				</span>
+			</xsl:if>
+			<span about="this:petitioner-address-1" property="vcard:postal-code">
+				<xsl:value-of select="$updates//*[@about='this:petitioner-address-1' and @property='vcard:postal-code']/text()"/>
+			</span>
+			<xsl:if test="$updates//*[@about='this:petitioner-address-1' and @property='vcard:country-name']/text() != ''">
+				<span about="this:petitioner-address-1" property="vcard:country-name">
+					<xsl:value-of select="$updates//*[@about='this:petitioner-address-1' and @property='vcard:country-name']/text()"/>
+				</span>
+			</xsl:if>
+      craving the Court <i>inter alia</i> to order that <p>
+				<span about="this:company-1" property="gazorg:name" datatype="xsd:string">
+					<xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:name']/text()"/>
+				</span>
+			</p> having its registered office at <span about="this:company-registered-office-1" property="vcard:street-address" typeof="vcard:Address">
+				<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:street-address']/text()"/>
+			</span>
+			<xsl:if test="$updates//*[@about='this:company-registered-office-1' and @property='vcard:extended-address']/text() != ''"> , <span about="this:company-registered-office-1" property="vcard:extended-address">
+					<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:extended-address']/text()"/>
+				</span>
+			</xsl:if> , <span about="this:company-registered-office-1" property="vcard:locality">
+				<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:locality']/text()"/>
+			</span>
+			<xsl:if test="$updates//*[@about='this:company-registered-office-1' and @property='vcard:region']/text() != ''"> , <span about="this:company-registered-office-1" property="vcard:region">
+					<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:region']/text()"/>
+				</span>
+			</xsl:if>
+			<span about="this:company-registered-office-1" property="vcard:postal-code">
+				<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:postal-code']/text()"/>
+			</span>
+			<xsl:if test="$updates//*[@about='this:company-registered-office-1' and @property='vcard:country-name']/text() != ''">
+				<span about="this:company-registered-office-1" property="vcard:country-name">
+					<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:country-name']/text()"/>
+				</span>
+			</xsl:if>
+      be wound up by the Court and to appoint a liquidator; the 
+      <span about="this:notifiableThing" property="corp-insolvency:sheriffName" datatype="xsd:string">
+				<xsl:value-of select="$updates//*[@about='this:notifiableThing' and @property='corp-insolvency:sheriffName']/text()"/>
+			</span>
+      by Interlocutor dated 
+      <xsl:variable name="dateOfInterlocutor">
+				<xsl:value-of select="$updates//*[@about='this:notifiableThing' and @property='corp-insolvency:dateOfInterlocutor']/text()"/>
+			</xsl:variable>
+			<span about="this:notifiableThing" property="corp-insolvency:dateOfInterlocutor" datatype="xsd:date" content="{$dateOfInterlocutor}">
+				<xsl:value-of select="format-date(xs:date($dateOfInterlocutor), '[D01] [MNn] [Y0001]')"/>
+			</span>
+      appointed all persons having an interest, if they intend to show cause why the prayer of the petition should not be granted, to lodge Answers in the hands of 
+      <span about="this:notifiableThing" property="corp-insolvency:nameOfPlaceOfHearing" datatype="xsd:string">
+				<xsl:value-of select="$updates//*[@about='this:notifiableThing' and @property='corp-insolvency:nameOfPlaceOfHearing']/text()"/>
+			</span> at <span about="this:hearingAddress" property="vcard:street-address" typeof="vcard:Address">
+				<xsl:value-of select="$updates//*[@about='this:hearingAddress' and @property='vcard:street-address']/text()"/>
+			</span>, <xsl:if test="$updates//*[@about='this:hearingAddress' and @property='vcard:extended-address']/text() != ''">
+				<span about="this:hearingAddress" property="vcard:extended-address">
+					<xsl:value-of select="$updates//*[@about='this:hearingAddress' and @property='vcard:extended-address']/text()"/>
+				</span> , </xsl:if>
+			<span about="this:hearingAddress" property="vcard:locality">
+				<xsl:value-of select="$updates//*[@about='this:hearingAddress' and @property='vcard:locality']/text()"/>
+			</span>, <xsl:if test="$updates//*[@about='this:hearingAddress' and @property='vcard:region']/text() != ''">
+				<span about="this:hearingAddress" property="vcard:region">
+					<xsl:value-of select="$updates//*[@about='this:hearingAddress' and @property='vcard:region']/text()"/>
+				</span>
+			</xsl:if>
+			<span about="this:hearingAddress" property="vcard:postal-code">
+				<xsl:value-of select="$updates//*[@about='this:hearingAddress' and @property='vcard:postal-code']/text()"/>
+			</span>
+			<xsl:if test="$updates//*[@about='this:hearingAddress' and @property='vcard:country-name']/text() != ''">
+				<span about="this:hearingAddress" property="vcard:country-name">
+					<xsl:value-of select="$updates//*[@about='this:hearingAddress' and @property='vcard:country-name']/text()"/>
+				</span>
+			</xsl:if>
+      within eight days after such intimation, service or advertisement. 
+    </p>
+    	<xsl:if test="$updates//*[@about='this:IP1' and @property='foaf:name']/text() != ''">
+			<p>
+				<span about="this:IP1" property="foaf:name" datatype="xsd:string">
+					<xsl:value-of select="$updates//*[@about='this:IP1' and @property='foaf:name']/text()"/>
+				</span> of
+          <span about="this:IP1" property="foaf:name" datatype="xsd:string">
+					<xsl:value-of select="$updates//*[@about='this:IP1' and @property='foaf:name']/text()"/>
+				</span>
+				<xsl:if test="$updates//*[@about='this:IP-company-1' and @property='gazorg:name']/text() != ''">
+					<span about="this:IP-company-1" property="gazorg:name" datatype="xsd:string">
+						<xsl:value-of select="$updates//*[@about='this:IP-company-1' and @property='gazorg:name']/text()"/>
+					</span>, </xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1-address-1' and @property='vcard:street-address']/text() != ''">
+					<span about="this:IP1-address-1" property="vcard:street-address" typeof="vcard:Address">
+						<xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:street-address']/text()"/>
+					</span>, </xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1-address-1' and @property='vcard:extended-address']/text() != ''">
+					<span about="this:IP1-address-1" property="vcard:extended-address">
+						<xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:extended-address']/text()"/>
+					</span>, </xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1-address-1' and @property='vcard:locality']/text() != ''">
+					<span about="this:IP1-address-1" property="vcard:locality">
+						<xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:locality']/text()"/>
+					</span>, </xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1-address-1' and @property='vcard:region']/text() != ''">
+					<span about="this:IP1-address-1" property="vcard:region">
+						<xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:region']/text()"/>
+					</span>
+				</xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1-address-1' and @property='vcard:postal-code']/text() != ''">
+					<span about="this:IP1-address-1" property="vcard:postal-code">
+						<xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:postal-code']/text()"/>
+					</span>
+				</xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1-address-1' and @property='vcard:country-name']/text() != ''">
+					<span about="this:IP1-address-1" property="vcard:country-name">
+						<xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:country-name']/text()"/>
+					</span>, </xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1' and @property='gaz:telephone']/text() != ''">
+          Tel: <span about="this:IP1" property="gaz:telephone" datatype="xsd:string">
+						<xsl:value-of select="$updates//*[@about='this:IP1' and @property='gaz:telephone']/text()"/>
+					</span>, </xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1' and @property='gaz:fax']/text() != ''"> Fax:
+            <span about="this:IP1" property="gaz:fax" datatype="xsd:string">
+						<xsl:value-of select="$updates//*[@about='this:IP1' and @property='gaz:fax']/text()"/>
+					</span>, </xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1' and @property='gaz:email']/text() != ''"> Email:
+            <span about="this:IP1" property="gaz:email" datatype="xsd:string">
+						<xsl:value-of select="$updates//*[@about='this:IP1' and @property='gaz:email']/text()"/>
+					</span>
+				</xsl:if>
+				<xsl:if test="$updates//*[@about='this:IP1' and @property='person:hasIPReferenceNumber']/text() != ''"> Ref: <span about="this:IP1" property="person:hasIPReferenceNumber" datatype="xsd:string">
+						<xsl:value-of select="$updates//*[@about='this:IP1' and @property='person:hasIPReferenceNumber']/text()"/>
+					</span>
+				</xsl:if>
+			</p>
+		</xsl:if>
+		<xsl:if test="$updates//*[@about='this:IP1' and @property='person:noticeDated']/text() != ''">
+		 <xsl:variable name="noticeDated">
+	 <xsl:value-of select="$updates//*[@about='this:IP1' and @property='person:noticeDated']/text()"/>
+	 </xsl:variable>
+<p>
+<span about="this:IP1" property="person:noticeDated" datatype="xsd:date" content="{$noticeDated}"><xsl:value-of select="format-date(xs:date($noticeDated), '[D01] [MNn] [Y0001]')"/></span>
+</p>
+		</xsl:if>
+		</xsl:template>
+<xsl:template name="boilerPlateText2441">
+	<xsl:param name="updates"/>
+		<p>Resolutions for Winding up</p>
+		<p>	<span about="this:company-1" property="gazorg:name"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:name']/text()"/></span> </p>
+		<p>	(Company Number <span about="this:company-1" property="gazorg:companyNumber" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:companyNumber']/text()"/></span>) </p>
+	
+		<xsl:if test="$updates//*[@about='this:company-1' and @property='gazorg:previousCompanyName']/text() != ''">
+		<p>(previously <span about="this:company-1" property="gazorg:previousCompanyName" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:previousCompanyName']/text()"/></span>)</p>
+		</xsl:if>
+		
+			<xsl:if test="$updates//*[@about='this:company-1' and @property='gazorg:tradingAs']/text() != ''">
+		<p>(previously <span about="this:company-1" property="gazorg:tradingAs" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:tradingAs']/text()"/></span>)</p>
+		</xsl:if>
+		
+			<xsl:if test="$updates//*[@about='this:company-1' and @property='gazorg:previouslyTradingAs']/text() != ''">
+		<p>(previously <span about="this:company-1" property="gazorg:previouslyTradingAs" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:previouslyTradingAs']/text()"/></span>)</p>
+		</xsl:if>
+	
+		<p>Registered Office: <span about="this:company-registered-office-1" property="vcard:street-address" typeof="vcard:Address">
+				<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:street-address']/text()"/>
+			</span>
+			<xsl:if test="$updates//*[@about='this:company-registered-office-1' and @property='vcard:extended-address']/text() != ''"> , <span about="this:company-registered-office-1" property="vcard:extended-address">
+					<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:extended-address']/text()"/>
+				</span>
+			</xsl:if> , <span about="this:company-registered-office-1" property="vcard:locality">
+				<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:locality']/text()"/>
+			</span>
+			<xsl:if test="$updates//*[@about='this:company-registered-office-1' and @property='vcard:region']/text() != ''"> , <span about="this:company-registered-office-1" property="vcard:region">
+					<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:region']/text()"/>
+				</span>
+			</xsl:if>
+			<span about="this:company-registered-office-1" property="vcard:postal-code">
+				<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:postal-code']/text()"/>
+			</span>
+			<xsl:if test="$updates//*[@about='this:company-registered-office-1' and @property='vcard:country-name']/text() != ''">
+				<span about="this:company-registered-office-1" property="vcard:country-name">
+					<xsl:value-of select="$updates//*[@about='this:company-registered-office-1' and @property='vcard:country-name']/text()"/>
+				</span>
+			</xsl:if>
+			</p>
+			
+			<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:street-address']/text() != ''">
+			<p>(Previous Registered Office: <span about="this:company-previous-registered-office-1" property="vcard:street-address" typeof="vcard:Address">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:street-address']/text()"/>
+					</span>,
+					
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:extended-address']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:extended-address">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:extended-address']/text()"/>
+					</span>, 
+</xsl:if>
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:locality']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:locality">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:locality']/text()"/>
+					</span>, </xsl:if>
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:region']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:region">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:region']/text()"/>
+					</span>
+				</xsl:if>
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:postal-code']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:postal-code">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:postal-code']/text()"/>
+					</span>
+				</xsl:if>
+				<xsl:if test="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:country-name']/text() != ''">
+					<span about="this:company-previous-registered-office-1" property="vcard:country-name">
+						<xsl:value-of select="$updates//*[@about='this:company-previous-registered-office-1' and @property='vcard:country-name']/text()"/>
+					</span>
+				</xsl:if>) 
+				</p>
+				</xsl:if>
+				
+				<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:street-address']/text() != ''">	
+				<p>
+(Principal Trading Address: <span about="this:company-principal-trading-address-1" property="vcard:street-address" typeof="vcard:Address"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:street-address']/text()"/></span>, 
+
+
+<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:extended-address']/text() != ''">
+<span about="this:company-principal-trading-address-1" property="vcard:extended-address"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:extended-address']/text()"/></span>, 
+</xsl:if>
+
+<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:locality']/text() != ''">
+<span about="this:company-principal-trading-address-1" property="vcard:locality"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:locality']/text()"/></span>, 
+</xsl:if>
+
+<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:region']/text() != ''">
+<span about="this:company-principal-trading-address-1" property="vcard:region"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:region']/text()"/></span>
+</xsl:if>
+
+<xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:postal-code']/text() != ''">
+ <span about="this:company-principal-trading-address-1" property="vcard:postal-code"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:postal-code']/text()"/></span> 
+ </xsl:if>
+ 
+ <xsl:if test="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:country-name']/text() != ''"> 
+ <span about="this:company-principal-trading-address-1" property="vcard:country-name"><xsl:value-of select="$updates//*[@about='this:company-principal-trading-address-1' and @property='vcard:country-name']/text()"/></span>
+ </xsl:if>)</p>
+ </xsl:if>
+			
+		<xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:street-address']/text() != ''">
+		<p>
+	 Previous Trading Address: <span about="this:previous-trading-address-1" property="vcard:street-address" typeof="vcard:Address"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:street-address']/text()"/></span>, 
+	 	 
+	 <xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:extended-address']/text() != ''">
+	 <span about="this:previous-trading-address-1" property="vcard:extended-address"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:extended-address']/text()"/></span>, 
+	 </xsl:if>
+	
+	<xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:locality']/text() != ''">
+	 <span about="this:previous-trading-address-1" property="vcard:locality"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:locality']/text()"/></span>, 
+	 </xsl:if>
+	 
+	 <xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:region']/text() != ''">
+	 <span about="this:previous-trading-address-1" property="vcard:region"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:region']/text()"/></span>
+	 </xsl:if>
+	 
+	 <xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:postal-code']/text() != ''">
+	  <span about="this:previous-trading-address-1" property="vcard:postal-code"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:postal-code']/text()"/></span>
+	  </xsl:if>
+	  
+	  <xsl:if test="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:country-name']/text() != ''">
+	  <span about="this:previous-trading-address-1" property="vcard:country-name"><xsl:value-of select="$updates//*[@about='this:previous-trading-address-1' and @property='vcard:country-name']/text()"/></span>
+	  </xsl:if>)
+	  </p>
+	</xsl:if>
+	
+	<xsl:if test="$updates//*[@about='this:company-1' and @property='gazorg:natureOfBusiness']/text() != ''">
+	<p>Nature of Business: <span about="this:company-1" property="gazorg:natureOfBusiness" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:company-1' and @property='gazorg:natureOfBusiness']/text()"/></span></p>
+	</xsl:if>		
+			
+			<p>
+			At a General Meeting of the Members of the above-named Company, duly convened, and held at <span about="this:meetingAddress-1" property="vcard:street-address" typeof="vcard:Address"><xsl:value-of select="$updates//*[@about='this:meetingAddress-1' and @property='vcard:street-address']/text()"/></span>, 
+			<xsl:if test="$updates//*[@about='this:meetingAddress-1' and @property='vcard:extended-address']/text() != ''">
+			<span about="this:meetingAddress-1" property="vcard:extended-address"><xsl:value-of select="$updates//*[@about='this:meetingAddress-1' and @property='vcard:extended-address']/text()"/></span>, </xsl:if>
+			
+			<span about="this:meetingAddress-1" property="vcard:locality"><xsl:value-of select="$updates//*[@about='this:meetingAddress-1' and @property='vcard:locality']/text()"/></span>, 
+			
+			<xsl:if test="$updates//*[@about='this:meetingAddress-1' and @property='vcard:region']/text() != ''">
+			<span about="this:meetingAddress-1" property="vcard:region"><xsl:value-of select="$updates//*[@about='this:meetingAddress-1' and @property='vcard:region']/text()"/></span></xsl:if>
+			
+			 <span about="this:meetingAddress-1" property="vcard:postal-code"><xsl:value-of select="$updates//*[@about='this:meetingAddress-1' and @property='vcard:postal-code']/text()"/></span> 
+			 
+	<xsl:if test="$updates//*[@about='this:meetingAddress-1' and @property='vcard:country-name']/text() != ''">		
+			 <span about="this:meetingAddress-1" property="vcard:country-name"><xsl:value-of select="$updates//*[@about='this:meetingAddress-1' and @property='vcard:country-name']/text()"/></span>
+			 </xsl:if>
+			
+			<xsl:variable name="corpInsolvencyMeetingDate">
+			<xsl:value-of select="$updates//*[@about='this:notifiableThing' and @property='corp-insolvency:meetingTime']/text()"/>
+			</xsl:variable>
+			
+					<xsl:variable name="corpInsolvencyMeetingTime">
+			<xsl:value-of select="$updates//*[@about='this:notifiableThing' and @property='corp-insolvency:meetingTimeWITHtime']/text()"/>
+			</xsl:variable>
+			
+					<xsl:variable name="corpInsolvencyMeetingDateAndTime">
+			<xsl:value-of select="concat($corpInsolvencyMeetingDate,'T',$corpInsolvencyMeetingTime,':00')"/>
+			</xsl:variable>
+			
+			 on <span about="this:notifiableThing" property="corp-insolvency:meetingTime" datatype="xsd:dateTime" content="{$corpInsolvencyMeetingDateAndTime}"/><xsl:value-of select="format-date(xs:date($corpInsolvencyMeetingDate), '[D01] [MNn] [Y0001]')"/> 
+		 <xsl:if test="$corpInsolvencyMeetingTime != ''"> 
+			 at  <xsl:value-of select="$corpInsolvencyMeetingTime"/> and [MeetingTime 2]
+			 </xsl:if>  the following Resolutions were duly passed, as a Special Resolution and as an Ordinary Resolution: 
+			
+			</p>
+			
+			<p>
+			“That it has been proved to the satisfaction of this Meeting that the Company cannot, by reason of its liabilities, continue its business, and that it is advisable to wind up the same, and accordingly that the Company be wound up voluntarily, and that <span about="this:IP1" property="foaf:name" datatype="xsd:string" typeof="person:InsolvencyPractitioner"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='foaf:name']/text()"/></span>
+	
+			<xsl:if test="$updates//*[@about='this:IP2' and @property='foaf:name']/text() != ''">
+			and <span about="this:IP2" property="foaf:name" datatype="xsd:string" typeof="person:InsolvencyPractitioner"><xsl:value-of select="$updates//*[@about='this:IP2' and @property='foaf:name']/text()"/></span>
+			</xsl:if>
+			
+			, (IP No
+			
+			<xsl:if test="$updates//*[@about='this:IP2' and @property='foaf:name']/text() != ''">(s)</xsl:if>
+			
+			 <span about="this:IP1" property="person:hasIPnum" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='person:hasIPnum']/text()"/></span> 
+			 
+			 <xsl:if test="$updates//*[@about='this:IP2' and @property='person:hasIPnum']/text() != ''">
+			 and <span about="this:IP2" property="person:hasIPnum" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:IP2' and @property='person:hasIPnum']/text()"/></span>
+			 </xsl:if>
+			 
+			 ),of <span about="this:IP-company-1" property="gazorg:name" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:IP-company-1' and @property='gazorg:name']/text()"/></span>, <span about="this:IP1-address-1" property="vcard:street-address" typeof="vcard:Address"><xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:street-address']/text()"/></span>, 
+			 
+			 <xsl:if test="$updates//*[@about='this:IP1-address-1' and @property='vcard:extended-address']/text() != ''">
+			 <span about="this:IP1-address-1" property="vcard:extended-address"><xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:extended-address']/text()"/></span>, 
+			 </xsl:if>
+			 
+			 
+			 <span about="this:IP1-address-1" property="vcard:locality"><xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:locality']/text()"/></span>, 
+			 
+					 <xsl:if test="$updates//*[@about='this:IP1-address-1' and @property='vcard:region']/text() != ''">
+			 <span about="this:IP1-address-1" property="vcard:region"><xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:region']/text()"/></span>
+			 </xsl:if>
+			 
+			 
+			  <span about="this:IP1-address-1" property="vcard:postal-code"><xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:postal-code']/text()"/></span> 
+			  
+			  	 <xsl:if test="$updates//*[@about='this:IP1-address-1' and @property='vcard:country-name']/text() != ''">
+			  <span about="this:IP1-address-1" property="vcard:country-name"><xsl:value-of select="$updates//*[@about='this:IP1-address-1' and @property='vcard:country-name']/text()"/></span>
+			  </xsl:if> be and 
+			 		  
+			  <xsl:choose>
+						<xsl:when test="$updates//*[@about='this:IP2' and @property='foaf:name']/text() != ''"> are </xsl:when>
+					<xsl:otherwise> is </xsl:otherwise>
+					</xsl:choose>
+			  
+			   hereby appointed 
+			   
+			   <xsl:if test="$updates//*[@about='this:IP2' and @property='foaf:name']/text() != ''"> 
+			   (Joint) 
+			   </xsl:if>
+			   
+			   Liquidator
+			   
+			     <xsl:if test="$updates//*[@about='this:IP2' and @property='foaf:name']/text() != ''">(s)</xsl:if>
+			   for the purposes of such winding-up.” 
+			
+			</p>
+			
+			<p>
+			Further details contact: --To be provided by Marta --, 
+			
+			 <xsl:if test="$updates//*[@about='this:IP1' and @property='gaz:telephone']/text() != ''">
+			Telephone number: <span about="this:IP1" property="gaz:telephone" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='gaz:telephone']/text()"/></span>, 
+			</xsl:if>
+			
+			 <xsl:if test="$updates//*[@about='this:IP1' and @property='gaz:fax']/text() != ''">
+			Fax: <span about="this:IP1" property="gaz:fax" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='gaz:fax']/text()"/></span>, 
+			</xsl:if>
+			
+			 <xsl:if test="$updates//*[@about='this:IP1' and @property='gaz:email']/text() != ''">
+			Email: <span about="this:IP1" property="gaz:email" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='gaz:email']/text()"/></span>
+			</xsl:if>
+			
+			<xsl:if test="$updates//*[@about='this:IP1' and @property='person:hasIPReferenceNumber']/text() != ''">
+			(Ref: <span about="this:IP1" property="person:hasIPReferenceNumber" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='person:hasIPReferenceNumber']/text()"/></span>)
+			</xsl:if>
+			
+			</p>
+			
+			<xsl:if test="$updates//*[@about='this:IP1' and @property='person:additionalInformationIP']/text() != ''">
+			<p><span about="this:IP1" property="person:additionalInformationIP"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='person:additionalInformationIP']/text()"/></span></p>
+			</xsl:if>
+			
+				<xsl:if test="$updates//*[@about='this:signatory-1' and @property='foaf:name']/text() != ''">
+				<p>
+			<span about="this:signatory-1" property="foaf:name" typeof="person:Person" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:signatory-1' and @property='foaf:name']/text()"/></span>
+				<xsl:if test="$updates//*[@about='this:role-signatory-1' and @property='person:roleName']/text() != ''">, <span about="this:role-signatory-1" property="person:roleName" typeof="person:Role" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:role-signatory-1' and @property='person:roleName']/text()"/></span></xsl:if></p>
+			</xsl:if>
+			
+			<xsl:variable name="dateAuthorisationSigned">
+			<xsl:value-of select="$updates//*[@about='this:authoriser-1' and @property='gaz:dateAuthorisationSigned']/text()"/>
+			</xsl:variable>
+			
+				<xsl:if test="$updates//*[@about='this:authoriser-1' and @property='gaz:dateAuthorisationSigned']/text() != ''">
+			<span about="this:authoriser-1" property="gaz:dateAuthorisationSigned" datatype="xsd:date" content="{$dateAuthorisationSigned}"><xsl:value-of select="format-date(xs:date($dateAuthorisationSigned), '[D01] [MNn] [Y0001]')"/></span>
+			</xsl:if>
+			
+</xsl:template>
+
+<xsl:template name="boilerPlateText2442">
+	<xsl:param name="updates"/>
+	
+	
+	
+	
+	</xsl:template>
+
 </xsl:stylesheet>
