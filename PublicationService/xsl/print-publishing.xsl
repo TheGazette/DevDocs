@@ -7,13 +7,10 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
 -->
 
 <!-- Version 1.02 -->
-<!-- Created by Chunyu Wilson-->
+<!-- Created by Williams Lea XML Team -->
 <!--
                 Change history
-                1.03        1-/12/2013         (Paul Manfield)Updates to 2903 display code, liberally scattered @TODO comments where there is still necessary work
-                1.02        09/10/2013         (Damon Smith)updates re. sort order at various levels
-                1.01        08/10/2013         (Damon Smith)now ordering by sort code on category from the taxonomy
-                1.00        01/10/2013         (Chunyu Wilson)Created              
+                1.0 Initial release         
                 -->
 <!-- This transformation is used for displaying dynamic contents for single notice -->
 
@@ -530,8 +527,8 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
       </header>
       <section class="publication-details">
         <!-- date & issue number to be passed through -->
-        <p><span class="publication-date"><xsl:value-of select="format-date($publication-date,'[D] [Mn] [Y]')"/></span><xsl:text> | </xsl:text>
-          <xsl:if test="$number != ''"><xsl:text>Number </xsl:text><xsl:value-of select="$number"/></xsl:if>
+        <p><span class="publication-date"><xsl:value-of select="format-date($publication-date,'[D] [Mn] [Y]')"/></span>
+          <xsl:if test="$number != ''"><xsl:text> | Number </xsl:text><xsl:value-of select="$number"/></xsl:if>
         </p>
         <p>Published by Authority | Established 1665</p>
         <p>www.thegazette.co.uk</p>
