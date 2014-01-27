@@ -4,6 +4,16 @@
 You may use and re-use this code free of charge under the terms of the Open Government Licence
  
 http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
+
+<!--Version 1.0-->
+<!--Created by Williams Lea XML Team-->
+<!--
+	  Purpose of transform: incorporate the Java layer draft format into an HTMLRDFa format document
+	  
+      Change history
+      1.0 Initial Release: 20th January 2014
+-->
+
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns:u="http://www.williamslea.com/ns/updates" xmlns:wlf="http://www.williamslea.com/xslt/functions" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:x="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml" exclude-result-prefixes="u wlf xsl xs x">
 	<xsl:param name="form">false</xsl:param>
 	<!-- Hard coding for the time being, to be London, but it needs to be considered on the form submission -->
