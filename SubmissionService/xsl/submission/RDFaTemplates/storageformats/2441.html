@@ -133,8 +133,6 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
                <span about="this:company-1" typeof="gazorg:LimitedCompany gazorg:Organisation gazorg:ForProfitCompany" data-hide="true"></span>
                		      
                <p>Company Name: <span about="this:company-1" property="gazorg:name" datatype="xsd:string" data-required="true"></span></p>
-               		      
-               <p>Company Number: <span about="this:company-1" property="gazorg:companyNumber" datatype="xsd:integer" data-required="true"></span></p>
                
                <p>Previous Company Name: <span about="this:company-1" property="gazorg:previousCompanyName" datatype="xsd:string"></span></p>
                
@@ -201,7 +199,22 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
                <!-- at a later date, we should be looking up IP details in an IP dataset which we maintain -->
                <span about="this:IP1" property="gazorg:hasOrganisationMember" resource="this:IP-company-1" data-hide="true"></span>
                		  <span about="this:notifiableThing" property="corp-insolvency:hasPrimaryIP" resource="this:IP1" data-hide="true"></span>
-               
+               <div data-container="address" about="this:IP1" property="person:hasAddress" resource="this:IP1-address-1">
+                  <span about="this:IP1-address-1" typeof="vcard:Address" data-hide="true"></span>
+                  
+                  <p>Address 1: <span about="this:IP1-address-1" property="vcard:street-address"></span></p>
+                  
+                  <p>Address 2: <span about="this:IP1-address-1" property="vcard:extended-address"></span></p>
+                  
+                  <p>City:      <span about="this:IP1-address-1" property="vcard:locality"></span></p>
+                  
+                  <p>County:    <span about="this:IP1-address-1" property="vcard:region"></span></p>
+                  
+                  <p>Country:   <span about="this:IP1-address-1" property="vcard:country-name"></span></p>
+                  
+                  <p>Postcode:  <span about="this:IP1-address-1" property="vcard:postal-code"></span></p>
+                  
+               </div>
                <p>IP Telephone: <span about="this:IP1" property="gaz:telephone" datatype="xsd:string"></span></p>
                
                <p>IP Fax:    <span about="this:IP1" property="gaz:fax" datatype="xsd:string"></span></p>

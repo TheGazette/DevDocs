@@ -55,7 +55,7 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
          </div>
          
          <div class="content" about="this:notifiableThing" data-gazettes="Notice" data-gazettes-type="2451">
-            
+            <div data-container="boilerplate"></div>
 			<div data-container="boilerplate"></div>
             <div data-gazettes="Notice Details">
                
@@ -73,15 +73,14 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
                <span resource="this:court-case-1" typeof="court:CourtCase" data-hide="true"></span>
                
                <p>Court Name: <span about="this:court-1" property="court:courtName" datatype="xsd:string" data-required="true"></span></p>
-               
             </div>
             
             <div data-gazettes="Partnership Details" about="this:notifiableThing" property="corp-insolvency:hasCompany" resource="this:company-1">
-               <span about="this:company-1" typeof="gazorg:LimitedCompany gazorg:Organisation gazorg:ForProfitCompany" data-hide="true"></span>
+               <span about="this:company-1" typeof="gazorg:Organisation gazorg:ForProfitCompany" data-hide="true"></span>
                
                <p>Partnership Name: <span about="this:company-1" property="gazorg:name" datatype="xsd:string" data-required="true"></span></p>
                
-               <p>Partnership Number: <span about="this:company-1" property="gazorg:partnershipNumber" datatype="xsd:integer" data-required="true"></span></p>
+               <p>Partnership Number: <span about="this:company-1" property="gazorg:partnershipNumber" datatype="xsd:string" data-required="true"></span></p>
                
                <p>Previous Partnership Name: <span about="this:company-1" property="gazorg:previousCompanyName" datatype="xsd:string"></span></p>
                
@@ -136,10 +135,13 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
             </div>
             
             <div data-gazettes="Petition">
+			<span about="this:notifiableThing" property="corp-insolvency:hasPetitioner" resource="this:petitioner-1" data-hide="true"></span>
+               <span about="this:notifiableThing" property="corp-insolvency:placeOfHearing" resource="this:hearingAddress" data-hide="true"></span>
                <span about="this:notifiableThing" property="corp-insolvency:hasPetitioner" resource="this:petitioner-1" data-hide="true"></span>
+			   <span about="this:petitioner-1" property="vcard:adr" resource="this:petitioner-address-1"></span>
                
                <p>Petitioner: <span about="this:petitioner-1" typeof="foaf:Agent" property="foaf:name" datatype="xsd:string" data-required="true"></span></p>
-               
+               		
             </div>
             
             <div data-gazettes="Deadline to Request Appearance in Court">
