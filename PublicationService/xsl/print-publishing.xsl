@@ -28,8 +28,13 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
   <xsl:param name="isbn-number" required="no"/>
   <!-- isbn number ## -->
   <xsl:param name="cover-price" as="xs:string" required="no"/>
+  <!-- limit the table of contents to just the comma separated list of top level notice categories , blank or not set = all -->   
+  <xsl:param name="limit-table-of-contents" as="xs:string" select="''"/>
+  
+  <!-- SVG files -->
   <xsl:param name="crest" as="node()" select="doc('local-test/gazette.svg')"/>
   <xsl:param name="tso_logo" as="node()" select="doc('local-test/tso-gazettes.svg')"/>
+  
   <!-- cover price ## -->
   <xsl:param name="publication-date" required="yes" as="xs:date"/>
   <!-- publication date -->
@@ -54,7 +59,7 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
   <xsl:param name="gazette-host-name" as="xs:string"/>
   <!-- used for images no trailing slash-->
   <xsl:param name="DEBUG">false</xsl:param>
-
+  
 
   <xsl:variable name="category">
     <xsl:sequence select="//m:notice-category-codes/m:notice-category-code"/>
@@ -135,7 +140,7 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
                           <thead>
                             <tr>
                               <th class="name">Name of Deceased (Surname first)</th>
-                              <th class="address">Address,description and date of death of Deceased</th>
+                              <th class="address">Address, description and date of death of Deceased</th>
                               <th class="represent">Names addresses and descriptions of Persons to whom notices of claims are to be given and names, in parentheses, of Personal Representatives</th>
                               <th class="claimsDate">Date before which notice of claims to be given</th>
                               <th class="noticeNum"/>
@@ -535,11 +540,21 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
       </section>
       <section class="table-of-contents">
         <header>Contents</header>
+        <xsl:variable name="limits">
+          <allowable-codes>
+            <xsl:for-each select="tokenize($limit-table-of-contents,',')">
+              <code value="{.}"/>
+            </xsl:for-each>
+          </allowable-codes>
+        </xsl:variable>
         <ul>
-
           <xsl:for-each select="$taxonomy-notice-type/tax:notice-taxonomy/tax:notice-type">
             <xsl:sort select="@code"/>
+            <xsl:variable name="code" select="@code"/>
+            <!-- Display the ToC item if there is a list of limits and the code is in it, or if there isn't a list -->
+            <xsl:if test="(count($limits//*:code) != 0 and $limits//.[@value=$code]) or (count($limits//*:code) = 0)">
             <li>
+              
               <xsl:choose>
                 <xsl:when test="contains($category,@code)">
                   <xsl:attribute name="class">active</xsl:attribute>
@@ -554,6 +569,7 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
                 </xsl:otherwise>
               </xsl:choose>
             </li>
+            </xsl:if>
           </xsl:for-each>
           <xsl:if test="count($terms-and-conditions//*:body//*:article/*)">
           <li class="active">
