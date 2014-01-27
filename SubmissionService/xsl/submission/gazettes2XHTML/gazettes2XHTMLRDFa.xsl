@@ -4,7 +4,19 @@
 You may use and re-use this code free of charge under the terms of the Open Government Licence
  
 http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
-   <!-- ############################################ --><!-- ##### FROM POST-2005 XML TO XHTML5RDFa ##### --><!-- ############################################ --><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:gz="http://www.tso.co.uk/assets/namespace/gazette" xmlns:ukm="http://www.tso.co.uk/assets/namespace/metadata" xmlns:wgs84="http://www.w3.org/2003/01/geo/wgs84_pos" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:personal-legal="http://www.thegazette.co.uk/def/personal-legal" xmlns:leg="http://www.thegazette.co.uk/def/legislation" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:gzc="http://www.tso.co.uk/assets/namespace/gazette/LGconfiguration" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:wlf="http://www.williamslea.com/xsl/functions" xmlns:saxon="http://saxon.sf.net/" xmlns="http://www.w3.org/1999/xhtml" xmlns:fnx="http://www.tso.co.uk/xslt/functions" exclude-result-prefixes="#all" version="2.0">
+
+<!--Version 1.0-->
+<!--Created by Williams Lea XML Team-->
+<!--
+	  Purpose of transform: transform legacy post-2005 format XML format to HTML-RDFa
+	  
+      Change history
+      1.0 Initial Release: 20th January 2014
+-->
+
+  <!-- ############################################ -->
+  <!-- ##### FROM POST-2005 XML TO XHTML5RDFa ##### -->
+  <!-- ############################################ --><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:gz="http://www.tso.co.uk/assets/namespace/gazette" xmlns:ukm="http://www.tso.co.uk/assets/namespace/metadata" xmlns:wgs84="http://www.w3.org/2003/01/geo/wgs84_pos" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:personal-legal="http://www.thegazette.co.uk/def/personal-legal" xmlns:leg="http://www.thegazette.co.uk/def/legislation" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:gzc="http://www.tso.co.uk/assets/namespace/gazette/LGconfiguration" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:wlf="http://www.williamslea.com/xsl/functions" xmlns:saxon="http://saxon.sf.net/" xmlns="http://www.w3.org/1999/xhtml" xmlns:fnx="http://www.tso.co.uk/xslt/functions" exclude-result-prefixes="#all" version="2.0">
 	<xsl:output method="xml" omit-xml-declaration="no" indent="no" exclude-result-prefixes="#all" encoding="utf-8"/>
 	<!-- xsl:strip-space elements="*"/ -->
 	<xsl:param name="issueNumber" as="xs:string" required="no">0</xsl:param>
