@@ -8,7 +8,7 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
 <!--Version 1.0-->
 <!--Created by Williams Lea XML Team-->
 <!--
-	  Purpose of transform: incorporate the Java layer draft format into an HTMLRDFa format document
+	  Purpose of transform: incorporate the Java layer draft format into an HTMLRDFa format document 
 	  
       Change history
       1.0 Initial Release: 20th January 2014
