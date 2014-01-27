@@ -10,16 +10,17 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
 
   <xsl:param name="status" as="xs:string">published</xsl:param>
   <xsl:param name="notice-code" as="xs:string">1119</xsl:param>
-  <xsl:param name="publication-date" as="xs:dateTime"/>
-  <xsl:param name="bundle-id" as="xs:string"/>
+  <xsl:param name="publishDate" as="xs:dateTime"/>
+  <xsl:param name="bundleId" as="xs:string"/>
   <xsl:param name="edition" as="xs:string"/>
-  <xsl:param name="issue" as="xs:string"/>
-  <xsl:param name="notice-id" as="xs:string"/>
+  <xsl:param name="issueNumber" as="xs:string" />
+  <xsl:param name="noticeId" as="xs:string"/>
   <xsl:param name="user-submitted" as="xs:nonNegativeInteger"/>
   <xsl:param name="version-count" as="xs:nonNegativeInteger"/>
   <xsl:param name="notice-capture-method" as="xs:string"/>
 
  <xsl:template match="/">
+
    <xsl:apply-templates/>
  </xsl:template>
   
@@ -37,11 +38,11 @@ http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
       <gazette-metadata xmlns="http://www.gazettes.co.uk/metadata">
         <status><xsl:value-of select="$status"/></status>
         <notice-code><xsl:value-of select="$notice-code"/></notice-code>
-        <publication-date><xsl:value-of select="$publication-date"/></publication-date>
-        <bundle-id><xsl:value-of select="$bundle-id"/></bundle-id>
+        <publication-date><xsl:value-of select="$publishDate"/></publication-date>
+        <bundle-id><xsl:value-of select="$bundleId"/></bundle-id>
         <edition><xsl:value-of select="$edition"/></edition>
-        <issue><xsl:value-of select="$issue"/></issue>
-        <notice-id><xsl:value-of select="$notice-id"/></notice-id>
+        <issue><xsl:value-of select="$issueNumber"/></issue>
+        <notice-id><xsl:value-of select="$noticeId"/></notice-id>
         <user-submitted><xsl:value-of select="$user-submitted"/></user-submitted>
         <version-count><xsl:value-of select="$version-count"/></version-count>
         <!--Notice category code is hard coded for now becasue there is only
