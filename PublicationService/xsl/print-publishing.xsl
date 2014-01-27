@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <!--©  Crown copyright
+<!--
+(c)  Crown copyright
+You may use and re-use this code free of charge under the terms of the Open Government Licence v2.0
+http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
  
-You may use and re-use this code free of charge under the terms of the Open Government Licence
- 
-http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
+-->
+
+<!-- Version 1.02 -->
+<!-- Created by Chunyu Wilson-->
+<!--
+                Change history
+                1.03        1-/12/2013         (Paul Manfield)Updates to 2903 display code, liberally scattered @TODO comments where there is still necessary work
+                1.02        09/10/2013         (Damon Smith)updates re. sort order at various levels
+                1.01        08/10/2013         (Damon Smith)now ordering by sort code on category from the taxonomy
+                1.00        01/10/2013         (Chunyu Wilson)Created              
+                -->
+<!-- This transformation is used for displaying dynamic contents for single notice -->
+
+
    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:xdt="http://www.w3.org/2005/xpath-datatypes" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:f="http://www.gazettes.co.uk/facets" xmlns:tax="http://www.gazettes.co.uk/assets/taxonomy" xmlns:m="http://www.gazettes.co.uk/metadata" xmlns="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" version="2.0" exclude-result-prefixes="#all">
 
 
