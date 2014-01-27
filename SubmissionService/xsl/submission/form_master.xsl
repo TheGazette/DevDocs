@@ -1854,7 +1854,7 @@ of <span about="this:company-principal-trading-address-1" property="vcard:street
 			</p>
 			
 			<p>
-			“That it has been proved to the satisfaction of this Meeting that the Company cannot, by reason of its liabilities, continue its business, and that it is advisable to wind up the same, and accordingly that the Company be wound up voluntarily, and that <span about="this:IP1" property="foaf:name" datatype="xsd:string" typeof="person:InsolvencyPractitioner"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='foaf:name']/text()"/></span>
+			"That it has been proved to the satisfaction of this Meeting that the Company cannot, by reason of its liabilities, continue its business, and that it is advisable to wind up the same, and accordingly that the Company be wound up voluntarily, and that <span about="this:IP1" property="foaf:name" datatype="xsd:string" typeof="person:InsolvencyPractitioner"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='foaf:name']/text()"/></span>
 	
 			<xsl:if test="$updates//*[@about='this:IP2' and @property='foaf:name']/text() != ''">
 			and <span about="this:IP2" property="foaf:name" datatype="xsd:string" typeof="person:InsolvencyPractitioner"><xsl:value-of select="$updates//*[@about='this:IP2' and @property='foaf:name']/text()"/></span>
@@ -1901,15 +1901,12 @@ of <span about="this:company-principal-trading-address-1" property="vcard:street
 			   (Joint) 
 			   </xsl:if>
 			   
-			   Liquidator
-			   
-			     <xsl:if test="$updates//*[@about='this:IP2' and @property='foaf:name']/text() != ''">(s)</xsl:if>
-			   for the purposes of such winding-up.” 
-			
+			   Liquidator<xsl:if test="$updates//*[@about='this:IP2' and @property='foaf:name']/text() != ''">(s)</xsl:if>
+			   for the purposes of such winding-up." 			
 			</p>
 			
 			<p>
-			Further details contact: --To be provided by Marta --, 
+			Further details contact: <span about="this:IP1" property="person:additionalContactName" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='person:additionalContactName']/text()"/></span>, 
 			
 			 <xsl:if test="$updates//*[@about='this:IP1' and @property='gaz:telephone']/text() != ''">
 			Telephone number: <span about="this:IP1" property="gaz:telephone" datatype="xsd:string"><xsl:value-of select="$updates//*[@about='this:IP1' and @property='gaz:telephone']/text()"/></span>, 
