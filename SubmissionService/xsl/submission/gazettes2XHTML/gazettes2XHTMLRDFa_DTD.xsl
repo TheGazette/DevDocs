@@ -4,6 +4,14 @@
 You may use and re-use this code free of charge under the terms of the Open Government Licence
  
 http://www.nationalarchives.gov.uk/doc/open-government-licence/-->
+<!--Version 1.0-->
+<!--Created by Williams Lea XML Team-->
+<!--
+	  Purpose of transform: transform legacy pre-2005 DTD format into HTML-RDFa for all notice types except 2903
+	  
+      Change history
+      1.0 Initial Release: 20th January 2014
+-->
    <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:gz="http://www.tso.co.uk/assets/namespace/gazette" xmlns:ukm="http://www.tso.co.uk/assets/namespace/metadata" xmlns:wgs84="http://www.w3.org/2003/01/geo/wgs84_pos" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:personal-legal="http://www.thegazette.co.uk/ontology/personal-legal" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:gzc="http://www.tso.co.uk/assets/namespace/gazette/LGconfiguration" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:functx="http://www.functx.com" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:dfn="http://www.dfn.org/dfn" exclude-result-prefixes="xs html gz ukm wgs84 personal-legal  dc gzc math" version="2.0">
 
   <!-- xsl:output method="xhtml" omit-xml-declaration="yes"/ -->
