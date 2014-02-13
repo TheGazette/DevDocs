@@ -16,12 +16,17 @@ The Gazettes REST API is served over HTTPS. To ensure data privacy, unencrypted 
 
 Gazettes have the following resources. Click on a link to read the API documentation for accessing or modifying each resource.
 
-**Publishing Service**
+**Online Publishing Service**
 
 * [The Gazette notice feeds](notice/notice-feed.md)
 * [The Gazette notice documents](notice/notice.md)
-* [The Gazette PDF publication](publication/pdf-publication.md)
 
+**Print Publishing Service**
+
+* [The Gazette Issue](publication/issue.md)
+* [The Gazette Supplement](publication/supplement.md)
+* [The Gazette Page](publication/page.md)
+* [The Gazette Index](publication/index.md)
  
 **Registration and user authentication**
 
@@ -31,7 +36,7 @@ Gazettes have the following resources. Click on a link to read the API documenta
 **Place notice in The Gazette**
 
 * [Notice taxonomy](notice/notice-taxonomy.md)
-* [Place notice options](notice/place-options.md)  
+* [Place notice options](mygazette/place-options.md)  
 * [Submission and asynchronous process](notice/notice-submissions.md) 
 * [Add to basket](basket/add-to-basket.md) 
 * [Checkout](basket/checkout.md) 
@@ -43,7 +48,7 @@ Gazettes have the following resources. Click on a link to read the API documenta
 
 **SPARQL end point**
 
-* [End points](sparql/sparql.html)
+* [End points](sparql/sparql.md)
 * [Sample queries](sparql/sample-queries.md) 
 
 ## Support ##

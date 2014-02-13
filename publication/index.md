@@ -26,6 +26,7 @@ The following editions exist, the correct parameter follows the title:
 
 
 ### Alternative Representations ###
+Due to the large number of alternative representations available there is a notes column to help guide the user to the appropriate representation.
 
 <table>
 <tr>
@@ -51,9 +52,3 @@ The following editions exist, the correct parameter follows the title:
 <td>JSON for the issue</td>
 </tr>
 </table>
-
-## Sample Responses ##
-
-### RDF XML ###
-
-### JSON ###

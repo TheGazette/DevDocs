@@ -6,7 +6,7 @@ The main `/sparql` endpoint is populated with data from the modern notices which
 
 Useful resources:
 
-- [sample queries](sample-queries.md)
+- [Sample queries](sample-queries.md)
 - [Flint editor on the gazette website](https://www.thegazette.co.uk/flint)
 - [Flint SPARQL editor project on github](https://github.com/TSO-Openup/FlintSparqlEditor)
 

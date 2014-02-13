@@ -1,7 +1,7 @@
 [home](../home.md)
 #The Gazette Notice #
 Notice content can be retrieved using following URIs, content will be for a particular notice (notice-id).
-The user can optionally be registered for this endpoint, being authenticated will allow users to retrieve their unpublished notices. [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
+The user can optionally be registered for this endpoint, being authenticated will allow users to retrieve their unpublished notices. To be authenticated users must [register](../authentication/registration.md) and then [sign-in](../authentication/sign-in.md).
 
 Other related endpoints which give further information about the notice:
 
@@ -15,11 +15,11 @@ Other related endpoints which give further information about the notice:
 Valid notice Ids for published notices can be found using:
 
 - [Notice feed](notice-feed.md)
-- [Saved notices](../my-gazette/my-gazette.md) (Authentication Required)
+- [Saved notices](../mygazette/mygazette.md) (Authentication Required)
 
 Ids for the user's own unpublished notices can be found using:
 
-- [My Gazette](../my-gazette/my-gazette.md)
+- [My Gazette](../mygazette/mygazette.md)
 
 ### Alternative Representations ###
 Due to the large number of alternative representations available there is a notes column to help guide the user to the appropriate representation.

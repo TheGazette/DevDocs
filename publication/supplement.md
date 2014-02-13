@@ -1,5 +1,5 @@
 [home](../home.md)
-#The Gazette Issue #
+#The Gazette Supplement #
 Print versions of the Gazette can be retrieved in pdf format, data about these print editions can also be retrieved in RDF+XML and JSON formats.
 
 Similar resources
@@ -11,18 +11,14 @@ Similar resources
 
 ## Resource URL ##
 
-`/{edition}/issue/{issue-number}`
+`/{edition}/issue/{issue-number}/supplement`
 
-The following editions exist, the correct parameter follows the title:
+Suppplements exist for the following editions, the correct parameter follows the title:
 
 - The London Gazette: `london`
 - The Edinburgh Gazette: `edinburgh`
 - The Belfast Gazette: `belfast`
-- The Insolvency Gazette*: `insolvency`
-- The Daily Edition*: `all-notices`
-- The Wills and Probate Gazette*: `wills-and-probate`
 
-*\* Please note: For the new editions (The Insolvency Gazette, The Daily Edition,The Wills and Probate Gazette) the issue number is the ISO 8601 date of publication in (YYYY-MM-DD).*
 
 
 ### Alternative Representations ###
