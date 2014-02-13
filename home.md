@@ -46,6 +46,10 @@ Gazettes have the following resources. Click on a link to read the API documenta
 * [End points](sparql/sparql.html)
 * [Sample queries](sparql/sample-queries.md) 
 
+## Support ##
+
+A Technical Services Helpdesk during Business Hours to deal with issues identified in The Gazette API. 
+The helpdesk can be contacted by emailing [cssup@tso.co.uk](mailto:cssup@tso.co.uk).
 
 ## License ##
 

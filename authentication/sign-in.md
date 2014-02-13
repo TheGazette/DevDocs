@@ -40,11 +40,11 @@ HTTP status code should be used an indicator to success, a 200 return code is
 </tr>
 <tr>
 <td>username</td>
-<td></td>
+<td>valid username (email)</td>
 </tr>
 <tr>
 <td>password</td>
-<td></td>
+<td>password for the account</td>
 </tr>
 <tr>
 <td rowspan=2>grant_type</td>
@@ -113,6 +113,7 @@ To run the sample below you need to have JDK and rest assured jars in class path
 
 	
 ###php###
+
 Requires that $username,$password,$headerAuth are defined with appropriate, requires a [php installation with cURL](https://php.net/curl) to be enabled.
 `$headerAuth` should be set to `Basic dHNvOkphdmEkY3IxcHQh`.
 
@@ -127,8 +128,6 @@ Requires that $username,$password,$headerAuth are defined with appropriate, requ
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,				"https://www.thegazette.co.uk/oauth/token");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER,	true);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,	false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,	false);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	false);
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields));
