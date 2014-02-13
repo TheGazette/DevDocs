@@ -11,7 +11,6 @@ Useful resources:
 - [Flint SPARQL editor project on github](https://github.com/TSO-Openup/FlintSparqlEditor)
 
 
-
 ## Resource URL ##
 
 `/sparql`
