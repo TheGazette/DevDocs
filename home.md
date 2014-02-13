@@ -46,11 +46,6 @@ Gazettes have the following resources. Click on a link to read the API documenta
 * [End points](sparql/sparql.html)
 * [Sample queries](sparql/sample-queries.md) 
 
-**Longitudinal Datasets**
-
-* [Datasets](datasets/datasets.md) 
-
-
 
 ## License ##
 
