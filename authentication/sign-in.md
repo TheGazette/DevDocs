@@ -84,33 +84,34 @@ Failure	(400 Status Code)
 ###Java###
 To run the sample below you need to have JDK and rest assured jars in class path.
 	
-	import com.jayway.restassured.RestAssured;
-	import com.jayway.restassured.response.Response;
-	import com.jayway.restassured.path.json.JsonPath;
-
-	public class RestClient {
-		public static void main(String args[]){
-			RestAssured.baseURI = "https://www.thegazette.co.uk";
-			final Map<String, String> params = new HashMap<String, String>();
-			params.put("grant_type", "password");
-			params.put("username", "-----");
-			params.put("password", "----");
-			params.put("scope", "trust");
-		
-			Response response = given().header("Authorization", "Basic dHNvOkphdmEkY3IxcHQh").expect().statusCode(200).when()
-				.post("/oauth/token");
+	CookieHandler.setDefault(new CookieManager());
 	
-			String body = response.getBody().asString();
-			JsonPath jsonPath = new JsonPath(body);
-			accessToken = jsonPath.getString("access_token");
+	final String uri = "https://www.thegazette.co.uk/sign-in";
+	HttpClient client = new HttpClient();
 
+	HttpMethod httpPost = new PostMethod(uri);
+	httpPost.addRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-			//the above access_token can be used in subsequent request to access any secured resource , must hold the access token(accessToken) in ‘Authentication’ HTTP request header for example :
-			String xmlDoc = "bundle that needs to be posted";
-			given().header("Authorization", "Bearer " + accessToken).header("content-type", "text/xml; charset=UTF-8").body(xmlDoc).expect().statusCode(302).when().post(endpoint);
-		}
+	final String body = "email=person@email.com&password=passWord";
+	RequestEntity requestEntity = new StringRequestEntity(body); 
+	((PostMethod) httpPost).setRequestEntity(requestEntity);
+
+	try {
+	    int httpStatus = client.executeMethod(httpPost);
+	    System.out.println("Http response code: " + httpStatus);
+
+	    BufferedInputStream is = new BufferedInputStream(httpPost.getResponseBodyAsStream());
+	    int r = 0;
+	    byte[] buf = new byte[10];
+	    while ((r = is.read(buf)) > 0) {
+		System.out.write(buf, 0, r);
+	    }
+
+	} catch (IOException e) {
+	    e.printStackTrace();
+	} finally {
+	    httpPost.releaseConnection();
 	}
-
 	
 ###php###
 
