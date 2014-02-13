@@ -1,4 +1,4 @@
-# The Gazette Web Service Interface #  
+# The Gazette Web Service Interface #
 
 The Gazette REST API allows you to access The Gazette notice feeds, notice documents, PDF publications and various other public resources. The API also allows clients to Place notices in The Gazette using a registered user account.
 
@@ -8,7 +8,7 @@ Since the API is based on REST principles, it's very easy to write and test appl
 
 All URLs referenced in the documentation have the following base:
 
-<pre>https://www.thegazette.co.uk</pre>
+	https://www.thegazette.co.uk
 
 The Gazettes REST API is served over HTTPS. To ensure data privacy, unencrypted HTTP is not supported.
 

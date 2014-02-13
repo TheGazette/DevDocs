@@ -43,15 +43,15 @@ This is for html clients only , returns back a list of options to place a notice
 </tr>
 </table>
 
-**NOTE:** The following URIs are for submission and once bundle/notice has been posted , user can   [check the status of submission](notice-submissions.md)
+**NOTE:** The following URIs are for submission and once bundle/notice has been posted, user can [check the status of submission](notice-submissions.md)
 
 ##Legacy submission##
-The uri for legacy bundle submission is **/my-gazette/bundle?legacy=true**.
+The URI for legacy bundle submission is `/my-gazette/bundle?legacy=true`.
 The legacy XML bundle can be posted as request body or multipart file upload
 
 ##XML submission##
 
-XMLas request body or multipart file upload.
+XML as request body or multipart file upload.
 <table>
 <tr>
 	<th>Representation URI</th>
@@ -74,7 +74,7 @@ XMLas request body or multipart file upload.
 ##Plain text submission##
 
 User needs to post the text bundle to the following end 
-{noticeType} could be 2903 etc.
+{noticeType} could be 1119 etc.
 <table>
 <tr>
 	<th>Representation URI</th>

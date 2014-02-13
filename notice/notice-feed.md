@@ -3,7 +3,8 @@
 
 # REST API: Notice Feed #
 Used to perform searches against the database of published notices.
-
+The user can optionally be registered for this endpoint, being authenticated will include an extra element in the response which indicates if the notices has been saved by the user. 
+More information on authentication is available, [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 ## Resource URL ##
 
 `/{service}/notice/`

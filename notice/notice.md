@@ -1,296 +1,205 @@
 [home](../home.md)
 #The Gazette Notice #
+Notice content can be retrieved using following URIs, content will be for a particular notice (notice-id).
+The user can optionally be registered for this endpoint, being authenticated will allow users to retrieve their unpublished notices. [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
+Other related endpoints which give further information about the notice:
 
-Notice content can be retrieved using following uris, content will be for a particular notice (notice-id).
+- [Provenance of the notice](notice-provenance.md)
+- [Previous versions of the notice](notice-version.md)
+
+## Resource URL ##
+
+`/notice/{notice-id}`
  
-<table>
-<tr>
-	<th>Representation URI</th>
-	<th>Method</th>
-	<th>Response type</th>
-	<th>Response code</th>
-	<th>Accept header​</th>
-</tr>
-<tr>
-	<td>/notice/{notice-id}</td>
-	<td>GET</td>
-	<td>HTML</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}/data.xml</td>
-	<td>GET</td>
-	<td>XML</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>​​/notice/{noticeid}/data.htm</td>
-	<td>GET</td>
-	<td>HTML</td>
-	<td>200</td>
-	<td>None</td>	
-</tr>
-<tr>
-	<td>/notice/{noticeid}/data.ttl</td>
-	<td>GET</td>
-	<td>TTL</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
+Valid notice Ids for published notices can be found using:
 
-<tr>
-	<td>​​/notice/{noticeid}/data.rdf</td>
-	<td>GET</td>
-	<td>RDF</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>/notice/{noticeid}/data.jsonld</td>
-	<td>GET</td>
-	<td>JSON LD</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>/notice/notice-id/data.pdf</td>
-	<td>GET</td>
-	<td>PDF</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}/provenance</td>
-	<td>GET</td>
-	<td>HTML</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}/provenance/data.rdf</td>
-	<td>GET</td>
-	<td>RDF</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}/provenance/data.ttl
-</td>
-	<td>GET</td>
-	<td>TTL</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}/provenance/data.jsonld
-</td>
-	<td>GET</td>
-	<td>JSON LD</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}/provenance/data.xml
-</td>
-	<td>GET</td>
-	<td>XML</td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-</table>
+- [Notice feed](notice-feed.md)
+- [Saved notices](../my-gazette/my-gazette.md) (Authentication Required)
 
-**Note:** 
-Above tables contain representation URIs, the Gazette API also performs content negotiation if the corresponding generic document URI with appropriate Accept header on the request.
+Ids for the user's own unpublished notices can be found using:
+
+- [My Gazette](../my-gazette/my-gazette.md)
+
+### Alternative Representations ###
+Due to the large number of alternative representations available there is a notes column to help guide the user to the appropriate representation.
 
 <table>
 <tr>
-	<th>Generic Document URI</th>
-	<th>Method</th>
-	<th>Response type</th>
-	<th>Response code</th>
-	<th>Accept header​</th>
+<th>Representation URI</th>
+<th>Method</th>
+<th>Response type</th>
+<th>Notes</th>
+</tr>
+<tr>
+<td>​​/notice/{notice-id}<br />/notice/{notice-id}/data.htm</td>
+<td rowspan=14>GET</td>
+<td>(X)HTML5+RDFa</td>
+<td>Website view of the notice with all of the page chrome included.</td>
 </tr>
 
 <tr>
-	<td>/notice/{notice-id}</td>
-	<td>GET</td>
-	<td>JSON LD</td>
-	<td>200</td>
-	<td>application/ld+json</td>
+<td>/notice/{notice-id}/data.xml</td>
+
+<td>(X)HTML5+RDFa</td>
+<td>Contains only the notice of the content</td>
 </tr>
 <tr>
-	<td>/notice/{notice-id}</td>
-	<td>GET</td>
-	<td>​RDF</td>
-	<td>200</td>
-	<td>​application/rdf+xml</td>
+<td>/notice/{notice-id}/data.pdf</td>
+<td>PDF</td>
+<td>PDF of the notice specified, compare to <a href="../publication/pdf-publication.md">page</a> and <a href="../publication/pdf-publication.md">issue</a></td>
 </tr>
 <tr>
-	<td>/notice/{notice-id}</td>
-	<td>GET</td>
-	<td>XML</td>
-	<td>200</td>
-	<td>application/xml</td>
+<td>/notice/{notice-id}/data.ttl</td>
+<td>TTL</td>
+<td></td>
+</tr>
+
+<tr>
+<td>​​/notice/{notice-id}/data.rdf</td>
+<td>RDF</td>
+<td></td>
 </tr>
 <tr>
-	<td>/notice/{notice-id}</td>
-	<td>GET</td>
-	<td>​TTL</td>
-	<td>200</td>
-	<td>text/ttl</td>
+<td>/notice/{notice-id}/data.jsonld</td>
+<td>JSON LD</td>
+<td></td>
 </tr>
 <tr>
-	<td>/notice/{notice-id}/version/{version-id}
-</td>
-	<td>GET</td>
-	<td>XML</td>
-	<td>200</td>
-	<td>application/xml</td>
+<td>/notice/{notice-id}?view=linked-data</td>
+<td>HTML</td>
+<td></td>
 </tr>
 <tr>
-	<td>/notice/{notice-id}/version/{version-id}
-</td>
-	<td>GET</td>
-	<td>JSON</td>
-	<td>200</td>
-	<td>application/json</td>
+<td>​​​​/notice/{notice-id}data.ttl?view=linked-data</td>
+<td>TTL</td>
+<td></td>
+</tr>
+<tr>
+<td>​​​​/notice/{notice-id}data.rdf?view=linked-data</td>
+<td>RDF/XML</td>
+<td></td>
+</tr>
+<tr>
+<td>​​/notice/{notice-id}data.rdfjson?view=linked-data</td>
+<td>RDF/JSON</td>
+<td></td>
+</tr>
+
+<tr>
+<td>/notice/{notice-id}data.json?view=linked-data</td>
+<td>JSON LD</td>
+<td></td>
+</tr>
+<tr>
+<td>​​/notice/{notice-id}data.xml?view=linked-data</td>
+<td>XML</td>
+<td>Linked data xml view containing the only data elements of the notice</td>
 </tr>
 </table>
 
-## Linked data view of The Gazette notice ##
+### Content Negotiation ###
 
 <table>
 <tr>
-	<th>Representation URI</th>
-	<th>Method</th>
-	<th>Response Type</th>
-	<th>Response code</th>
-	<th>Accept header​</th>
+<th>Generic Document URI</th>
+<th>Method</th>
+<th>Accept header​</th>
+<th>Response type</th>
+<th>Matching Representation*</th>
 </tr>
 <tr>
-	<td>/notice/{notice-id}?view=linked-data</td>
-	<td>GET</td>
-	<td>HTML</td>
-	<td>200</td>
-	<td>None</td>
+<td rowspan=6>/notice/{notice-id}</td>
+<td rowspan=13>GET</td>
+<td>application/ld+json</td>
+<td>JSON LD</td>
+<td></td>
 </tr>
 <tr>
-	<td>​​​​/notice/{notice-id}.rdf?view=linked-data</td>
-	<td>GET</td>
-	<td>RDF/XML</td>
-	<td>200</td>
-	<td>None</td>	
+<td>​application/rdf+xml</td>
+<td>​RDF</td>
+<td></td>
 </tr>
 <tr>
-	<td>​​/notice/{notice-id}.rdfjson?view=linked-data</td>
-	<td>GET</td>
-	<td>RDF/JSON</td>
-	<td>200</td>
-	<td>None</td>
+<td>text/turtle</td>
+<td>​TTL</td>
+<td></td>
 </tr>
 <tr>
-	<td>​​​​/notice/{notice-id}.ttl?view=linked-data</td>
-	<td>GET</td>
-	<td>TTL</td>
-	<td>200</td>
-	<td>None</td>
+<td>application/xml</td>
+<td>(X)HTML5+RDFa</td>
+<td>/notice/{notice-id}/data.xml</td>
 </tr>
 <tr>
-	<td>/notice/{notice-id}.json?view=linked-data</td>
-	<td>GET</td>
-	<td>JSON LD</td>
-	<td>200</td>
-	<td>None</td>
+<td>text/html</td>
+<td rowspan=2>(X)HTML5+RDFa</td>
+<td rowspan=2>/notice/{notice-id}<br/>/notice/{notice-id}/data.htm</td>
 </tr>
 <tr>
-	<td>​​/notice/{notice-id}.xml?view=linked-data</td>
-	<td>GET</td>
-	<td>XML</td>
-	<td>200</td>
-	<td>None</td>
+<td>*/*</td>
+</tr>
+
+<tr>
+<td rowspan=7>/notice/{notice-id}?view=linked-data</td>
+<td>​application/rdf+xml</td>
+<td>RDF/XML</td>
+<td></td>
 </tr>
 <tr>
-	<td>​​/notice/{notice-id}.htm?view=linked-data</td>
-	<td>GET</td>
-	<td>HTML</td>
-	<td>200</td>
-	<td>None</td>
+<td>​application/rdf+json</td>
+<td>RDF/JSON</td>
+<td></td>
+</tr>
+<tr>
+<td>text/turtle</td>
+<td>TTL</td>
+<td></td>
+</tr>
+<tr>
+<td>application/json</td>
+<td>JSON</td>
+<td></td>
+</tr>
+<tr>
+<td>​application/xml</td>
+<td>XML</td>
+<td></td>
+</tr>
+<tr>
+<td>​text/html</td>
+<td rowspan=2>HTML</td>
+<td rowspan=2></td>
+</tr>
+<tr>
+<td>*/*</td>
 </tr>
 </table>
-
-
-**Note:** 
-Above tables contain representation URIs, the Gazette API also performs content negotiation if the corresponding generic document URI with appropriate Accept header on the request.
-
+*\*Only included where the response type is otherwise ambiguous*
+## Parameters ##
 <table>
 <tr>
-	<th>Generic Document URI</th>
-	<th>Method</th>
-	<th>Response Type</th>
-	<th>Response code</th>
-	<th>Accept header​</th>
+<td rowspan=2 style="width:12em">view</td>
+<td>Only one value is allowable <code>linked-data</code> this switches the responses to be a Linked-Data API view</a>, this will contain the data elements of the notice.</td>
 </tr>
 <tr>
-	<td>/notice/{notice-id}?view=linked-data</td>
-	<td>GET</td>
-	<td>RDF/XML</td>
-	<td>200</td>
-	<td>​application/rdf+xml</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}?view=linked-data</td>
-	<td>GET</td>
-	<td>RDF/JSON</td>
-	<td>200</td>
-	<td>​application/rdf+json</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}?view=linked-data</td>
-	<td>GET</td>
-	<td>TTL</td>
-	<td>200</td>
-	<td>text/turtle</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}?view=linked-data</td>
-	<td>GET</td>
-	<td>JSON</td>
-	<td>200</td>
-	<td>application/json</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}?view=linked-data</td>
-	<td>GET</td>
-	<td>XML</td>
-	<td>200 </td>
-	<td>​application/xml</td>
-</tr>
-<tr>
-	<td>/notice/{notice-id}?view=linked-data</td>
-	<td>GET</td>
-	<td>HTML</td>
-	<td>200</td>
-	<td>​text/html</td>
+<td><b>Example Values:</b> linked-data</td>
 </tr>
 </table>
 
-##Example##
+## Code Samples ##
 
 ###	java ###
 	// with accept header
 	import com.jayway.restassured.RestAssured;
 	import com.jayway.restassured.response.Response;
 	public class RestClient {
-	public static void main(String args[])
-	{
-	// get the access token via POST explained in Sign-in document.
-	   RestAssured.baseURI = "https://www.thegazette.co.uk";
-	   	
-	   Response response = given().header("Authorization", "Bearer " + accessToken).header("Accept", "application/rdf+xml").expect().statusCode(200).get("/notice/{notice-id}");
-		String asString = response.getBody().asString();
+		public static void main(String args[])
+		{
+			// get the access token via POST explained in Sign-in document.
+		   	RestAssured.baseURI = "https://www.thegazette.co.uk";
+		   	
+		   	Response response = given().header("Authorization", "Bearer " + accessToken).header("Accept", "application/rdf+xml").expect().statusCode(200).get("/notice/{notice-id}");
+			String asString = response.getBody().asString();
 	    }
 	
 	}
@@ -299,17 +208,16 @@ Above tables contain representation URIs, the Gazette API also performs content 
 	import com.jayway.restassured.RestAssured;
 	import com.jayway.restassured.response.Response;
 	public class RestClient {
-	public static void main(String args[])
-	{
-	// get the access token via POST explained in Sign-in document.
-		   RestAssured.baseURI = "https://www.thegazette.co.uk";
+		public static void main(String args[])
+		{
+			// get the access token via POST explained in Sign-in document.
+		   	RestAssured.baseURI = "https://www.thegazette.co.uk";
+	
+	    	Response response = given().expect().statusCode(200).get("/notice/{notice-id}");
+			String asString = response.getBody().asString();
+	    }
 
-    Response response = given().expect().statusCode(200).get("/notice/{notice-id}");
-	String asString = response.getBody().asString();
-
-    }
-
-}
+	}
 
 
 
