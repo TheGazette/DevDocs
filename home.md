@@ -1,4 +1,4 @@
-# The Gazette Web Service Interface #
+# The Gazette Web Service Interface #  
 
 The Gazette REST API allows you to access The Gazette notice feeds, notice documents, PDF publications and various other public resources. The API also allows clients to Place notices in The Gazette using a registered user account.
 
