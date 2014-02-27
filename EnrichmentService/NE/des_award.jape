@@ -1,0 +1,92 @@
+/*
+* Filename: 	des_awards.jape
+* Author:	Paul Appleby
+* Description:	Annotates awards
+* Date created:	16/11/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Award
+Input:  Split Token Lookup LineBreak
+Options: control = appelt negationGrouping = false
+
+
+Macro: POSSESSION
+(
+	(
+		(
+			{Token.string == "\u2019"} |
+			{Token.string == "'"}
+		)
+		{Token.string == "s"}
+	) |
+	{Token.string == "'s"}
+)
+
+
+/* A term within an award title, including a year. We'll allow famous people in the event */
+Macro: AWARDTERM
+(
+	(
+		(
+			{Lookup.minorType == famous} |
+			{Token.orth == upperInitial, Token.category == NN, !Lookup.minorType == facility} |
+			{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == facility} |
+			{Token.orth == upperInitial, Token.category == NNS, !Lookup.minorType == facility} |
+			{Token.orth == upperInitial, Token.category == NNPS, !Lookup.minorType == facility}
+		)
+		(POSSESSION)?
+	) |
+	{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == facility} |
+	{Token.category == CD, Token.length == 4, Token.kind == number} |
+	(
+		(
+			{Lookup.minorType == famous} |
+			{Token.orth == allCaps, Token.category == NN, !Lookup.minorType == facility} |
+			{Token.orth == allCaps, Token.category == NNP, !Lookup.minorType == facility} |
+			{Token.orth == allCaps, Token.category == NNS, !Lookup.minorType == facility} |
+			{Token.orth == allCaps, Token.category == NNPS, !Lookup.minorType == facility}
+		)
+		(POSSESSION)?
+	)
+)
+
+/* Will pick up basic award sequences and organisation events */
+Macro: AWARDTERMSEQ
+(
+	(AWARDTERM)+
+)
+
+
+/* Award such as Grammy */
+Rule: Award
+(
+	{Lookup.majorType == award, Lookup.minorType == award}
+):award
+-->
+	:award.Award = {rule = "Award"}
+
+
+/* Awards such as Nobel Peace Prize */
+Rule: AwardWithKey
+(
+	(
+		(AWARDTERMSEQ)
+		(
+			(
+				{Lookup.majorType == award, Lookup.minorType == award_type}
+			)
+		)
+	):award
+)
+-->
+	:award.Award = {rule = "AwardWithKey"}
+

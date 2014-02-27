@@ -1,0 +1,92 @@
+/*
+*  
+* Filename: 	des_compoundnounphrase_verbgroup.jape
+* Author:	Paul Appleby
+* Description:	Links compound noun phrase with preceding or following VG
+* Date created:	05/03/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	CompoundNounChunkVG
+Input:  Split Token CompoundNounChunk NounChunk VG
+Options: control = appelt negationGrouping = false
+
+
+Rule: MatchCompoundNounVerbChunk
+(
+  	{CompoundNounChunk.type == "NounVerbNounChunk"}
+	( {Token.category == IN} | (({VG})+) )
+	( {NounChunk} | {CompoundNounChunk} )
+	(
+		( {Token.category == IN} | (({VG})+) )
+		( {NounChunk} | {CompoundNounChunk} )
+	)?
+):cn
+-->
+	:cn.CompoundVerbChunk = {rule="MatchCompoundNounVerbChunk" }
+
+
+Rule: MatchCompoundNounVerbChunk2
+(
+  	{CompoundNounChunk}
+	( {Token.category == IN} | (({VG})+) )
+	{CompoundNounChunk.type == "NounVerbNounChunk"}
+	(
+		( {Token.category == IN} | (({VG})+) )
+		( {NounChunk} | {CompoundNounChunk} )
+	)?
+):cn
+-->
+	:cn.CompoundVerbChunk = {rule="MatchCompoundNounVerbChunk2" }
+	
+
+Rule: MatchCompoundNounChunkVG
+(
+  	{CompoundNounChunk}
+	({VG})+
+	(( {NounChunk} | {CompoundNounChunk} ))?
+	(
+		( {Token.category == IN} | (({VG})+) )
+		( {NounChunk} | {CompoundNounChunk} )
+	)?
+):cn
+-->
+	:cn.CompoundVerbChunk = {rule="MatchCompoundNounChunkVG" }
+
+
+Rule: MatchCompoundNounChunkVG2
+(
+	(( {NounChunk} | {CompoundNounChunk} ))?
+	({VG})+
+  	{CompoundNounChunk}
+  	(
+		( {Token.category == IN} | (({VG})+) )
+		( {NounChunk} | {CompoundNounChunk} )
+	)?
+):cn
+-->
+	:cn.CompoundVerbChunk = {rule="MatchCompoundNounChunkVG2" }
+
+
+Rule: MatchCompoundNounChunkVG3
+(
+	(( {NounChunk} | {CompoundNounChunk} ))?
+	({VG})+
+  	{CompoundNounChunk}
+	({VG})+
+	(( {NounChunk} | {CompoundNounChunk} ))?
+	(
+		( {Token.category == IN} | (({VG})+) )
+		{NounChunk}
+	)?
+):cn
+-->
+	:cn.CompoundVerbChunk = {rule="MatchCompoundNounChunkVG3" }

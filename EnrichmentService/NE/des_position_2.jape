@@ -1,0 +1,269 @@
+/*
+* Filename: 	des_position_2.jape
+* Author:	Paul Appleby
+* Description:	Annotates more information about people and their position building upon the first position pass
+*		and any information we have about the person
+*		This is a first attempt at identifying people precisely
+* Date created:	21/06/2010
+* This version:	0.7
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 28/09/10	0.7		PA		Updated PersonMinisterial to handle shadow roles
+* 20/09/10	0.6		PA		Updated to handle Rt Hon
+* 10/09/10	0.5		PA		Changes to peer rule and improvements to prefix ministerial
+* 02/08/10	0.4		PA		Added in postfix ministerial rule
+* 29/06/10	0.3		PA		Change Name to Person
+* 21/06/10	0.2		PA		Further work
+*/
+
+
+Phase:	Positions
+Input:  Token LineBreak Lookup Person Position Organisation
+Options: control = appelt negationGrouping = false
+
+/* Identify peers. Here we may need to extend the person to include the location of the peer */
+/* e.g. Lord Pearson of Rannoch */
+Rule: Peer
+Priority: 15
+(
+ 	{Lookup.majorType == name, Lookup.minorType == peer}
+):peer
+-->
+{
+	AnnotationSet peerSet = bindings.get("peer");
+	AnnotationSet personSet = inputAS.get("Person", peerSet.firstNode().getOffset(), peerSet.lastNode().getOffset());
+	if (personSet.size() > 0) {
+		Annotation personAnn = personSet.iterator().next();
+		Annotation lookupAnn = peerSet.iterator().next();
+
+		FeatureMap features = Factory.newFeatureMap();
+		features.put("context", lookupAnn.getFeatures().get("context").toString());
+		features.put("rule", "Peer");
+		features.put("type", "peer");
+		outputAS.add(personSet.firstNode(), peerSet.lastNode(), "Person", features);
+		doc.getAnnotations("DES").remove(personAnn);
+	}
+}
+
+
+/* Person with party and MP status preceding, e.g. Labour MP John Smith */
+Rule: PrefixMP
+(
+	(
+		(
+			{Lookup.majorType == organisation, Lookup.minorType == political_party}
+			{Token.string == "MP"}
+		) |
+		(
+			{Organisation.type == governmentDepartment}
+			{Token.string == "Minister"}
+			({Token.string == ","})?
+		)
+	)	
+	(
+		{Person, Lookup.majorType == name, Lookup.minorType == mp}
+	):person
+):mp
+-->
+{
+	AnnotationSet person = bindings.get("person");
+	AnnotationSet name = person.get("Person");
+	AnnotationSet lookup = person.get("Lookup");
+	Annotation personAnn = name.iterator().next();
+	Annotation lookupAnn = lookup.iterator().next();
+	
+//	personAnn.getFeatures().put("context", lookupAnn.getFeatures().get("context").toString());
+	personAnn.getFeatures().put("rule", "PrefixMP");
+	personAnn.getFeatures().put("type", "memberOfParliament");
+}
+
+/* Person with party and ministerial status preceding, e.g. Prime Minister David Cameron */
+/* The combination of a known MP allows us to be sure the position is a UK minister */
+Rule: PrefixMinisterial
+(
+	(
+		({Position.type == ministerial, Lookup.minorType == ministerial}):ministerialPost
+		({Token.string == ","})?
+	)	
+	(
+		{Person, Lookup.majorType == name, Lookup.minorType == mp}
+	):person
+):mp
+-->
+{
+	AnnotationSet person = bindings.get("person");
+	AnnotationSet name = person.get("Person");
+	AnnotationSet lookup = person.get("Lookup");
+	Annotation personAnn = name.iterator().next();
+	Annotation lookupAnn = lookup.iterator().next();
+	
+//	personAnn.getFeatures().put("context", lookupAnn.getFeatures().get("context").toString());
+	personAnn.getFeatures().put("rule", "PrefixMinisterial");
+	personAnn.getFeatures().put("type", "memberOfParliament");
+
+	AnnotationSet ministerialPost = bindings.get("ministerialPost");
+	AnnotationSet postSet = ministerialPost.get("Position");
+	lookup = ministerialPost.get("Lookup");
+	Annotation postAnn = postSet.iterator().next();
+	lookupAnn = lookup.iterator().next();
+	if (lookupAnn.getFeatures().get("context") != null) {
+		postAnn.getFeatures().put("context", lookupAnn.getFeatures().get("context").toString());
+	}
+}
+
+/* Here we have a person with a position and name. Is it a minister? */
+/* This is the start of a generic means to identify people */
+Rule: PersonMinisterial
+(
+	(
+		{Person contains {Position.type == ministerial}, Person contains {Lookup.minorType == mp},
+			Lookup.minorType == ministerial} |
+		{Person contains {Position.type == shadowMinisterial}, Person contains {Lookup.minorType == mp}}
+	):minister
+)
+-->
+{
+	AnnotationSet ministerSet = bindings.get("minister");
+	
+	// Extract annotation containing person URI
+	AnnotationSet nameSet = inputAS.get("Lookup", ministerSet.firstNode().getOffset(), ministerSet.lastNode().getOffset());
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("minorType", "mp");
+	AnnotationSet mpLookupSet = nameSet.get("Lookup", features);
+	Annotation nameAnn = mpLookupSet.iterator().next();
+		
+	// Annotate person with context
+	AnnotationSet personSet = ministerSet.get("Person");
+	Annotation personAnn = personSet.iterator().next();
+//	personAnn.getFeatures().put("context", nameAnn.getFeatures().get("context").toString());
+	personAnn.getFeatures().put("rule", "PrefixMinisterial");
+	personAnn.getFeatures().put("type", "memberOfParliament");
+
+	// Now annotate post if possible (won't be for shadow roles)
+	AnnotationSet lookupSet = ministerSet.get("Lookup");
+	if (lookupSet.size() > 0) {
+		Annotation lookupAnn = lookupSet.iterator().next();
+		//System.out.println("Position: " + gate.Utils.stringFor(doc, lookupAnn));
+		// Get Position annotations
+		AnnotationSet positionSet = inputAS.get("Position", ministerSet.firstNode().getOffset(), ministerSet.lastNode().getOffset());
+		features = Factory.newFeatureMap();
+		features.put("type", "ministerial");
+		AnnotationSet postSet = positionSet.get("Position", features);
+		Annotation postAnn = postSet.iterator().next();
+		if (lookupAnn.getFeatures().get("context") != null) {
+			postAnn.getFeatures().put("context", lookupAnn.getFeatures().get("context").toString());
+		}
+	}
+}
+
+
+/* Person with party and ministerial status following, e.g. David Cameron, Prime Minister */
+/* The combination of a known MP allows us to be sure the post is a UK minister */
+/* We'll also use a reference to Minister of State to indicate a link */
+Rule: PostfixMinisterial
+(
+	(
+		{Person, Lookup.majorType == name, Lookup.minorType == mp}
+		({Token.string == ","})
+	):person
+	(
+		(
+			(
+				({Position.type == ministerial, Lookup.minorType == ministerial}):ministerialPost
+			)	
+		) |
+		(
+			{Token.string == "Minister"}
+			{Token.string == "of"}
+			{Token.string == "State"}
+		)
+	)
+):mp
+-->
+{
+	AnnotationSet person = bindings.get("person");
+	AnnotationSet name = person.get("Person");
+	AnnotationSet lookup = person.get("Lookup");
+	Annotation personAnn = name.iterator().next();
+	Annotation lookupAnn = lookup.iterator().next();
+	
+//	personAnn.getFeatures().put("context", lookupAnn.getFeatures().get("context").toString());
+	personAnn.getFeatures().put("rule", "PostfixMinisterial");
+	personAnn.getFeatures().put("type", "memberOfParliament");
+
+	AnnotationSet ministerialPost = bindings.get("ministerialPost");
+	if (ministerialPost != null) {
+		AnnotationSet post = ministerialPost.get("Position");
+		lookup = ministerialPost.get("Lookup");
+		Annotation postAnn = post.iterator().next();
+		lookupAnn = lookup.iterator().next();
+		if (lookupAnn.getFeatures().get("context") != null) {
+			postAnn.getFeatures().put("context", lookupAnn.getFeatures().get("context").toString());
+		}
+	}
+}
+
+/* Person with party and MP status following, e.g. John Smith Labour MP */
+Rule: PostfixMP
+(
+	(
+		{Person, Lookup.majorType == name, Lookup.minorType == mp}
+	):person
+	(
+		(
+			{Lookup.majorType == organisation, Lookup.minorType == political_party}
+			{Token.string == "MP"}
+		) |
+		(
+			{Token.string == "MP"}
+		) |
+		(			
+			{Token.string == ","}
+			{Lookup.majorType == organisation, Lookup.minorType == political_party}
+			{Token.string == "MP"}
+			{Token.string == "for"}
+		)
+	)
+):mp
+-->
+{
+	AnnotationSet person = bindings.get("person");
+	AnnotationSet name = person.get("Person");
+	AnnotationSet lookup = person.get("Lookup");
+	Annotation personAnn = name.iterator().next();
+	Annotation lookupAnn = lookup.iterator().next();
+	
+//	personAnn.getFeatures().put("context", lookupAnn.getFeatures().get("context").toString());
+	personAnn.getFeatures().put("rule", "PostfixMP");
+	personAnn.getFeatures().put("type", "memberOfParliament");
+}
+
+
+/* Person with Rt hon status */
+Rule: RtHonMP
+(
+	(
+		{Person, Person contains {Lookup.minorType == mp}, Person contains {Lookup.full == "Right Honourable"}}
+	):person
+):mp
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+	AnnotationSet nameSet = personSet.get("Person");
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("minorType", "mp");
+	AnnotationSet lookupSet = inputAS.get("Lookup", personSet.firstNode().getOffset(), personSet.lastNode().getOffset());
+	AnnotationSet lookupMpSet = lookupSet.get("Lookup", features);
+	Annotation personAnn = nameSet.iterator().next();
+	Annotation lookupAnn = lookupMpSet.iterator().next();
+	
+//	personAnn.getFeatures().put("context", lookupAnn.getFeatures().get("context").toString());
+	personAnn.getFeatures().put("rule", "RtHonMP");
+	personAnn.getFeatures().put("type", "rightHonourable");
+}
+

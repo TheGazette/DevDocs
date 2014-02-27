@@ -1,0 +1,218 @@
+/*
+* Filename: 	des_person_resolution.jape
+* Author:	Paul Appleby
+* Description:	With names now marked up attempts to remove false positives
+* Date created:	21/06/2010
+* This version:	0.12
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 22/10/11	0.12		PA		Removed people followed by company type
+* 15/01/11	0.11		PA		Removed people that are obviously places PersonNameRemove1B
+* 27/09/10	0.10		PA		Added PersonNameRemoveAvoid
+* 14/09/10	0.9		PA		Removed logic removing names in parens and added check for name following facility type
+* 29/08/10	0.8		PA		Removed PersonNameRemove
+* 26/08/10	0.7		PA		Added in name genders
+* 13/08/10	0.6		PA		Added in PersonNameRemove6
+* 30/07/10	0.5		PA		Removed rule PersonNameRemove3
+* 28/07/10	0.4		PA		Added in removal of names with A as initial where DT
+						And names in parens
+* 27/07/10	0.3		PA		Added in disambiguation of street name (rule 6)
+* 21/06/10	0.2		PA		Added in removal using events - moved confirmation to next phase
+*/
+
+
+Phase:	PersonResolution
+Input:  TempName Token Lookup LineBreak Position Surname
+Options: control = appelt negationGrouping = false
+
+
+/* Allow a name following 'A' as a determinant if conjucted */
+Rule: PersonNameRemoveAvoid
+(
+	{TempName}
+	{Token.category == CC}
+	{Token.category == DT, Token.string == "A", TempName}
+)
+-->{}
+
+
+/* Remove a name following 'A' as a determinant */
+Rule: PersonNameRemove1A
+(
+	({Token.category == DT, Token.string == "A", TempName}):name
+):nameSequence
+-->
+{
+	AnnotationSet nameSet = bindings.get("name");
+ 	outputAS.removeAll(nameSet);
+}
+
+
+/* Remove a name following place indicator */
+Rule: PersonNameRemove1B
+(
+	(
+		{Token.root == "state"} |
+		{Token.root == "village"} |
+		{Token.root == "town"} |
+		{Token.root == "hamlet"} |
+		{Token.root == "city"}
+	)
+	(
+		{Token.root == "of"} |
+		{Token.root == "near"}
+	)
+	({TempName}):name
+):nameSequence
+-->
+{
+	AnnotationSet nameSet = bindings.get("name");
+ 	outputAS.removeAll(nameSet);
+}
+
+
+/* Remove a name that is probably a company (but not if the possesive form is used) */
+/* That is folling IN tokens the only likely instance of a person would have a association following it */
+/* e.g. in Osborne Clarke, the law firm */
+Rule: PersonNameRemove2
+(
+	(
+		{Token.string == "in"}
+		({TempName, !Lookup.minorType == titleMale, !Lookup.minorType == titleFemale}):name
+	):nameSequence
+	{!Token.string == "'"}
+)
+-->
+{
+	AnnotationSet name = bindings.get("name");
+ 	outputAS.removeAll(name);
+}
+
+
+/* Remove names that are actually event names or incorrectly identified, e.g. 'Gay Pride Festival' or '(Rod Duties)'
+	We will remove all similar names which will then cover where the same name is used in the same document
+	Rather than remove things here we'll just mark them ready to be removed */
+Rule: PersonNameRemove4
+(
+	(
+		({TempName}):name1
+		{Lookup.majorType == event, Lookup.minorType == event_type}
+	)
+)
+-->
+{
+	// First get the text of the name to remove
+	AnnotationSet name = bindings.get("name1");
+	Annotation nameAnn = name.iterator().next();
+	Long nameStart = nameAnn.getStartNode().getOffset();
+	Long nameEnd = nameAnn.getEndNode().getOffset();
+	String nameTextToRemove = "";
+	try {
+		nameTextToRemove = doc.getContent().getContent(nameStart, nameEnd).toString();
+	}
+	catch (Exception e) {
+	}
+	//System.out.println("Name to remove: " + nameTextToRemove);
+
+	// Now iterate through all names and remove similar 	
+	Iterator<Annotation> nameItr = inputAS.get("TempName").iterator();
+	while (nameItr.hasNext()) {
+		nameAnn = nameItr.next();
+		nameStart = nameAnn.getStartNode().getOffset();
+		nameEnd = nameAnn.getEndNode().getOffset();
+		String nameText = "";
+		try {
+			nameText = doc.getContent().getContent(nameStart, nameEnd).toString();
+			//System.out.println("Name found: " + nameText + "; at " + nameStart + "," + nameEnd);
+		}
+		catch (Exception e) {
+		}
+		// Mark any matches as removable
+		if (nameText.equals(nameTextToRemove)) {		
+			nameAnn.getFeatures().put("remove", "true");
+		}
+	}
+
+}
+
+
+/* Remove a person followed by a street name key, e.g. 'A Downing Street' */
+Rule: PersonNameRemove5
+(
+	({TempName}):name
+	(
+		{Lookup.majorType == location, Lookup.minorType == street_name}
+	)
+):nameSequence
+-->
+{
+	AnnotationSet nameSet = bindings.get("name");
+ 	outputAS.removeAll(nameSet);
+}
+
+
+/* Remove names that are actually streets, e.g. Perry Close. (i.e. we're assuming a street following a street) */
+/* Or something following a facility type. Far more likely to be a place */
+Rule: PersonNameRemove6
+(
+	(
+		{Lookup.minorType == "street_name"} |
+		{Lookup.minorType == "facility_type"}
+	)
+	({Token.string == ","})?
+	({TempName, !Position}):name
+):nameSequence
+-->
+{
+	AnnotationSet nameSet = bindings.get("name");
+ 	outputAS.removeAll(nameSet);
+}
+
+/* Remove names that are actually organisations, e.g. U.N. Security Council. */
+Rule: PersonNameRemove7
+(
+	({TempName}):name
+	{Lookup.minorType == organisation_type}
+):nameSequence
+-->
+{
+	AnnotationSet nameSet = bindings.get("name");
+ 	outputAS.removeAll(nameSet);
+}
+
+/* Remove a person followed by a company type key, e.g. 'Managing Director Sapphire Partners' */
+Rule: PersonNameRemoveCompanyType
+(
+	({TempName}):name
+	(
+		{Lookup.majorType == organisation, Lookup.minorType == company_type}
+	)
+):nameSequence
+-->
+{
+	AnnotationSet nameSet = bindings.get("name");
+ 	outputAS.removeAll(nameSet);
+}
+
+/* Remove a person followed by a person with position and surname, e.g. 'Christina Ioannidis, chief executive officer Aquitude' */
+/* Almost certainly indicates that the surname is a company name */
+Rule: PersonNameRemoveCompanyType
+(
+	{TempName}
+	({Token.string == ","})?
+	(
+		{Position within TempName}
+		{Surname}
+	):name
+):nameSequence
+-->
+{
+	AnnotationSet nameSet = bindings.get("name");
+	AnnotationSet tempNameSet = inputAS.get("TempName", nameSet.firstNode().getOffset(), nameSet.lastNode().getOffset());
+ 	outputAS.removeAll(tempNameSet);
+}

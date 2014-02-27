@@ -1,0 +1,9 @@
+/* 
+*	rdfa-output-main.jape
+*/
+
+Multiphase: rdfaOutput
+Phases:
+rdfaOutput0
+rdfaOutput1
+rdfaOutput2

@@ -1,0 +1,80 @@
+/*
+*  
+* Filename: 	des_term_abbrev_resolution.jape
+* Author:	Paul Appleby
+* Description:	Links previously matched terms and abbreviations
+* Date created:	05/03/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 21/10/10	0.2		PA		Added 'term-' to id values for consistency with other elements
+*/
+
+
+Phase:	TermAndAbbrevResolution
+Input:  Term
+Options: control = appelt negationGrouping = false
+
+Rule: Term
+(
+	({Term})*
+):term
+-->
+:term{
+
+	// Get list of terms in document order
+	List<Annotation> terms = new ArrayList<Annotation>(termAnnots);
+	Collections.sort(terms, new OffsetComparator());
+	
+	for (int i = 0; i < terms.size(); i++) {
+		terms.get(i).getFeatures().put("id", "term-" + (i + 1));
+		String termString = "";
+		try {
+			termString = doc.getContent().getContent(terms.get(i).getStartNode().getOffset(),
+				terms.get(i).getEndNode().getOffset()).toString();
+		}
+		catch (Exception e) {
+		}
+
+		// Get the string content of the abbrev just matched above
+		String thisContent = (String) terms.get(i).getFeatures().get("abbrev");
+
+		Iterator<Annotation> itr = doc.getAnnotations("DES").get("TempAbbrev").iterator();	
+
+		// Iterate over all Abbrev annotations to see if we have a match
+		while (itr.hasNext())	{
+			Annotation abbrevAnn = itr.next();
+			String abbrevContent = "";
+			try {
+				abbrevContent = doc.getContent().getContent(abbrevAnn.getStartNode().getOffset(),
+					abbrevAnn.getEndNode().getOffset()).toString();
+				if (abbrevContent.endsWith("s")) {
+					abbrevContent = abbrevContent.substring(0, abbrevContent.length() - 1);
+				}
+			}
+			catch (Exception e) {
+			}
+
+			// A match!
+			if (thisContent.equals(abbrevContent)) {
+				try {
+					gate.FeatureMap features = Factory.newFeatureMap();
+					features.put("termRef", "term-" + (i + 1));
+					features.put("term", termString);				
+					features.put("rule", "Abbrev");				
+					outputAS.add(abbrevAnn.getStartNode(), abbrevAnn.getEndNode(), "Abbrev", features);
+				} catch (Exception e) {
+					// something went wrong here but we want to continue
+				}
+			}
+
+		}
+
+	}
+}
+

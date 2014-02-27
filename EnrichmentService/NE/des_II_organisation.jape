@@ -1,0 +1,58 @@
+/*
+* Filename: 	des_II_organisation.jape
+* Author:	Paul Appleby
+* Description:	Annotates organisations names using existing annotations
+* Date created:	28/08/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 21/02/11	0.3		PA		Added PersonOrganisation
+* 02/11/10	0.2		PA		Restricted PlaceOrganisation to courts
+*/
+
+
+Phase:	OrganisationII
+Input:  Token Lookup LineBreak Country County Organisation Place Person
+Options: control = appelt negationGrouping = false
+
+/* Extend organisations to include a preceding place of some sort */
+Rule: PlaceOrganisation
+(
+	(
+		{County} |
+		{Place}
+	):place
+	({Organisation.type == court}):organisation
+):extendedOrganisation
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+	AnnotationSet extendedOrganisationSet = bindings.get("extendedOrganisation");
+	Annotation organisationAnn = organisationSet.iterator().next();
+	outputAS.add(extendedOrganisationSet.firstNode(), extendedOrganisationSet.lastNode(), "Organisation", organisationAnn.getFeatures()); 	
+	outputAS.remove(organisationAnn);
+}
+
+
+/* Person Organisations! */
+Rule: PersonOrganisation
+(
+	{Person}
+	{Lookup.majorType == organisation, Lookup.minorType == organisation_type, Token.orth != lowercase}
+):organisation
+-->
+{
+	AnnotationSet annotSet = bindings.get("organisation");
+ 	AnnotationSet orgSet = inputAS.get("Organisation", annotSet.firstNode().getOffset(), annotSet.lastNode().getOffset());
+ 	outputAS.removeAll(orgSet);
+
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "PersonOrganisationWithKey");
+	outputAS.add(annotSet.firstNode(), annotSet.lastNode(), "Organisation", features);
+
+}

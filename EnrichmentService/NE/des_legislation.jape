@@ -1,0 +1,67 @@
+/*  
+* Filename: 	des_legislation.jape
+* Author:	Paul Appleby
+* Description:	Extract primary legislation references from text
+* Date created:	01/06/2010
+* This version:	0.1
+*
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+Phase:	Legislation
+Input:  Lookup Token LineBreak
+Options: control = all negationGrouping = false
+
+/* Match legislation. We'll allow for an optional acronym in parens for odd instances where that happens */
+/* Note the mode is all because the year is calculated separately and there may be multiple instances with the
+same title */
+
+
+Rule: Legislation
+Priority: 10
+(
+	{Lookup.majorType == legislation}
+	(
+		{Token.string == "("}
+		{Token.orth == allCaps}
+		{Token.string == ")"}
+	)?
+	(
+		{Token.category == CD}
+	):legisyear
+):legis
+-->
+{	
+	AnnotationSet legisSet = bindings.get("legis");
+	AnnotationSet legisYearContainerSet = bindings.get("legisyear");
+
+	AnnotationSet legisTitleSet = legisSet.get("Lookup");
+	AnnotationSet legisYearSet = legisYearContainerSet.get("Token"); 	
+
+	Annotation titleAnn = legisTitleSet.iterator().next();	
+	Annotation yearAnn = legisYearSet.iterator().next();	
+
+	FeatureMap features = Factory.newFeatureMap();
+	
+	if (titleAnn.getFeatures().get("context") != null) {
+		//System.out.println("Detected legislation");
+		// Get year from lookup info
+		String titleYear = titleAnn.getFeatures().get("year").toString();
+		// Get year from document
+		String yearYear = yearAnn.getFeatures().get("string").toString();
+		// If the same use information
+		if (titleYear.equals(yearYear)) {
+			String context = titleAnn.getFeatures().get("context").toString();;		
+			features.put("context", context);
+			features.put("rule", "Legislation");
+			String type = titleAnn.getFeatures().get("minorType").toString();
+			features.put("type", type);
+			outputAS.add(legisSet.firstNode(), legisSet.lastNode(), "Legislation", features);	
+		}
+	}	
+}
+

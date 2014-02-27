@@ -1,0 +1,275 @@
+/*
+* Filename: 	des_date.jape
+* Author:	Paul Appleby
+* Description:	Annotates dates that occur in various formats
+* Date created:	14/09/2010
+* This version:	0.5
+* 
+* Change history
+* ==========================================================================
+* Date		Version	Author	Description
+* ==========================================================================
+*
+* 28/06/11		0.5		PA		Improved range handling
+* 02/02/11		0.4		PA		Avoided years that are GMT times
+* 27/09/10		0.3		PA		Added PartialDate3 and YearRangeShort And PartialDate2Range
+* 14/09/10		0.2		PA		Extended year match down to 1500s
+*/
+
+Phase:	Date
+Input: Lookup Token LineBreak
+Options: control = appelt negationGrouping = false
+
+
+Macro: YEAR
+(
+	{Token.kind == number, Token.length == 4}
+)
+
+
+Macro: DATESEP
+(
+	{Token.kind == punctuation, Token.string == "/"} |
+	{Token.kind == punctuation, Token.string == "-"}
+)
+
+
+Macro: DAYOFMONTH
+(
+	{Token.string ==~ "0?[1-9]"} |
+	{Token.string ==~ "1[0-9]"} |
+	{Token.string ==~ "2[0-9]"} |
+	{Token.string ==~ "3[0-1]"}
+)
+
+
+Macro: YEARLONG
+(
+	{Token.string ==~ "15[0-9]{2}"} |	
+	{Token.string ==~ "16[0-9]{2}"} |
+	{Token.string ==~ "17[0-9]{2}"} |
+	{Token.string ==~ "18[0-9]{2}"} |
+	{Token.string ==~ "19[0-9]{2}"} |
+	{Token.string ==~ "20[0-9]{2}"}
+)
+
+
+/* Match year only, e.g. 1956 */
+Rule: YearOnly
+(
+	(YEARLONG):year	
+):dt
+-->
+	:dt.TempDate = {year =: year.Token.string, rule = "YearOnly"}
+  
+
+/* Match year only, e.g. 1956-60 */
+Rule: YearRangeShort
+(
+	(YEARLONG):year1
+	(DATESEP)
+	(
+		{Token.string ==~ "[0-9]{2}"}
+	):year2
+)
+-->
+{
+	AnnotationSet year1 = bindings.get("year1");
+	AnnotationSet year2 = bindings.get("year2");
+	Annotation year1Ann = year1.iterator().next();
+	Annotation year2Ann = year2.iterator().next();
+	
+	FeatureMap features1 = Factory.newFeatureMap();
+	features1.put("year", gate.Utils.stringFor(doc, year1Ann));
+	features1.put("rule", "YearRangeShort");	
+	outputAS.add(year1.firstNode(), year1.lastNode(), "TempDate", features1);
+
+	FeatureMap features2 = Factory.newFeatureMap();
+	features2.put("year", gate.Utils.stringFor(doc, year1Ann).substring(0, 2) + gate.Utils.stringFor(doc, year2Ann));
+	features2.put("rule", "YearRangeShort");	
+	outputAS.add(year2.firstNode(), year2.lastNode(), "TempDate", features2);
+}
+
+  
+/* Match partial date e.g. February 2008 or September, 2007 */
+Rule: PartialDate
+(
+	({Lookup.majorType == date, Lookup.minorType == month}):month
+	({Token.string == ","})?
+	(YEAR):year
+):dt
+-->
+	:dt.TempDate = {month=:month.Lookup.month, year=:year.Token.string, rule="PartialDate"}
+  
+
+/* Match partial date e.g. January 30 */
+Rule: PartialDate2
+(
+	({Lookup.majorType == date, Lookup.minorType == month}):month
+	(DAYOFMONTH):day
+):dt
+-->
+	:dt.TempDate = {month=:month.Lookup.month, day=:day.Token.string, rule="PartialDate2"}
+
+
+/* Match partial date rangee e.g. January 30 - 31*/
+Rule: PartialDate2Range
+(
+	({Lookup.majorType == date, Lookup.minorType == month}):month
+	(DAYOFMONTH):day1
+	(DATESEP)
+	(DAYOFMONTH):day2
+):dt
+-->
+	:day1.TempDate = {month =: month.Lookup.month, day =: day1.Token.string, rule = "PartialDate2Range"},
+	:day2.TempDate = {month =: month.Lookup.month, day =: day2.Token.string, rule = "PartialDate2Range"},
+	:dt.TempDateRange = {}
+
+/* Match partial date e.g. 30 January */
+Rule: PartialDate3
+(
+	(DAYOFMONTH):day
+	({Lookup.majorType == date, Lookup.minorType == month}):month
+):dt
+-->
+	:dt.TempDate = {month=:month.Lookup.month, day=:day.Token.string, rule="PartialDate3"}
+
+
+/* Matches 3-6 February 2008 */
+Rule: DateRange
+(
+	(
+		{Lookup.majorType == date, Lookup.minorType == day} |
+		(DAYOFMONTH)
+	):day1
+	(DATESEP)
+	(
+		{Lookup.majorType == date, Lookup.minorType == day} |
+		(DAYOFMONTH)
+	):day2
+	({Lookup.majorType == date, Lookup.minorType == month}):month
+	({Token.string == ","})?
+	(YEAR):year
+):dt
+-->
+	:day1.TempDate = {day=:day1.Lookup.day, day=:day1.Token.string, month=:month.Lookup.month, year=:year.Token.string, rule="DateRange"},
+ 	:day2.TempDate = {day=:day2.Lookup.day, day=:day2.Token.string, month=:month.Lookup.month, year=:year.Token.string, rule="DateRange"},
+  	:dt.TempDateRange = {}
+
+  
+/* Matches 6 February 2008, 27th day of January 2009 */
+Rule: Date
+(
+	(
+		{Lookup.majorType == date, Lookup.minorType == day} |
+		(DAYOFMONTH)
+	):day
+	(
+		{Token.string ==~ "(?)day"}
+		{Token.string ==~ "(?)of"}
+	)?
+	(
+		{Lookup.majorType == date, Lookup.minorType == month}
+	):month
+	(
+		{Token.string == ","}
+	)?
+	(YEAR):year
+):dt
+-->
+  :dt.TempDate = {day=:day.Lookup.day, day=:day.Token.string, month=:month.Lookup.month, year=:year.Token.string, rule="Date"}
+
+/* Matches February 6, 2008 */
+Rule: DateBeforeTime
+(
+	({Lookup.majorType == date, Lookup.minorType == month}):month
+	(
+		{Lookup.majorType == date, Lookup.minorType == day} |
+		(DAYOFMONTH)
+	):day
+):dt
+(
+	{Token.string == ","}
+	(YEAR)
+	{Token.string == "GMT"}
+)
+-->
+  :dt.TempDate = {day=:day.Lookup.day, day=:day.Token.string, month=:month.Lookup.month, rule="Date"}
+
+
+/* Matches February 6, 2008 */
+Rule: Date
+(
+	(
+		{Lookup.majorType == date, Lookup.minorType == month}
+	):month
+	(
+		{Lookup.majorType == date, Lookup.minorType == day} |
+		(DAYOFMONTH)
+	):day
+	(
+		{Token.string == ","}
+	)
+	(YEAR):year
+):dt
+-->
+  :dt.TempDate = {day=:day.Lookup.day, day=:day.Token.string, month=:month.Lookup.month, year=:year.Token.string, rule="Date"}
+  
+  
+/* Matches UK date in dd/mm/yyyy, dd/mm/yy, dd-mm-yyyy or dd-mm-yy format */
+Rule: UKDate
+(
+	(DAYOFMONTH):day
+	(DATESEP)
+	(
+		{Token.string ==~ "0?[1-9]"} |
+		{Token.string ==~ "1[0-2]"}
+	):month
+	(DATESEP)
+	(
+		(YEAR) |
+		{Token.kind == number, Token.length == 2}
+	):year
+):dt
+-->
+  :dt.TempDate = {day=:day.Token.string, month=:month.Token.string, year=:year.Token.string, rule="UKDate"}
+  
+
+/* Matches US date in mm/dd/yyyy, mm/dd/yy, mm-dd-yyyy or mm-dd-yy format */
+Rule: USDate
+(
+	(
+		{Token.string ==~ "0?[1-9]"} |
+		{Token.string ==~ "1[0-2]"}
+	):month
+	(DATESEP)
+	(DAYOFMONTH):day
+	(DATESEP)
+	(
+		(YEAR) |
+		{Token.kind == number, Token.length == 2}
+	):year
+):dt
+-->
+  :dt.TempDate = {day=:day.Token.string, month=:month.Token.string, year=:year.Token.string, rule="USDate"}
+  
+  
+/* Matches date in yyyy-mm-dd format */
+Rule: Date3
+(	
+	(
+		{Token.string ==~ "19[0-9]{2}"} |
+		{Token.string ==~ "20[0-9]{2}"}
+	):year
+	{Token.kind == punctuation, Token.string == "-"}
+	(
+		{Token.string ==~ "0[1-9]"} |
+		{Token.string ==~ "1[0-2]"}
+	):month
+	{Token.kind == punctuation, Token.string == "-"}
+	(DAYOFMONTH):day
+):dt
+-->
+  :dt.TempDate = {day=:day.Token.string, month=:month.Token.string, year=:year.Token.string, rule="Date3"}
+ 
+ 

@@ -1,0 +1,148 @@
+/*
+* Filename: 	des_number.jape
+* Author:	Paul appleby
+* Description:	Annotates compound numbers (5,000, five million, 5 million etc)
+* Date created:	05/03/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Number
+Input:  Split SpaceToken Token Lookup
+Options: control = appelt negationGrouping = false
+
+
+/* Annotates e.g. 3,123.45 */
+Rule: DecimalNumber
+(
+  {Token.kind == number}
+  (
+  	(
+  		{Token.category == ","}
+  	)
+  	{Token.kind == number, Token.length == 3}
+  )*
+  (
+  	{Token.category == "."}
+  	{Token.kind == number}
+  )
+):num
+-->
+	:num.Number = {type="delimited" rule="DecimalNumber" }
+
+
+/* Annotates e.g. 3,123 */
+Rule: LongNumber
+(
+  {Token.kind == number}
+  (
+  	(
+  		{Token.category == ","}
+  	)
+  	{Token.kind == number, Token.length == 3}
+  )+
+):num
+-->
+	:num.Number = {type="delimited" rule="LongNumber" }
+	
+/* We'll omit e.g. '20m' for now - more likely to be a distance, but allow '£20m' */
+Rule: EnumeratedCompoundNumberAvoid
+Priority: 10
+(
+	(
+		{Token.kind != symbol} |
+		{SpaceToken} |
+		{Split}
+	)
+	{Token.kind == number}
+	({SpaceToken})?
+  	{Lookup.majorType == number, Lookup.minorType == quantifier, Token.string == "m"}
+)
+-->{}
+
+
+/* Annotates e.g. 20 million */
+Rule: EnumeratedCompoundNumber
+(
+  (
+  	{Token.kind == number}
+  ):num
+  ({SpaceToken})?
+  (
+  	{Lookup.majorType == number, Lookup.minorType == quantifier}
+  ):quant
+):fullnum
+-->
+{
+
+	gate.AnnotationSet fullnum = (gate.AnnotationSet)bindings.get("fullnum");
+	gate.AnnotationSet num = (gate.AnnotationSet)bindings.get("num");
+	gate.Annotation numAnn = (gate.Annotation)num.iterator().next();
+
+	gate.AnnotationSet quant = (gate.AnnotationSet)bindings.get("quant");
+	gate.Annotation quantAnn = (gate.Annotation)quant.iterator().next();
+
+	String strNum = "";
+
+	// Get the string content of the number Token just matched in the JAPE rule above
+	try {
+		strNum = doc.getContent().getContent(numAnn.getStartNode().getOffset(), 
+		numAnn.getEndNode().getOffset()).toString();
+	}  catch(InvalidOffsetException ioe) {
+		// this should never happen
+		throw new GateRuntimeException(ioe);
+	}
+
+	double count = Double.parseDouble(quantAnn.getFeatures().get("count").toString());
+	double number = Double.parseDouble(strNum);
+
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule","EnumeratedCompoundNumber");
+	features.put("number",  number * count);
+	outputAS.add(fullnum.firstNode(), fullnum.lastNode(),"Number", features);
+}
+
+
+/* Annotates e.g. twenty billion */
+Rule: SpeltOutCompoundNumber
+(
+  (
+  	{Lookup.majorType == number, Lookup.minorType == cardinal}
+  ):num
+  {SpaceToken}
+  (
+  	{Lookup.majorType == number, Lookup.minorType == quantifier}
+  ):quant
+):fullnum
+-->
+{
+	gate.AnnotationSet fullnum = (gate.AnnotationSet)bindings.get("fullnum");
+	gate.AnnotationSet num = (gate.AnnotationSet)bindings.get("num");
+    	gate.Annotation numAnn = (gate.Annotation)num.iterator().next();
+        gate.AnnotationSet quant = (gate.AnnotationSet)bindings.get("quant");
+    	gate.Annotation quantAnn = (gate.Annotation)quant.iterator().next();
+    		
+    	double count = Double.parseDouble(quantAnn.getFeatures().get("count").toString());
+    	double number = Double.parseDouble(numAnn.getFeatures().get("number").toString());
+    	
+        FeatureMap features = Factory.newFeatureMap();
+    	features.put("rule","SpeltOutCompoundNumber");
+    	features.put("number",  number * count);
+    	outputAS.add(fullnum.firstNode(), fullnum.lastNode(),"Number", features);
+}
+	
+	
+/* Annotates e.g. twenty-one */
+Rule: SpeltOutNumber
+(
+  {Lookup.majorType == number, Lookup.minorType == cardinal}
+):num
+-->
+	:num.Number = {number=:num.Lookup.number, rule="SpeltOutNumber" }

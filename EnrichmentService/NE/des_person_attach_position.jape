@@ -1,0 +1,37 @@
+/*
+* Filename: 	des_person_attach_position.jape
+* Author:	Paul Appleby
+* Description:	Attachs positions to people
+* Date created:	24/10/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	PersonAttachPosition
+Input:  Token Lookup LineBreak Position Company Organisation Publication Facility Person
+Options: control = appelt negationGrouping = false
+
+/* Connect positions following names to the name */
+Rule: ConnectPosition
+(
+	({Person}):person
+	({Token.string == ","})?
+	({Token.category == DT})?
+	({Position, !Position within Person}):position
+	{!Person}
+):annotation
+-->
+{
+	AnnotationSet positionSet = bindings.get("position");
+	Annotation positionAnn = positionSet.iterator().next();
+	AnnotationSet personSet = bindings.get("person");
+	Annotation personAnn = personSet.iterator().next();
+	positionAnn.getFeatures().put("personRef", personAnn.getFeatures().get("id"));
+}

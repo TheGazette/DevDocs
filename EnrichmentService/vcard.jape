@@ -1,0 +1,35 @@
+Phase: firstpass
+Input: dt dd p span 
+Options: control = first
+
+Rule: personAddress_dd
+(
+ {dd.typeof=="vcard:Address"}|
+ {dd.property=="vcard:address"}|
+ {dd.property=="vcard:label"}
+ {dd.property=="vcard:postal-code"}
+):match
+-->
+ :match.AddressOwned = {about= :match.dd.about, resource= :match.dd.resource}
+
+Rule: personAddress_p
+(
+ {p.typeof=="vcard:Address"}|
+ {p.property=="vcard:address"}|
+ {p.property=="vcard:label"}|
+ {p.property=="vcard:postal-code"} 
+):match
+-->
+ :match.AddressOwned = {about= :match.p.about, resource= :match.p.resource}
+
+Rule: personAddress_span
+(
+ {span.typeof=="vcard:Address"}|
+ {span.property=="vcard:address"}|
+ {span.property=="vcard:label"}|
+ {span.property=="vcard:postal-code"}
+):match
+-->
+ :match.AddressOwned = {about= :match.span.about, resource= :match.span.resource}
+
+ 

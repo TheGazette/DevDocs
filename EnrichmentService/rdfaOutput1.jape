@@ -1,0 +1,46 @@
+Phase: rdfaOutput1
+Input: PostcodeNotOwned Person Date Legislation
+Options: control = appelt debug = true  
+ 
+Rule: Legislation_RDFaOutput
+(  
+  {Legislation}
+):match
+-->  
+:match.RDFaOutput = {
+  subject="this:notifiableThing",
+  predicate="https://www.thegazette.co.uk/def/publication#relatedLegislation",
+  object=:match.Legislation.context, typeof="https://www.thegazette.co.uk/def/legislation#Legislation"},
+:match.RDFaOutputLiteral = {
+  subject=:match.Legislation.context,
+	predicate="http://www.w3.org/2000/01/rdf-schema#label",
+	literal=:match@string
+}
+
+Rule: Person_RDFaOutput
+(  
+  {Person}
+):match
+-->  
+:match.RDFaOutput = {
+  subject="this:notifiableThing",
+  predicate="https://www.thegazette.co.uk/def/publication#relatedPerson",
+  objectLocalName=:match.Person.id, 
+	typeof="gaz:Person"},
+:match.RDFaOutputLiteral = {
+  subjectLocalName=:match.Person.id,
+	predicate="xmlns.com/foaf/0.1/name",
+	literal=:match@string
+}
+
+Rule: Date_RDFaOutput
+(  
+  {Date.isoDate=~".+"}
+):match
+-->  
+:match.RDFaOutputLiteral = {
+  subject="this:notifiableThing",
+	predicate="https://www.thegazette.co.uk/def/publication#relatedDate",
+	datatype="http://www.w3.org/2001/XMLSchema#date",
+	literal=:match.Date.isoDate
+}

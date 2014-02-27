@@ -1,0 +1,34 @@
+/*
+* Filename: 	des_location_clean_4.jape
+* Author:	Paul Appleby
+* Description:	Now that we've done a first round of clean up - do some more!
+* Date created:	27/09/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	LocationClean4
+Input:  Token Person LineBreak Place Country Surname
+Options: control = appelt negationGrouping = false
+
+/* Country within ... */
+Rule: PlaceRemove1
+(
+	({Country within Surname}):place
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+
+
+

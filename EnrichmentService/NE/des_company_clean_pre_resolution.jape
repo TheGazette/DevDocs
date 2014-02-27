@@ -1,0 +1,61 @@
+/*
+* Filename: 	des_company_clean_pre_resolution.jape
+* Author:		Paul Appleby
+* Description:	Removes false positives for companies. We do some initial clean up before resolving companies
+* Date created:	25/04/2012
+* This version:	0.1
+* 
+* 
+*/
+
+
+Phase:	CompanyCleanPreResolution
+Input:  Person Company Token LineBreak Paragraph Organisation Lookup Place Number Facility Activity Event Value Time Postcode Street Landmark AdminArea
+Options: control = appelt negationGrouping = false
+
+/* Companies mistagged in conjunctions */
+/* If this proves to general tighten to single word instances */
+/* And then maybe tighten by looking for other examples in document */
+Rule: CompanyRemove2
+Priority: 10
+(
+	({LineBreak})?
+	{Token.category == DT}
+	({Company}):company
+	{Token.category == CC}
+	{!Company, Token.orth == upperInitial}
+)
+-->
+{
+	AnnotationSet companySet = bindings.get("company");
+ 	outputAS.removeAll(companySet);
+}
+
+/* In certain positions there is a candidate company name within a position 'at' a company
+That will be allowed because of the proximity to the company so we need to get rid of it
+*/
+Rule: CompanyRemove6
+Priority: 10
+(
+	({Company}):company
+	{Token.string == "at"}
+	{Company}
+)
+-->
+{
+	AnnotationSet companySet = bindings.get("company");
+ 	outputAS.removeAll(companySet);
+}
+
+Rule: CompanyRemove7
+Priority: 10
+(
+	{Token.string == "-"}
+	({Company}):company
+	{Token.string == "-"}
+)
+-->
+{
+	AnnotationSet companySet = bindings.get("company");
+ 	outputAS.removeAll(companySet);
+}

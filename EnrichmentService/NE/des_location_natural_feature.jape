@@ -1,0 +1,119 @@
+/*
+* Filename: 	des_location_natural_feature.jape
+* Author:	Paul Appleby
+* Description:	Annotates non UK Cities
+* Date created:	31/08/2010
+* This version:	0.3
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 01/02/11	0.3		PA		Added Feature
+* 27/09/10	0.2		PA		Loosened FEATUREITEM facility check
+*/
+
+
+Phase:	NaturalFeature
+Input:  LineBreak Lookup Token
+Options: control = appelt negationGrouping = false
+
+Macro: FEATURETERM
+(
+	(
+		(
+			{Token.orth == upperInitial, Token.category == NN, !Lookup.majorType == facility, Token.length > 1, Token.root != "at"} |
+			{Token.orth == upperInitial, Token.category == NNP, !Lookup.majorType == facility, Token.length > 1, Token.root != "at"} |
+			{Token.orth == upperInitial, Token.category == NNS, !Lookup.majorType == facility, Token.length > 1, Token.root != "at"} |
+			{Token.orth == upperInitial, Token.category == NNPS, !Lookup.majorType == facility, Token.length > 1, Token.root != "at"}
+		)
+		(
+			{Token.string == "\u2019"}
+			{Token.string == "s"}
+		)?
+	) |
+	{Token.orth == upperInitial, Token.category == JJ, !Lookup.majorType == facility, Token.length > 1} |
+	{Token.category == CD, Token.length == 4, Token.kind == number} |
+	(
+		(
+			{Token.orth == allCaps, Token.category == NN, !Lookup.majorType == facility, Token.length > 1, Token.root != "at"} |
+			{Token.orth == allCaps, Token.category == NNP, !Lookup.majorType == facility, Token.length > 1, Token.root != "at"} |
+			{Token.orth == allCaps, Token.category == NNS, !Lookup.majorType == facility, Token.length > 1, Token.root != "at"} |
+			{Token.orth == allCaps, Token.category == NNPS, !Lookup.majorType == facility, Token.length > 1, Token.root != "at"}
+		)
+		(
+			{Token.string == "\u2019"}
+			{Token.string == "S"}
+		)?
+	)
+)
+
+/* Will pick up basic feature sequences */
+Macro: FEATURETERMSEQ
+(
+	(FEATURETERM)+
+)
+
+/* Features such as 'Big Moor' */
+Rule: FeatureWithKey
+(
+	(
+		(FEATURETERMSEQ)
+		{Lookup.majorType == feature, Lookup.minorType == feature_type}
+	):feature
+)
+-->
+	:feature.Feature = {rule = "FeatureWithKey"}
+
+	
+/* Water Features such as 'River Thames' */
+Rule: WaterFeature
+(
+	{Lookup.majorType == feature, Lookup.minorType == water_feature}
+):feature
+-->
+{
+	AnnotationSet featureSet = bindings.get("feature");
+	Annotation featureAnn = featureSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	String context = "http://data.ordnancesurvey.co.uk/id/50kGazetteer/";
+	if (featureAnn.getFeatures().get("partial-context").toString().indexOf(",") < 0) {
+		context += featureAnn.getFeatures().get("partial-context");
+	}
+	else {
+		features.put("contextOptions", featureAnn.getFeatures().get("partial-context"));
+	}
+	features.put("context", context);
+	features.put("rule", "WaterFeature");
+	features.put("type", "water");
+	features.put("easting", featureAnn.getFeatures().get("easting"));
+	features.put("northing", featureAnn.getFeatures().get("northing"));
+	outputAS.add(featureSet.firstNode(), featureSet.lastNode(), "Feature", features);
+}
+
+
+/* Other Features such as 'Ben Nevis' */
+Rule: Feature
+(
+	{Lookup.majorType == feature, Lookup.minorType == feature}
+):feature
+-->
+{
+	AnnotationSet featureSet = bindings.get("feature");
+	Annotation featureAnn = featureSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	String context = "http://data.ordnancesurvey.co.uk/id/50kGazetteer/";
+	if (featureAnn.getFeatures().get("partial-context").toString().indexOf(",") < 0) {
+		context += featureAnn.getFeatures().get("partial-context");
+	}
+	else {
+		features.put("contextOptions", featureAnn.getFeatures().get("partial-context"));
+	}
+	features.put("context", context);
+	features.put("rule", "Feature");
+	features.put("type", featureAnn.getFeatures().get("type"));
+	features.put("easting", featureAnn.getFeatures().get("easting"));
+	features.put("northing", featureAnn.getFeatures().get("northing"));
+	outputAS.add(featureSet.firstNode(), featureSet.lastNode(), "Feature", features);
+}

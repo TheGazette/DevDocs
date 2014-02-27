@@ -1,0 +1,99 @@
+/*
+* Filename: 	des_spacetoken_clean.jape
+* Author:		Paul Appleby
+* Description:	Remove annotations that make no sense when space tokens are considered
+* Date created:	29/06/2010
+* This version:	0.5
+* 
+*/
+
+
+Phase:	SpaceTokenClean
+Input:  Person SpaceToken Token LineBreak BuildingNumber MiddleInitials
+Options: control = appelt negationGrouping = false
+
+
+/* Person followed directly by number */
+Rule: PersonRemove1
+(
+	({Person}):person
+	{Token.category == CD}
+)
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+ 	outputAS.removeAll(personSet);
+}
+
+
+/* Person preceded directly by number */
+Rule: PersonRemove2
+(
+	{Token.category == CD}
+	({Person}):person
+)
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+ 	outputAS.removeAll(personSet);
+}
+
+
+/* Person preceded directly by a digit or conjunction or certain punctuation */
+Rule: PersonRemove3
+(
+	(
+		{Token.category == CD} |
+		{Token.category == CC, Token.string == "&"}
+	)
+	({Person}):person
+)
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+ 	outputAS.removeAll(personSet);
+}
+
+/* Person preceded directly by a digit or conjunction or certain punctuation */
+Rule: PersonRemove3A
+(
+	(
+		{Token.string == "/"}
+	)
+	({Person, MiddleInitials}):person
+)
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+ 	outputAS.removeAll(personSet);
+}
+
+
+/* Person preceded directly by a conjunction combination, e.g. 'A & B Courses' */
+Rule: PersonRemove4
+(
+	{Token.length == 1, Token.kind == word}
+	({SpaceToken})?
+	{Token.category == CC, Token.string == "&"}
+	({SpaceToken})?
+	({Person}):person
+)
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+ 	outputAS.removeAll(personSet);
+}
+
+
+/* Building number preceded directly by a letter (probably a road!) */
+Rule: BuildingNumberRemove1
+(
+	{Token}
+	({BuildingNumber}):buildingNumber
+)
+-->
+{
+	AnnotationSet buildingNumberSet = bindings.get("buildingNumber");
+ 	outputAS.removeAll(buildingNumberSet);
+}
+

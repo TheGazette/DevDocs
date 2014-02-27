@@ -1,0 +1,118 @@
+/*
+* Filename: 	des_identifier_fix.jape
+* Author:	Paul Appleby
+* Description:	Change any annotation that the identifier has noted are wrongly annotatted
+* Date created:	26/10/2011
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author	Description
+* ==========================================================================
+*
+* 23/11/11	0.2		PA	Added event and Person map
+*/
+
+
+Phase:	IdenfitiferFix
+Input:  Person Organisation Facility Event
+Options: control = once negationGrouping = false
+
+Rule: ChangePerson
+(
+	{Person} |
+	{Event} |
+	{Organisation} |
+	{Facility}
+):annotation
+-->
+{
+	LinkedHashSet<String> removeIdList = new LinkedHashSet<String>();
+	LinkedHashSet<String> removeList = new LinkedHashSet<String>();
+	// Create the list of annotations to remove from within the changed annotation
+	// This is for clean-up
+	removeList.add(new String("Person"));
+	removeList.add(new String("Event"));
+	removeList.add(new String("Position"));
+	removeList.add(new String("FirstName"));
+	removeList.add(new String("MiddleInitials"));
+	removeList.add(new String("MiddleNames"));
+	removeList.add(new String("Surname"));
+	removeList.add(new String("Pedigree"));
+	removeList.add(new String("Organisation"));
+	removeList.add(new String("Facility"));
+	Integer idCount = 1000;
+
+	LinkedHashSet<String> typesList = new LinkedHashSet<String>();
+	// The list of annotations to try
+	typesList.add(new String("Person"));
+	typesList.add(new String("Organisation"));
+	typesList.add(new String("Facility"));
+	typesList.add(new String("Event"));
+
+ 	AnnotationSet annotsToCheckSet = inputAS.get(typesList);
+	List<Annotation> orderedAnnots = gate.Utils.inDocumentOrder(annotsToCheckSet);
+
+ 	for (Annotation checkAnn: orderedAnnots) {
+ 		// Change the wrongly annotated thing
+		if (checkAnn.getFeatures().get("identifierAnnotation") != null) {
+	 		String checkId = checkAnn.getFeatures().get("id").toString();
+			Long checkStart = checkAnn.getStartNode().getOffset();
+			Long checkEnd = checkAnn.getEndNode().getOffset();
+			// Get annotations to clean
+			AnnotationSet removeInputSet = inputAS.getContained(checkStart, checkEnd);
+			AnnotationSet removeSet = removeInputSet.get(removeList);
+
+			String newType = checkAnn.getFeatures().get("identifierAnnotation").toString();
+			//System.out.println("New type: " + newType);
+			FeatureMap features = Factory.newFeatureMap();
+			features.put("rule", "IdentifierChange");
+			String idTag = "";
+			if (newType.equals("Product")) idTag = "product";
+			else if (newType.equals("Organisation")) idTag = "organisation";
+			else if (newType.equals("Company")) idTag = "company";
+			else if (newType.equals("Medical")) idTag = "medical";
+			else if (newType.equals("Person")) idTag = "name";
+			else if (newType.equals("Animal")) idTag = "animal";
+			else if (newType.equals("Street")) idTag = "street";
+			else if (newType.equals("Event")) idTag = "event";
+			features.put("id", idTag + "-" + idCount);
+			removeIdList.add(checkId);
+			features.put("context", checkAnn.getFeatures().get("context").toString());
+			try {
+				outputAS.add(checkStart, checkEnd, newType, features); 	
+				outputAS.removeAll(removeSet); 	
+				// Change any co-refs
+				for (Annotation isAddAnn: orderedAnnots) {
+					if (isAddAnn != checkAnn && isAddAnn.getFeatures().get("ref") != null) {
+						if (removeIdList.contains(isAddAnn.getFeatures().get("ref").toString())) { 
+							Long checkAddStart = isAddAnn.getStartNode().getOffset();
+							Long checkAddEnd = isAddAnn.getEndNode().getOffset();
+							removeInputSet = inputAS.get(checkAddStart, checkAddEnd);
+							removeSet = removeInputSet.get(removeList);
+							outputAS.removeAll(removeSet); 	
+							FeatureMap corefFeatures = Factory.newFeatureMap();
+							corefFeatures.put("ref", idTag + "-" + idCount);
+							outputAS.add(checkAddStart, checkAddEnd, newType, corefFeatures);
+						}
+					}
+				}
+			}
+			catch (Exception e) {
+				System.err.println("Problem with person identifier fix: " + e.getMessage());
+			}
+			idCount++;
+		}
+		// Is this a co-reference that needs removing?
+		/*else if (checkAnn.getFeatures().get("ref") != null) {
+			if (removeIdList.contains(checkAnn.getFeatures().get("ref").toString())) { 
+				Long checkStart = checkAnn.getStartNode().getOffset();
+				Long checkEnd = checkAnn.getEndNode().getOffset();
+				AnnotationSet removeInputSet = inputAS.get(checkStart, checkEnd);
+				AnnotationSet removeSet = removeInputSet.get(removeList);
+				outputAS.removeAll(removeSet); 	
+			}
+		}*/
+	}
+}

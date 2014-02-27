@@ -1,0 +1,22 @@
+
+US$;unit=USD
+US $;unit=USD
+AUS$;unit=AUD
+AUS $;unit=AUD
+$;unit=USD
+£;unit=GBP
+¥;unit=JPY
+yen;unit=JPY
+€;unit=EUR
+euros;unit=EUR
+euro;unit=EUR
+dollars;unit=USD
+dollar;unit=USD
+cents;unit=USD;count=0.01
+cent;unit=USD;count=0.01
+pound;unit=GBP
+pound sterling;unit=GBP
+pounds;unit=GBP
+pounds sterling;unit=GBP
+pence;unit=GBP;count=0.01
+sterling;unit=GBP

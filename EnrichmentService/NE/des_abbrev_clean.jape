@@ -1,0 +1,31 @@
+/*
+* Filename: 	des_abbrev_clean.jape
+* Author:	Paul Appleby
+* Description:	With date now marked up removes unwanted abbreviations
+* Date created:	29/06/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	AbbrevClean
+Input:  Abbrev Company
+Options: control = all negationGrouping = false
+
+
+/* Abbreviations in a company */
+Rule: CompanyRemove5
+(
+	{Abbrev within Company}
+):abbrev
+-->
+{
+	AnnotationSet abbrev = bindings.get("abbrev");
+ 	outputAS.removeAll(abbrev);
+}

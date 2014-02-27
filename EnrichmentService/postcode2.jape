@@ -1,0 +1,12 @@
+Phase: postcode2
+Input: Postcode PostcodeOwned
+Options: control = brill
+
+Rule: PostcodeNotOwned
+(
+  {Postcode,!PostcodeOwned}
+):match
+-->
+:match.PostcodeOwned = {
+	context=:match.Postcode.context
+}

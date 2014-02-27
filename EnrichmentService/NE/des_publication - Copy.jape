@@ -1,0 +1,106 @@
+/*
+* Filename: 	des_publication.jape
+* Author:		Paul Appleby
+* Description:	Annotates publications.
+* Date created:	06/12/2010
+* This version:	0.4
+* 
+*/
+
+
+Phase:	Publication
+Input:  Split Token Lookup LineBreak
+Options: control = all negationGrouping = false
+
+
+Macro: PUBLICATIONTERM
+(
+	(
+		(
+			{Token.orth == upperInitial, Token.category == CD, Token.kind == word} |
+			{Token.orth == upperInitial, Token.category == VBG, Token.kind == word} |
+			{Token.orth == upperInitial, Token.category == DT, Token.kind == word} |
+			{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == position} |
+			{Token.orth == upperInitial, Token.category == NNS, !Lookup.minorType == position} |
+			{Token.orth == upperInitial, Token.category == NNPS, !Lookup.minorType == position}
+		)
+	) |
+	{Token.orth == upperInitial, Token.category == JJ} |
+	(
+		(
+			{Token.orth == allCaps, Token.category == CD, Token.kind == word} |
+			{Token.orth == allCaps, Token.category == VBG, Token.kind == word} |
+			{Token.orth == allCaps, Token.category == DT, Token.kind == word} |			
+			{Token.orth == allCaps, Token.category == NNP, !Lookup.minorType == position} |
+			{Token.orth == allCaps, Token.category == NNS, !Lookup.minorType == position} |
+			{Token.orth == allCaps, Token.category == NNPS, !Lookup.minorType == position}
+		)
+	)
+)
+
+
+/* Publication for papers with the determinant */
+Rule: Publication
+(
+	({Lookup.majorType == publication, Lookup.minorType == publication}):publication
+)
+-->
+	:publication.Publication = {rule = "Publication"}
+
+
+/* Publication with a key */
+Rule: PublicationWithKey
+(
+	(PUBLICATIONTERM)+
+	{Lookup.majorType == publication, Lookup.minorType == publication_type, !Lookup contains {Token.orth == lowercase}}
+):publication
+-->
+	:publication.Publication = {rule = "PublicationWithKey"}
+	
+
+/* Report */
+Rule: OrganisationPublication
+(
+	(
+		{Lookup.minorType == organisation} |
+		{Lookup.minorType == public_body}
+	)
+	(
+		{Token.root == "annual"} |
+		{Token.root == "final"}
+	)	
+	{Token.root == "report"}
+):publication
+-->
+	:publication.Publication = {rule = "OrganisationPublication"}
+
+
+/* Publication */
+
+/* Replaces with some ML logic
+Rule: PublicationPostContext
+(
+	({Lookup.majorType == publication, Lookup.minorType == publication, Token.root == "the"}):publication
+	(
+		{Token.root == "report"} |
+		{Token.root == "journalist"} |
+		{Token.root == "newspaper"}
+	)
+)
+-->
+	:publication.Publication = {rule = "Publication"}
+
+Rule: PublicationPreContext
+(
+	(
+		{Token.root == "in"} |
+		{Token.root == "with"} |
+		{Token.root == "for"} |
+		{Token.root == "from"}
+	)
+	({Lookup.majorType == publication, Lookup.minorType == publication, Token.root == "the"}):publication
+)
+-->
+	:publication.Publication = {rule = "Publication"}
+*/
+

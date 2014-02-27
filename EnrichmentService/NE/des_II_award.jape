@@ -1,0 +1,40 @@
+/*
+* Filename: 	des_awards.jape
+* Author:	Paul Appleby
+* Description:	Annotates awards using other annotations
+* Date created:	21/02/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Award
+Input:  Split Token Lookup LineBreak Person
+Options: control = appelt negationGrouping = false
+
+/* Awards such as Nobel Peace Prize */
+Rule: PersonAwardWithKey
+(
+	{Person}
+	{Lookup.majorType == award, Lookup.minorType == award_type}
+):award
+-->
+{
+	AnnotationSet annotSet = bindings.get("award");
+	// Remove existing award if any
+ 	AnnotationSet awardSet = inputAS.get("Award", annotSet.firstNode().getOffset(), annotSet.lastNode().getOffset());
+ 	outputAS.removeAll(awardSet);
+
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "PersonAwardWithKey");
+	outputAS.add(annotSet.firstNode(), annotSet.lastNode(), "Award", features);
+
+}
+
+

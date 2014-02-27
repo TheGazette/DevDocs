@@ -1,0 +1,116 @@
+/*
+* Filename: 	des_location_clean_3.jape
+* Author:	Paul Appleby
+* Description:	Removes more false positives for locations but in appelt mode
+* Date created:	28/06/2010
+* This version:	0.3
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 03/03/11	0.3		PA		Added in check for nationality
+* 16/09/10	0.2		PA		Added in PlaceRemove2
+*/
+
+
+Phase:	LocationClean3
+Input:  Token Emirate Location Person LineBreak Place Period Nationality
+Options: control = appelt negationGrouping = false
+
+
+/* Remove false positives for emirates and provinces */
+Rule: PlaceRemove1Avoid
+Priority: 10
+(
+	( 
+		{Emirate} |
+		{Location.type == world}
+	)
+	{Person}
+)
+-->{}
+
+
+Rule: PlaceRemove1
+(
+	( 
+		{Emirate} |
+		{Location.type == world}
+	):place
+	{Token.category == NNP}
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+
+
+
+/* Remove single word places that are related to facility keys, e.g. 'Chapel' */
+Rule: PlaceRemove2
+(
+	({Place.type == other, Place.rule == OtherAmbiguous}):place
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	String place = gate.Utils.stringFor(doc, placeSet);
+	if (place.indexOf(" ") == -1) {
+		// Find facilities
+		AnnotationSet facilityToTestSet = inputAS.get("Facility");
+
+		// Iterate over all facility annotations to see if we have a match
+		Boolean isMatch = false;
+		// Remove trailing s which might indicate plural, e.g. 'Chapels'
+		if (place.toLowerCase().endsWith("s")) place = place.substring(0, place.length() - 1);
+		place = place.toLowerCase();
+	 	//System.out.println("Testing place against facilities: " + place);
+		for (Annotation facilityAnn: facilityToTestSet)	{
+			String facilityToTest = gate.Utils.stringFor(doc, facilityAnn).toLowerCase();
+			// A match!
+			if (facilityToTest.endsWith(place)) {
+				isMatch = true;
+				//System.out.println("Matches facility: " + facilityToTest);
+				break;
+			}
+		}
+		if (isMatch) outputAS.removeAll(placeSet);
+	} 	
+}
+
+
+/* Annoyingly Georgian nationality and Georgian period cause conflict! */
+Rule: PlaceRemove2
+(
+	{Nationality, Period}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet periodSet = annotationSet.get("Period");
+	AnnotationSet nationalitySet = annotationSet.get("Nationality");
+	// If it's a single word period then test
+ 	String period = gate.Utils.stringFor(doc, periodSet);
+	if (period.indexOf(" ") == -1) {
+		// Find other nationalities
+		AnnotationSet nationalitiesToTestSet = inputAS.get("Nationality");
+		String nationality = gate.Utils.stringFor(doc, nationalitySet).toLowerCase();
+
+		// Iterate over all nationality annotations to see if we have a match for a different nationality
+		Boolean isMatch = false;
+		for (Annotation nationalityAnn: nationalitiesToTestSet)	{
+			String nationalityToTest = gate.Utils.stringFor(doc, nationalityAnn).toLowerCase();
+			// A different match!
+			if (!nationalityToTest.equals(nationality)) {
+				isMatch = true;
+				break;
+			}
+		}
+		if (!isMatch) outputAS.removeAll(nationalitySet);
+	} 	
+}

@@ -1,0 +1,30 @@
+Phase: postcode
+Input: Postcode AddressOwned
+Options: control = brill
+
+Rule: PostcodeOwned
+(
+	{AddressOwned contains {Postcode}}
+):owned
+-->
+{
+	AnnotationSet annSet= bindings.get("owned");
+	Annotation owned= annSet.iterator().next();
+	
+  AnnotationSet pcAS = inputAS.getContained(owned.getStartNode().getOffset(), owned.getEndNode().getOffset());
+	
+  // create new annotation              
+  Iterator<Annotation> it= pcAS.iterator();
+	while (it.hasNext()) {
+		Annotation pc= it.next();
+		if ("Postcode".equals(pc.getType())) {
+				FeatureMap ownedFM= owned.getFeatures();
+				FeatureMap pcOwnedFM= new SimpleFeatureMapImpl();
+				String subject= (String) ownedFM.get("resource");
+				if (subject==null) subject= (String) ownedFM.get("about");
+				pcOwnedFM.put("about",subject);
+				pcOwnedFM.put("context",pc.getFeatures().get("context"));
+				outputAS.add(pc.getStartNode(),pc.getEndNode(),"PostcodeOwned",pcOwnedFM);
+		}
+	}
+}

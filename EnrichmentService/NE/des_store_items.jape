@@ -1,0 +1,49 @@
+/*
+* Filename: 	des_store_items.jape
+* Author:	Paul Appleby
+* Description:	Store certain annotations in case we need them back after identifier fix
+* Date created:	23/11/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	StoreItems
+Input:  Person
+Options: control = appelt negationGrouping = false
+
+Rule: Store
+(
+	{Person}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet inputFullSet = inputAS.getContained(annotationSet.firstNode().getOffset(), annotationSet.lastNode().getOffset());
+	HashSet<String> coveringList = new HashSet<String>();
+	coveringList.add("Person");
+	coveringList.add("FirstName");
+	coveringList.add("MiddleInitials");
+	coveringList.add("MiddleNames");
+	coveringList.add("Surname");
+	AnnotationSet inputSet = inputFullSet.get(coveringList);	
+	/* We'll use a weird bit of GATE here. We'll use a reference to the annotation features and store that.
+	That will allow updates to those features, including the addition of an id to filter through to the stored
+	values. Then, when we restore the stored information the features are all up to date! */
+	for (Annotation itemAnn: inputSet) {
+		try {
+			outputAS.add(itemAnn.getStartNode().getOffset(), itemAnn.getEndNode().getOffset(),
+				"Store" + itemAnn.getType(), itemAnn.getFeatures());
+		}
+		catch (Exception e) {
+			System.err.println("Could not add store annotation: " + e.getMessage());
+		}
+	}
+
+}

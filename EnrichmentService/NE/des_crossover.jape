@@ -1,0 +1,229 @@
+/*
+* Filename: 	des_crossover.jape
+* Author:	Paul Appleby
+* Description:	Sort out crossovers
+* Date created:	27/08/2010
+* This version:	0.4
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 15/01/11	0.4		PA		Split crossovers
+* 19/11/10	0.3		PA		Added in CrossoverPositionOrganisation
+* 04/10/10	0.2		PA		Added in CrossoverPesonOrganisation
+*/
+
+
+Phase:	Crossover
+Input:  Token LineBreak Publication Organisation Person Landmark Position
+Options: control = appelt negationGrouping = false
+
+/* Where there is a crossover with an ampersand at the intersection that indicates separate entities so split again */
+Rule: CrossoverAmpersandOrganisation
+(
+	({Publication})
+	({Token.root == "&", Token within Organisation}):ampersand
+	({Token within Organisation}):organisation
+):crossover
+-->
+{
+	try {
+		AnnotationSet organisationSet = bindings.get("organisation");
+		Long organisationStart = organisationSet.firstNode().getOffset();
+		AnnotationSet realOrganisationSet = inputAS.get("Organisation", organisationStart, organisationStart);
+		Annotation annotAnn = realOrganisationSet.iterator().next();
+		Long annotStart = annotAnn.getStartNode().getOffset();
+		Long annotEnd = annotAnn.getEndNode().getOffset();
+		FeatureMap features = Factory.newFeatureMap();
+		features.put("rule", "SplitOrganisation");
+		outputAS.add(organisationStart, annotEnd, "Organisation", features);
+		outputAS.remove(annotAnn);
+	}
+	catch (Exception e) {
+	}
+}
+
+
+/* To handle the tricky situation of a leading 'the' causing confusion check if a longer different annotation starts
+after the 'the' which starts the earlier annotation */
+Rule: CrossoverPublicationOrganisation
+(
+	({Token.root == "the", Token within Publication}):token
+	({Organisation}):organisation
+):crossover
+-->
+{
+	try {
+		AnnotationSet organisationSet = bindings.get("organisation");
+		AnnotationSet tokenSet = bindings.get("token");
+		Long organisationStart = organisationSet.firstNode().getOffset();
+		Long organisationEnd = organisationSet.lastNode().getOffset();
+		Annotation organisationAnn = organisationSet.iterator().next();
+
+		//System.out.println("Organisation start: " + organisationStart + ", end: " + organisationEnd);
+		//System.out.println("Organisation: " + doc.getContent().getContent(organisationStart, organisationEnd).toString());
+		
+		AnnotationSet annotSet = inputAS.get("Publication", organisationStart, organisationStart);
+		Annotation annotAnn = annotSet.iterator().next();
+		Long annotStart = annotAnn.getStartNode().getOffset();
+		Long annotEnd = annotAnn.getEndNode().getOffset();
+		// Is this a crossover? If so we'll prefer the organisation and ignore the publication
+		if (annotStart < organisationStart && annotEnd > organisationStart && annotEnd < organisationEnd) {
+			//System.out.println("Annot start: " + annotStart + ", end: " + annotEnd);
+			//System.out.println("Crossover: " + doc.getContent().getContent(annotStart, annotEnd).toString());
+			outputAS.remove(annotAnn);
+		}
+	}
+	catch (Exception e) {
+	}
+}
+
+
+
+/* Organisation that has a person starting half way through */
+Rule: CrossoverPersonOrganisation
+(
+	({Token within Organisation, Token within Person}):token
+):crossover
+-->
+{
+	try {
+		AnnotationSet tokenSet = bindings.get("token");
+		Long tokenStart = tokenSet.firstNode().getOffset();
+		Long tokenEnd = tokenSet.lastNode().getOffset();
+
+		//System.out.println("Token start: " + tokenStart + ", end: " + tokenEnd);
+
+		AnnotationSet organisationSet = inputAS.get("Organisation", tokenStart, tokenEnd);
+		AnnotationSet personSet = inputAS.get("Person", tokenStart, tokenEnd);
+
+		//System.out.println("Organisation start: " + organisationSet.firstNode().getOffset() + ", end: " + organisationSet.lastNode().getOffset());
+		//System.out.println("Person start: " + personSet.firstNode().getOffset() + ", end: " + personSet.lastNode().getOffset());
+
+		// Does organisation come before person?
+		if (organisationSet.firstNode().getOffset() < personSet.firstNode().getOffset()) {
+			//System.out.println("Removing Person");
+			outputAS.removeAll(personSet);
+		}
+		else {
+			//System.out.println("Removing Organisation");
+			outputAS.removeAll(organisationSet);
+		}
+		
+	}
+	catch (Exception e) {
+	}
+}
+
+
+/* Organisation that has a position starting half way through */
+Rule: CrossoverPositionOrganisation
+(
+	({Token within Organisation, Token within Position}):token
+):crossover
+-->
+{
+	try {
+		AnnotationSet tokenSet = bindings.get("token");
+		Long tokenStart = tokenSet.firstNode().getOffset();
+		Long tokenEnd = tokenSet.lastNode().getOffset();
+
+		//System.out.println("Token start: " + tokenStart + ", end: " + tokenEnd);
+
+		AnnotationSet organisationSet = inputAS.get("Organisation", tokenStart, tokenEnd);
+		AnnotationSet positionSet = inputAS.get("Position", tokenStart, tokenEnd);
+
+		//System.out.println("Organisation start: " + organisationSet.firstNode().getOffset() + ", end: " + organisationSet.lastNode().getOffset());
+		//System.out.println("Position start: " + positionSet.firstNode().getOffset() + ", end: " + positionSet.lastNode().getOffset());
+
+		// Does organisation come before position?
+		if (organisationSet.firstNode().getOffset() < positionSet.firstNode().getOffset()) {
+			//System.out.println("Removing Position");
+			outputAS.removeAll(positionSet);
+		}
+		else {
+			//System.out.println("Removing Organisation");
+			outputAS.removeAll(organisationSet);
+		}
+		
+	}
+	catch (Exception e) {
+	}
+}
+
+
+/* Organisation that has a landmark starting half way through */
+Rule: CrossoverLandmarkOrganisation
+(
+	({Token within Organisation, Token within Landmark}):token
+):crossover
+-->
+{
+	try {
+		AnnotationSet tokenSet = bindings.get("token");
+		Long tokenStart = tokenSet.firstNode().getOffset();
+		Long tokenEnd = tokenSet.lastNode().getOffset();
+
+		//System.out.println("Token start: " + tokenStart + ", end: " + tokenEnd);
+
+		AnnotationSet organisationSet = inputAS.get("Organisation", tokenStart, tokenEnd);
+		AnnotationSet landmarkSet = inputAS.get("Landmark", tokenStart, tokenEnd);
+
+		//System.out.println("Organisation start: " + organisationSet.firstNode().getOffset() + ", end: " + organisationSet.lastNode().getOffset());
+		//System.out.println("Landmark start: " + landmarkSet.firstNode().getOffset() + ", end: " + landmarkSet.lastNode().getOffset());
+
+		// Does organisation come before landmark?
+		if (organisationSet.firstNode().getOffset() < landmarkSet.firstNode().getOffset()) {
+			//System.out.println("Removing Landmark");
+			outputAS.removeAll(landmarkSet);
+		}
+		else {
+			//System.out.println("Removing Organisation");
+			outputAS.removeAll(organisationSet);
+		}
+		
+	}
+	catch (Exception e) {
+	}
+}
+
+
+/* Company that has a position starting half way through */
+Rule: CrossoverPositionCompany
+(
+	({Token within Company, Token within Position}):token
+):crossover
+-->
+{
+	try {
+		AnnotationSet tokenSet = bindings.get("token");
+		Long tokenStart = tokenSet.firstNode().getOffset();
+		Long tokenEnd = tokenSet.lastNode().getOffset();
+
+		//System.out.println("Token start: " + tokenStart + ", end: " + tokenEnd);
+
+		AnnotationSet companySet = inputAS.get("Company", tokenStart, tokenEnd);
+		AnnotationSet positionSet = inputAS.get("Position", tokenStart, tokenEnd);
+
+		//System.out.println("Company start: " + companySet.firstNode().getOffset() + ", end: " + companySet.lastNode().getOffset());
+		//System.out.println("Position start: " + positionSet.firstNode().getOffset() + ", end: " + positionSet.lastNode().getOffset());
+
+		// Does company come before position?
+		if (companySet.firstNode().getOffset() < positionSet.firstNode().getOffset()) {
+			//System.out.println("Removing Position");
+			outputAS.removeAll(positionSet);
+		}
+		else {
+			//System.out.println("Removing Company");
+			outputAS.removeAll(companySet);
+		}
+		
+	}
+	catch (Exception e) {
+	}
+}
+
+

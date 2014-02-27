@@ -1,0 +1,35 @@
+/*
+* Filename: 	des_feature_clean.jape
+* Author:	Paul Appleby
+* Description:	Removes false positives for features
+* Date created:	31/08/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 11/09/10	0.2		PA		Added removal of Feature in Company
+*/
+
+
+Phase:	FeatureClean
+Input:  Feature LineBreak Person Company Place
+Options: control = appelt negationGrouping = false
+
+
+/* Feature within ... */
+Rule: FeatureRemove1
+Priority: 10
+(
+	{Feature within Person, Feature.rule == "FeatureWithKey"} |
+	{Feature within Company} |
+	{Feature within Place}
+):feature
+-->
+{
+	AnnotationSet featureSet = bindings.get("feature");
+ 	outputAS.removeAll(featureSet);
+}

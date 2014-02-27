@@ -1,0 +1,31 @@
+/*
+* Filename: 	des_activity.jape
+* Author:	Paul Appleby
+* Description:	Annotates activities.
+* Date created:	02/09/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 23/10/11	0.2		PA		Added context
+*/
+
+
+Phase:	Activity
+Input:  Split Token Lookup LineBreak
+Options: control = appelt negationGrouping = false
+
+
+/* Sport */
+Rule: Sport
+(
+	{Lookup.majorType == activity, Lookup.minorType == sport}
+):activity
+-->
+	:activity.Activity = {rule = "Sport", type = "sport", context = :activity.Lookup.context}
+
+

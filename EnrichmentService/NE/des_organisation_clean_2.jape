@@ -1,0 +1,33 @@
+/*
+* Filename: 	des_organisation_clean_2.jape
+* Author:		Paul Appleby
+* Description:	Removes false positives for organisations
+* Date created:	03/046/2012
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	OrganisationClean2
+Input:  Organisation Lookup
+Options: control = appelt negationGrouping = false
+
+
+/* Organisations within ... */
+Rule: OrganisationRemove1
+Priority: 10
+(
+	{Organisation within {Lookup.majorType == misc}}
+):organisation
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	outputAS.removeAll(organisationSet);
+}
+

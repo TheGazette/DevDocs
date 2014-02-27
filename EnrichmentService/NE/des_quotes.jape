@@ -1,0 +1,40 @@
+/*  
+* Filename: 	des__quotes.jape
+* Author:	Paul Appleby
+* Description:	Extract quotes from text
+* Date created:	05/03/2010
+* This version:	0.1
+*
+* Change history
+* ==========================================================================
+* Date				Version		Author		Description
+* ==========================================================================
+* 
+*
+*/
+
+Phase:	Quotes
+Input:  Token SpaceToken LineBreak
+Options: control = first negationGrouping = false
+
+
+/* Match "quoted text" but only within a line */
+
+Rule: Quote
+(
+	(
+		(
+			({Token.string == "\u201C"})
+			|
+			({Token.string == "\""})
+		)
+		({Token, Token.string != "\u201C"} | {SpaceToken.kind != control})+
+		(
+			({Token.string == "\u201D"})
+			|
+			({Token.string == "\""})
+		)
+	)
+):quote
+-->
+  :quote.Quote = {rule="Quote"}

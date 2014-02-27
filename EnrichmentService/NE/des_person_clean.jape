@@ -1,0 +1,195 @@
+/*
+* Filename: 	des_person_clean.jape
+* Author:		Paul Appleby
+* Description:	Removes false positives related to person
+* Date created:	16/08/2010
+* This version:	0.15
+* 
+*/
+
+
+Phase:	PersonClean
+Input:  Person Token LineBreak Legislation Company Position Organisation Honorific Surname Lookup Location Country Facility FirstName Nationality Emirate Feature Award Place Publication Street
+Options: control = all negationGrouping = false
+
+
+/* Person within ... */
+Rule: Remove1
+Priority: 10
+(
+	{Person within Legislation} |
+	{Person within Nationality} |
+	{Person within Location} |
+	{Person within Organisation} |	
+	{Person within Facility} |	
+	{Person within Street} |		
+	{Person within Emirate} |			
+	{Person within Feature} |		
+	{Person within Award} |	
+	{Person within Country} |	
+	{Person within Place, Lookup.minorType == non_uk_city} |	
+	{Person within Company} |
+	{Person within Publication}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+ 	outputAS.removeAll(annotationSet);
+}
+
+
+/* Position within ... */
+Rule: Remove2
+(
+	{Position within Legislation} |
+	{Position within Organisation} |
+	{Position within Company}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+ 	outputAS.removeAll(annotationSet);
+}
+
+
+/* ... within Position */
+Rule: Remove3
+(
+	{Honorific}
+	({Surname within Position}):surname
+)
+-->
+{
+	AnnotationSet surnameSet = bindings.get("surname");
+ 	outputAS.removeAll(surnameSet);
+}
+
+
+/* Remove stuff like Lord Chancellor as person */
+Rule: Remove4
+Priority: 10
+(
+	{Person, Position}
+):annotation
+-->
+{
+	try {
+		AnnotationSet annotSet = bindings.get("annotation");
+		AnnotationSet personSet = annotSet.get("Person");
+		Annotation personAnn = personSet.iterator().next();
+		Long personStart = personAnn.getStartNode().getOffset();
+		Long personEnd = personAnn.getEndNode().getOffset();
+
+		// We need to get the position annotation from input set because JAPE rule will only match one
+		// Which may not be the longest if two are present at same position
+		AnnotationSet positionSet = inputAS.get("Position", personStart, personStart + 1);
+		Long positionEnd = positionSet.lastNode().getOffset();
+
+		// If a position remove the person
+		if (personEnd <= positionEnd) {
+			outputAS.removeAll(personSet);
+			// Now refetch position set to get that position starting at Person location but any positions
+			// that were part of that name
+			positionSet = inputAS.get("Position", personStart, personEnd);
+		}
+
+
+		// Now clear out any nested positions
+		try {
+			if (positionSet.size() > 1) {
+				Iterator<Annotation> positionItr = positionSet.iterator();
+				while (positionItr.hasNext()) {
+					Annotation positionAnn = positionItr.next();
+					// Is this a ministerial annotation? If not remove
+					if (positionAnn.getFeatures().get("type") == null) {
+						//System.out.println("Removing position");
+						doc.getAnnotations("DES").remove(positionAnn);
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			System.err.println("Error clearing nested positions: " + e.getMessage());
+		}
+	}
+	catch (Exception e) {
+		System.err.println("Error in Remove4: " + e.getMessage());
+	}
+
+}
+
+
+/* Person followed by road structure - indicates its a structure! */
+Rule: Remove5
+(
+	{Person}
+	(
+		{Lookup.majorType == structure} |
+		{Lookup.minorType == facility_type}
+	)
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+ 	outputAS.removeAll(annotationSet);
+}
+
+
+/* Avoid all caps first name followed by upper initial surname */
+Rule: Remove6
+Priority: 100
+(
+	{FirstName, Token.orth == allCaps, FirstName within Person}
+	{Surname, Token.orth == upperInitial, Surname within Person}
+):annotation
+-->
+{
+
+	AnnotationSet annotSet = bindings.get("annotation");
+ 	AnnotationSet personSet = inputAS.get("Person", annotSet.firstNode().getOffset(), annotSet.lastNode().getOffset());
+ 	outputAS.removeAll(personSet);
+}
+
+/* Avoid lowercase position followed by allcaps surname */
+Rule: Remove7
+Priority: 100
+(
+	{Position, Token.orth == lowercase, Position within Person}
+	{Surname, Token.orth == allCaps, Surname within Person}
+):annotation
+-->
+{
+
+	AnnotationSet annotSet = bindings.get("annotation");
+ 	AnnotationSet personSet = inputAS.get("Person", annotSet.firstNode().getOffset(), annotSet.lastNode().getOffset());
+ 	outputAS.removeAll(personSet);
+}
+
+/* Avoid political positions connected with countries, e.g. HM Ambassador France */
+Rule: Remove8
+Priority: 100
+(
+	{Position.format == political, Position within Person}
+	{Surname, Lookup.minorType == country, Surname within Person}
+):annotation
+-->
+{
+
+	AnnotationSet annotSet = bindings.get("annotation");
+ 	AnnotationSet personSet = inputAS.get("Person", annotSet.firstNode().getOffset(), annotSet.lastNode().getOffset());
+ 	outputAS.removeAll(personSet);
+}
+
+/* Remove if WordNet categories on surrounding tokens indicate not a person */
+Rule: Remove9
+(
+	{Token.string == "at"}
+	({Token})?
+	({Token.wordTypes == "organisation"})?
+	({Person}):annotation
+)
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+ 	outputAS.removeAll(annotationSet);
+}

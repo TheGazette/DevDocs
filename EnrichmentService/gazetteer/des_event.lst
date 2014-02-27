@@ -1,0 +1,55 @@
+Battle of Bannockburn;type=historic
+Battle of Bosworth Field;type=historic
+Battle of Britain;type=historic
+Battle of Culloden;type=historic
+Battle of Hastings;type=historic
+Battle of Sedgemoor;type=historic
+Battle of Stalling Down;type=historic
+Battle of Waterloo;type=historic
+Chanuka;type=religious;group=Jewish
+Chanukah;type=religious;group=Jewish
+D-Day;type=historic;context=http://dbpedia.org/resource/Normandy_landings
+Diwali;type=religious;group=Hindu,Sikh
+Eid Ul Adha;type=religious;group=Muslim
+Eid-Ul-Adha;type=religious;group=Muslim
+Eid Ul Fitr;type=religious;group=Muslim
+Eid-Ul-Fitr;type=religious;group=Muslim
+Epiphany;type=religious;group=Christian
+Eurovision Song Contest
+FA Trophy;type=sport
+Falklands War;type=historic;context=http://dbpedia.org/resource/Falklands_War
+Festival of Lights;type=religious;group=Jewish
+First World War;type=historic
+Franco-Prussian War;type=historic
+Hanukkah;type=religious;group=Jewish
+Hanuman Jayanti;type=religious;group=Hindu
+Hina-matsuri;type=religious;group=Shinto
+Hola Mohalla;type=religious;group=Sikh
+Holi;type=religious;group=Hindu
+Janmashtami;type=religious;group=Hindu
+Lughnasadh;type=religious;group=Pagan
+Mahashivratri;type=religious;group=Hindu
+Makar Sankranti;type=religious;group=Hindu
+Olympics;type=sport
+Paralympics;type=sport
+Parinirvana;type=religious;group=Buddhist
+Raksha Bandhan;type=religious;group=Hindu
+Ramadan;type=religious;group=Muslim
+Rissun;type=religious;group=Shinto
+Royal Ascot;type=sport
+Royal National Eisteddfod;type=musical
+Second Boer War;type=historic
+Second World War;type=historic
+Six Nations;type=sport
+The Ashes;type=sport
+Trooping the Colour;type=military
+Ugadi;type=religious;group=Hindu
+Vaisakhi;type=religious;group=Sikh
+Vasant Panchami;type=religious;group=Hindu
+Wesak;type=religious;group=Buddhist
+World War I;type=historic;context=http://dbpedia.org/resource/World_War_II
+World War II;type=historic;context=http://dbpedia.org/resource/World_War_II
+World War One;type=historic;context=http://dbpedia.org/resource/World_War_II
+World War Two;type=historic;context=http://dbpedia.org/resource/World_War_II
+Yom Hazikaron;type=memorial;context=http://dbpedia.org/resource/Yom_Hazikaron
+Victory over Japan Day;type=historic

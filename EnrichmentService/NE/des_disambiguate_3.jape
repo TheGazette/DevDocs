@@ -1,0 +1,179 @@
+/*
+* Filename: 	des_disambiguate_3.jape
+* Author:	Paul Appleby
+* Description:	Work out from a list of candidates which is the best fit for certain location-based annotations
+* Date created:	19/05/10
+* This version:	0.7
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 02/09/10	0.7		A		Added Feature to disambiguation
+* 27/06/10	0.6		PA		Added removal of names in streets
+* 28/06/10	0.5		PA		Added removal of names in provinces and emirates. Changed Name to Person
+* 15/06/10	0.4		PA		Added in place disambiguation
+* 19/05/10	0.3		PA		Added in location-based disambiguation
+*/
+
+
+Phase:	Disambiguation3
+Input:  Person Organisation Token Place Feature
+Options: control = appelt negationGrouping = false
+
+
+/* Disambiguate schools, features and places */
+Rule: Locations
+Priority: 20
+(
+	{Organisation.rule == "OrganisationEducational", Organisation.easting =~ ","} |
+	{Place, Place.easting =~ ","} |
+	{Feature, Feature.easting =~ ","}
+):location
+-->
+{
+
+	// This code expects a comma-separated list for easting, northing and contextOptions where ambiguity exists
+	// context should contains the base part of the URI to which the resolved value will be appended
+
+	AnnotationSet locationSet = bindings.get("location");
+	Annotation locationAnn = locationSet.iterator().next();
+	Long locationStart = locationAnn.getEndNode().getOffset();
+	Long locationEnd = locationAnn.getEndNode().getOffset();
+	//System.out.println("");
+	//System.out.println("Checking place: " + gate.Utils.stringFor(doc, locationAnn));
+	
+	Double northingCentroid = 0.0;
+	Double eastingCentroid = 0.0;
+	Double itemCount = 0.0;
+	
+	// Get annotations that can have co-ordinates
+	LinkedHashSet<String> coorsList = new LinkedHashSet<String>();
+	coorsList.add(new String("Organisation"));
+	coorsList.add(new String("Place"));
+	coorsList.add(new String("Feature"));
+	coorsList.add(new String("Postcode"));
+	Iterator<Annotation> coorsItr = inputAS.get(coorsList).iterator();
+
+	Integer maxDistance = 0;
+	
+	// Iterate over all geo information to calculate maximum distance in tokens of any mentions
+	while (coorsItr.hasNext()) {
+		Annotation locAnn = coorsItr.next();
+		if (locAnn.getFeatures().get("easting") != null) {
+			String locEasting = locAnn.getFeatures().get("easting").toString();
+			if (locEasting.indexOf(",") < 0) {
+				// Calculate how far away this mention is from our mention
+				Long locStart = locAnn.getStartNode().getOffset();
+				Long locEnd = locAnn.getStartNode().getOffset();				
+				locStart = (locStart < locationStart) ? locStart : locationStart; 
+				locEnd = (locEnd > locationEnd) ? locEnd : locationEnd; 
+				AnnotationSet toks = inputAS.get("Token", locStart, locEnd);
+				List<Annotation> orderedToks = gate.Utils.inDocumentOrder(toks);
+				Integer locDistance = orderedToks.size();				
+				// Need to allow for places only separated by linebreak
+				if (locDistance == 0) locDistance = 1;
+				if (locDistance > maxDistance) maxDistance = locDistance;
+			}
+		}
+	}
+	
+	//System.out.println("Max mention distance is: " + maxDistance);	
+	coorsItr = inputAS.get(coorsList).iterator();
+	
+	// Iterate over all geo information to calculate centroid for this location in the document
+	while (coorsItr.hasNext()) {
+		Annotation locAnn = coorsItr.next();
+		if (locAnn.getFeatures().get("easting") != null) {
+			String locEasting = locAnn.getFeatures().get("easting").toString();
+			if (locEasting.indexOf(",") < 0) {
+
+				String locNorthing = locAnn.getFeatures().get("northing").toString();		
+				// Calculate how far away this mention is from our mention
+				Long locStart = locAnn.getStartNode().getOffset();
+				Long locEnd = locAnn.getStartNode().getOffset();				
+				locStart = (locStart < locationStart) ? locStart : locationStart; 
+				locEnd = (locEnd > locationEnd) ? locEnd : locationEnd; 
+				AnnotationSet toks = inputAS.get("Token", locStart, locEnd);
+				List<Annotation> orderedToks = gate.Utils.inDocumentOrder(toks);
+				Integer locDistance = orderedToks.size();
+				// Need to allow for places only separated by linebreak
+				if (locDistance == 0) locDistance = 1;
+
+				//System.out.println("Easting: " + locEasting + ", Northing: " + locNorthing);
+				//System.out.println("Mention distance is: " + locDistance);
+				// Get weighting - we'll use the cube root of (maxDistance - distance)
+				Double weighting = (double) (maxDistance/java.lang.Math.pow(locDistance, 2.0));
+				//System.out.println("Weighting is: " + weighting);
+
+				northingCentroid += Double.valueOf(locNorthing).doubleValue() * weighting;
+				eastingCentroid += Double.valueOf(locEasting).doubleValue() * weighting;
+				itemCount+= weighting;
+			}
+		}
+	}
+	
+	
+	// Calculate final centroid values
+	//System.out.println("Total item count is: " + itemCount);
+	//System.out.println("Total easting count is: " + eastingCentroid);
+	//System.out.println("Total northing count is: " + northingCentroid);
+	if (northingCentroid != 0) {
+		northingCentroid = java.lang.Math.floor(northingCentroid/itemCount);
+		eastingCentroid = java.lang.Math.floor(eastingCentroid/itemCount);
+
+		//System.out.println("Centroid calculated as: " + "Easting: " + eastingCentroid + ", Northing: " + northingCentroid);
+
+		// Now find which of the co-ordinate items in the annotation item list are closest to centroid
+		String eastingList = locationAnn.getFeatures().get("easting").toString();
+		String northingList = locationAnn.getFeatures().get("northing").toString();
+		String contextList = locationAnn.getFeatures().get("contextOptions").toString();
+
+		// Tokenise lists
+		StringTokenizer eastingTokens = new StringTokenizer(eastingList, ",");
+		StringTokenizer northingTokens = new StringTokenizer(northingList, ",");
+		StringTokenizer contextTokens = new StringTokenizer(contextList, ",");
+
+		// Set initial distance way beyond anything possible	
+		Double minDistanceFromCentroid = 100000000.0;
+		Double northingCalculated = 0.0;
+		Double eastingCalculated = 0.0;
+		String contextCalculated = "";
+
+		while (eastingTokens.hasMoreTokens()) {
+			Double easting = Double.valueOf(eastingTokens.nextToken()).doubleValue();
+			Double northing = Double.valueOf(northingTokens.nextToken()).doubleValue();
+			String context = contextTokens.nextToken();
+			//System.out.println("Easting: " + easting + ", Northing: " + northing);
+
+			// Use pythagoras theorem to calculate distance from centroid
+			Double distanceFromCentroid = java.lang.Math.pow(java.lang.Math.pow(easting - eastingCentroid, 2.0) +
+				java.lang.Math.pow(northing - northingCentroid, 2.0), 0.5);
+			//System.out.println("Distance from centroid: " + distanceFromCentroid);
+			if (distanceFromCentroid < minDistanceFromCentroid) {
+				northingCalculated = northing;
+				eastingCalculated = easting;
+				contextCalculated = context;
+				minDistanceFromCentroid = distanceFromCentroid;
+			}
+		}
+
+		try {
+			locationAnn.getFeatures().put("northing", northingCalculated);
+			locationAnn.getFeatures().put("easting", eastingCalculated);		
+			locationAnn.getFeatures().put("context", locationAnn.getFeatures().get("context").toString() + contextCalculated);
+			locationAnn.getFeatures().remove("contextOptions");		
+		} catch (Exception e) {
+			// something went wrong here but we want to continue
+		}
+	}
+	else {
+		// Unable to disambiguate so simply remove unwanted features
+		locationAnn.getFeatures().remove("northing");
+		locationAnn.getFeatures().remove("easting");		
+		locationAnn.getFeatures().remove("contextOptions");
+		locationAnn.getFeatures().remove("context");
+	}
+}

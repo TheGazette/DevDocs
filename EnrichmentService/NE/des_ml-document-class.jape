@@ -1,0 +1,37 @@
+/*
+* Filename: 	des_ml-document-class.jape
+* Author:	Paul Appleby
+* Description:	Adds a document annotation from a document feature
+* Date created:	23/12/11
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	DocumentClass
+Input:  Token
+Options: control = appelt negationGrouping = false
+
+
+Rule: Class1
+(
+	({Token})+
+):document
+-->
+{
+	System.out.println("Found Document annotation");
+	AnnotationSet documentSet = bindings.get("document");
+	Annotation documentAnn = documentSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	if (documentAnn.getFeatures().get("category") != null) {
+		features.put("category", documentAnn.getFeatures().get("category").toString());
+	}
+	outputAS.add(documentSet.firstNode(), documentSet.lastNode(), "Document", features); 	
+}
+

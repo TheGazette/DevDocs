@@ -1,0 +1,58 @@
+/*
+* Filename: 	des_IV_person.jape
+* Author:	Paul Appleby
+* Description:	Do some additional processing on stuff around names
+* Date created:	23/11/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 22/10/11	0.2		PA		Connected positions to people
+*/
+
+
+Phase:	PersonIV
+Input:  Person Lookup Token LineBreak Position
+Options: control = appelt
+
+/* E.g. CBE, OBE */
+Macro: HONOUR
+(
+	{Lookup.minorType == honour} |
+	{Lookup.minorType == qualification}
+)
+
+
+Rule: HonoursDetached
+(
+	({Person}):person
+	{Token.string == ","}
+	(HONOUR)+:honour
+)
+-->
+	:honour.Honours = {personRef =: person.Person.id}
+
+
+Rule: Honours
+(
+	({Person}):person
+	(HONOUR)+:honour
+):extendedPerson
+-->
+{
+	AnnotationSet honourSet = bindings.get("honour");
+	Annotation honourAnn = honourSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	outputAS.add(honourSet.firstNode(), honourSet.lastNode(), "Honours", features);
+
+	AnnotationSet personSet = bindings.get("person");
+	AnnotationSet extendedPersonSet = bindings.get("extendedPerson");
+	Annotation personAnn = personSet.iterator().next();
+	outputAS.add(extendedPersonSet.firstNode(), extendedPersonSet.lastNode(), "Person", personAnn.getFeatures()); 	
+	outputAS.remove(personAnn);
+}
+

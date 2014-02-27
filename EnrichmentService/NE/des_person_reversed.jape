@@ -1,0 +1,166 @@
+/*
+* Filename: 	des_person_reversed.jape
+* Author:	Paul Appleby
+* Description:	Annotates people's names
+* Date created:	05/03/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Person
+Input:  Token Lookup LineBreak NounChunk
+Options: control = appelt negationGrouping = false
+
+
+/* Initial in the form A.B. and A. B. and AB and A-B */
+Macro: INITIALS
+(
+  (
+  	{Token.orth == allCaps, Token.length =="2"}
+  )
+  |
+  (
+  	{Token.string ==~ "[A-Z][-][A-Z]", Token.length =="3"}
+  )
+  |
+  (
+  	{Token.orth == upperInitial, Token.length =="1"}
+  	({Token.string == "."})?
+  )+
+)
+
+/* We repeast double first names here so that we can force a priority instance where there is ambiguity with surname */
+Macro: DOUBLEFIRSTNAME
+(
+	(
+		{Lookup.majorType == name, Lookup.minorType == first, Token.string ==~ "[A-Z][A-Za-z]+[-]", !Lookup.majorType == organisation, Token.category == "NNP"}
+		{Token.orth == upperInitial, !Lookup.majorType == organisation}
+	)
+)
+
+/* We capture single first names and double-barelled names also */
+Macro: FIRSTNAME
+(
+	(DOUBLEFIRSTNAME)
+	|
+	{Lookup.majorType == name, Lookup.minorType == first}
+)
+
+
+
+/* Will capture initial capital Surnames, double barrel surnames and names of the form 'Sarh McCarthy Fry' */
+/* And di Maggio and D'Souza and O'Grady */
+Macro: SURNAME
+(
+	(
+		(
+			{Token.string ==~ "[A-Z][a-z]+", !Lookup.majorType == organisation, Token.category == "NNP"}
+		)
+		|
+		(
+			{Token.string ==~ "Mc[A-Z][a-z]+", !Lookup.majorType == organisation, Token.category == "NNP"}
+		)
+		|
+		(
+			{Token.string ==~ "(de|De|di|Di|von|Von|van|Van)"}
+			{Token.string ==~ "[A-Z][a-z]+", !Lookup.majorType == organisation}
+		)
+		|
+		(
+			({Token.string == "D"} | {Token.string == "O"})
+			{Token.string == "'"}
+			{Token.string ==~ "[A-Z][a-z]+", !Lookup.majorType == organisation}
+		)
+		|
+		(
+			{Token.string ==~ "[A-Z][A-Za-z]+[-]", !Lookup.majorType == organisation, Token.category == "NNP"}
+			{Token.orth == upperInitial, !Lookup.majorType == organisation}
+		)
+	)
+	(
+		{Token.orth == upperInitial, !Lookup.majorType == organisation,
+			!Lookup.minorType == title, !Lookup.minorType == first,
+			Token.length > 1}
+	)?
+)
+
+/* Pick up reversed names of the format Smith, J and Brown, PD and Jones, Paul. Most of this will be highly ambiguous */
+
+
+/* Standard surname, firstname */
+
+Rule: PersonNameReversed
+(
+	(SURNAME):surname
+	{Token.string == ","}
+	(FIRSTNAME):firstName	
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:person.TempName = {rule = "PersonNameReversed", ambiguity = "Yes"}
+
+
+
+/* Surname, initials */
+
+Rule: PersonNameBasicReversedInitials
+(
+	(SURNAME):surname
+	({Token.string == ","})?
+	(INITIALS):middleInitials
+):person
+-->
+	:middleInitials.MiddleInitials = {}, 
+	:surname.Surname = {},
+	:person.TempName = {rule = "PersonNameBasicReversedInitials", ambiguity = "Yes"}
+
+
+
+
+
+/* ========== Pick up some permutations that are almost certainly not names ==========  */
+
+/* Picks up 'Port of Spain, Trinidad' etc */
+
+Rule: PersonNameReversedDummy1
+(
+	(
+		(
+			{Token.category == IN}
+		)
+		|
+		(
+			{Token.category == DT}
+		)
+	)
+	(SURNAME)
+	{Token.string == ","}
+	(FIRSTNAME)
+)
+-->
+{}
+
+Rule: PersonNameReversedDummy2
+(
+  	(SURNAME):surname
+	({Token.string == ","})?
+	(INITIALS):middleInitials
+	(
+		{Token.kind == number}
+		|
+		(
+			{Token.kind == punctuation}
+			{Token.orth == allCaps}
+		)
+	)
+)
+-->
+{}

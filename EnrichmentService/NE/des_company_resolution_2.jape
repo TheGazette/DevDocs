@@ -1,0 +1,43 @@
+/*
+* Filename: 	des_company_resolution_2.jape
+* Author:		Paul Appleby
+* Description:	Further work to confirm companies
+* Date created:	20/10/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version	Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	CompanyResolution2
+Input:  Company Lookup Person
+Options: control = appelt negationGrouping = false
+
+/* If we can confirm the company by context we'll mark all instances of that company */
+/* It's possible we might ending up marking companies more than once but we'll accept that */
+Rule: CompanyResolveByOccupation
+(
+	({Company}):company
+	{Lookup.minorType == "occupation"}
+	{Person}
+)
+-->
+{
+	AnnotationSet companyFoundSet = bindings.get("company");
+	Annotation companyAnn = companyFoundSet.iterator().next();
+	String companyName = gate.Utils.stringFor(doc, companyAnn);
+	System.out.println(companyName);
+	AnnotationSet companySet = inputAS.get("Company");
+	for (Annotation companyTestAnn: companySet) {
+		String companyTestName = gate.Utils.stringFor(doc, companyTestAnn);
+		if (companyTestName.equals(companyName)) {
+			companyAnn.getFeatures().put("confirmed", "yes");
+		}
+	}
+	
+}

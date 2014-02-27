@@ -1,0 +1,25 @@
+/*  
+* Filename: 	des__medical.jape
+* Author:		Paul Appleby
+* Description:	Medical related things
+* Date created:	16/05/2011
+* This version:	0.1
+*
+* Change history
+* ==========================================================================
+* Date				Version		Author		Description
+* ==========================================================================
+* 
+*
+*/
+
+Phase:	Medical
+Input:  Lookup
+Options: control = appelt negationGrouping = false
+
+Rule: Medical
+(
+	({Lookup.majorType == "medical"})
+):medical
+-->
+  :medical.Medical = {rule="Medical"}

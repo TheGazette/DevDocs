@@ -1,0 +1,38 @@
+/*  
+* Filename: 	des_space_control.jape
+* Author:		Paul Appleby
+* Description:	Annotate certain features where space is important
+* Date created:	14/09/2010
+* This version:	0.2
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase: SpaceControl
+Input: SpaceToken Token
+Options: control = appelt negationGrouping = false
+
+	
+Rule: Dash
+(
+	{SpaceToken.kind != control}
+	{Token.string == "-"}
+	{SpaceToken.kind != control}
+):dash
+-->
+	:dash.TempDash = {}
+	
+Rule: HyphenSeparator
+(
+	{Token.string != "-"}
+	{Token.string == "-"}
+	{Token.string != "-"}
+):dash
+-->
+	:dash.TempDashGroup = {}
+

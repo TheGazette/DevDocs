@@ -1,0 +1,25 @@
+/*  
+* Filename: 	des__technology.jape
+* Author:	Paul Appleby
+* Description:	Technology related things
+* Date created:	09/11/2011
+* This version:	0.1
+*
+* Change history
+* ==========================================================================
+* Date				Version		Author		Description
+* ==========================================================================
+* 
+*
+*/
+
+Phase:	Technology
+Input:  Lookup
+Options: control = appelt negationGrouping = false
+
+Rule: Technology
+(
+	({Lookup.majorType == "technology"})
+):technology
+-->
+  :technology.Technology = {rule = "Technology"}

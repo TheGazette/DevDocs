@@ -1,0 +1,36 @@
+/*
+* Filename: 	des_assign_publication_id.jape
+* Author:	Paul Appleby
+* Description:	Assign ids to every publication that makes sense
+* Date created:	22/11/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	AssignPublicationIdentifiers
+Input:  Publication 
+Options: control = once negationGrouping = false
+
+
+Rule: AssignPublicationID
+(
+	{Publication}
+):publication
+-->
+{
+	AnnotationSet publicationSet = inputAS.get("Publication");
+	List<Annotation> orderedPublication = gate.Utils.inDocumentOrder(publicationSet);
+	Integer count = 0;
+	for (Annotation publication: orderedPublication) {
+		publication.getFeatures().put("id", "publication-" + count);
+		count++;
+	}
+}
+

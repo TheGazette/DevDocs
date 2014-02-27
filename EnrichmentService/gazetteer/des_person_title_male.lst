@@ -1,0 +1,25 @@
+Crown Prince;format=nobility
+Duke;format=nobility
+Earl;format=nobility
+Emir;format=nobility
+Herr;format=standard
+King;format=nobility
+Lord;format=nobility
+Marquis;format=nobility
+Master;format=standard
+Messr;format=standard
+Messr.;format=standard
+Mister;format=standard
+Monsieur;format=standard
+Mr;format=standard
+Mr.;format=standard
+Prince;format=nobility
+Sheikh;format=nobility
+Viscount;format=nobility
+Sir;format=honour
+His Excellency;format=nobility
+His Highness;format=nobility
+His Royal Highness;format=nobility
+H.E.;format=nobility;full=His Excellency
+H.H.;format=nobility;full=His Highness
+H.R.H.;format=nobility;full=His Royal Highness

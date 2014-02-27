@@ -1,0 +1,62 @@
+/*
+* Filename: 	des_value_clean.jape
+* Author:	Paul Appleby
+* Description:	With date now marked up removes unwanted values
+* Date created:	29/06/2010
+* This version:	0.4
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 08/11/11	0.5		PA		Removed Value within Technology
+* 04/10/10	0.4		PA		Removed Value and Number within Link
+* 28/08/10	0.3		PA		Remove numbers that aren't really numbers
+* 13/08/10	0.2		PA		Removed numbers in events
+*/
+
+
+Phase:	ValueClean
+Input:  Value Postcode Number Event SpaceToken Token Technology Link Time Event
+Options: control = all negationGrouping = false
+
+
+/* Remove values in ... */
+Rule: ValueRemove
+(
+	{Value within Postcode} |
+	{Value within Technology} |
+	{Value within Link}
+):value
+-->
+{
+	AnnotationSet value = bindings.get("value");
+ 	outputAS.removeAll(value);
+}
+
+Rule: NumberRemove
+(
+	{Number within Postcode} |
+	{Number within Link} |
+	{Number within Time} |
+	{Number within Event}
+):number
+-->
+{
+	AnnotationSet number = bindings.get("number");
+ 	outputAS.removeAll(number);
+}
+
+Rule: NumberComboRemove
+(
+	{Number}
+	{Token.string == "."}
+	{Token.category == CD}
+):number
+-->
+{
+	AnnotationSet number = bindings.get("number");
+ 	outputAS.removeAll(number);
+}

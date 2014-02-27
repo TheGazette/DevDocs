@@ -1,0 +1,133 @@
+/*
+* Filename: 	des_number_cleanup.jape
+* Author:	Paul Appleby
+* Description:	Annotates decimals with quantifiers, e.g. 3.5 billion, 3,125 trillion and cleans up non-numbers
+* Date created:	05/03/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	NumberCleanup
+Input:  Split SpaceToken Lookup Number Token Value
+Options: control = appelt negationGrouping = false
+
+
+/* Adds features to  e.g. 3,125.25 */
+Rule: DelimitedNumberCleanup
+(
+  {Number.type == delimited}
+):num
+-->
+{
+	gate.AnnotationSet num = (gate.AnnotationSet)bindings.get("num");
+    	gate.Annotation numAnn = (gate.Annotation)num.iterator().next();
+    	
+    	String strNum = "";
+		
+		// Get the string content of the Number annot just matched in the JAPE rule above
+		try {
+			strNum = doc.getContent().getContent(numAnn.getStartNode().getOffset(), 
+			numAnn.getEndNode().getOffset()).toString();
+		}  catch(InvalidOffsetException ioe) {
+			// this should never happen
+       		throw new GateRuntimeException(ioe);
+		}
+		
+		Number n = 0;
+		
+		try {
+			n = java.text.NumberFormat.getInstance().parse(strNum);
+		} catch (Exception pe) {
+			// carry on
+		}
+		
+    	double number = n.doubleValue();
+    	
+    	numAnn.getFeatures().remove("rule");
+	numAnn.getFeatures().put("rule", "DelimitedNumberCleanup");
+	numAnn.getFeatures().remove("number");
+	numAnn.getFeatures().put("number", number);
+}
+
+	
+/* Annotates e.g. 3,125 million */
+Rule: NumberCleanup
+(
+  (
+  	{Number}
+  ):num
+  ({SpaceToken})?
+  (
+  	{Lookup.majorType == number, Lookup.minorType == quantifier}
+  ):quant
+):fullnum
+-->
+	{
+	gate.AnnotationSet fullnum = (gate.AnnotationSet)bindings.get("fullnum");
+	gate.AnnotationSet num = (gate.AnnotationSet)bindings.get("num");
+    	gate.Annotation numAnn = (gate.Annotation)num.iterator().next();
+    	
+        gate.AnnotationSet quant = (gate.AnnotationSet)bindings.get("quant");
+    	gate.Annotation quantAnn = (gate.Annotation)quant.iterator().next();
+    	
+    	String strNum = "";
+		
+	// Get the string content of the Number annot just matched in the JAPE rule above
+	try {
+		strNum = doc.getContent().getContent(numAnn.getStartNode().getOffset(), 
+		numAnn.getEndNode().getOffset()).toString();
+	}  catch(InvalidOffsetException ioe) {
+		// this should never happen
+	throw new GateRuntimeException(ioe);
+	}
+
+	Number n = 0;
+
+	try {
+		n = java.text.NumberFormat.getInstance().parse(strNum);
+	} catch (Exception pe) {
+		// carry on
+	}
+		
+	double count = Double.parseDouble(quantAnn.getFeatures().get("count").toString());
+	double number = n.doubleValue();
+
+	FeatureMap features = Factory.newFeatureMap();
+    	features.put("rule","NumberCleanup");
+    	features.put("number",  number * count);
+    	outputAS.add(fullnum.firstNode(), fullnum.lastNode(),"Number", features);
+    	outputAS.removeAll(num);
+   
+	}
+
+	
+/* Remove oddities, such as No-one, one-off*/
+
+Rule: NumberRemove1
+(
+	{Number within {Token.string =~ "[A-Za-z]+-one"}}
+):number
+-->
+{
+	gate.AnnotationSet number = (gate.AnnotationSet)bindings.get("number");
+ 	outputAS.removeAll(number);
+}
+
+
+Rule: NumberRemove2
+(
+	{Number within {Token.string =~ "one-"}}
+):number
+-->
+{
+	gate.AnnotationSet number = (gate.AnnotationSet)bindings.get("number");
+ 	outputAS.removeAll(number);
+}
+

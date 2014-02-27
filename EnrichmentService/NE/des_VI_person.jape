@@ -1,0 +1,34 @@
+/*
+* Filename: 	des_IV_person.jape
+* Author:	Paul Appleby
+* Description:	Do some additional processing on stuff around names
+* Date created:	21/10/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+Phase:	PersonVI
+Input:  Person Lookup Token LineBreak Position
+Options: control = appelt negationGrouping = false
+
+/* Extend names to 'Prime Minister David Cameron */
+Rule: PositionPerson
+(
+	({Position}):position
+	({Person}):person
+):extendedPerson
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+	AnnotationSet extendedPersonSet = bindings.get("extendedPerson");
+	Annotation personAnn = personSet.iterator().next();
+	outputAS.add(extendedPersonSet.firstNode(), extendedPersonSet.lastNode(), "Person", personAnn.getFeatures()); 	
+	outputAS.remove(personAnn);
+}
+

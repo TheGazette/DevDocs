@@ -1,0 +1,46 @@
+/*
+* Filename: 	des_location_non_UK_cities.jape
+* Author:	Paul Appleby
+* Description:	Annotates non UK Cities
+* Date created:	15/06/2010
+* This version:	0.3
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 19/11/11	0.3		PA		Change to all and added country feature
+* 24/09/10	0.2		PA		Added context for cities
+*/
+
+
+Phase:	Location
+Input:  Split Lookup Token Country
+Options: control = all negationGrouping = false
+
+
+
+/* ========== Non-UK Cities ==========
+
+This is in this pass to ensure both UK versions and non-UK versions get annotated, which are then disambiguated later
+
+It's an all pass because there can be more than one city with the same name
+
+*/
+
+Rule: NonUkCityAvoid
+(
+	{Country}
+)
+-->{}
+
+
+Rule: NonUkCity
+(
+	{Lookup.majorType == location, Lookup.minorType == non_uk_city}
+):city
+-->
+	:city.Place = {type = "globalCity", rule = "NonUkCity", context = :city.Lookup.context, country = :city.Lookup.country}
+
+

@@ -1,0 +1,70 @@
+Academy
+Agency
+Alliance
+Army
+Assembly
+Association
+Authority
+Battalion;type=military
+Board
+Brigade;type=military
+Bureau
+Chamber of Commerce
+Club
+College;type=education
+Commission
+Committee
+Confederation
+Congress
+Consortium
+Constabulary
+Corporation
+Corps
+Council
+Federation
+Fellowship
+Field Ambulance
+Fire & Rescue
+Fire and Rescue
+Forum
+Foundation
+Fund;subtype=academic
+Fusiliers;type=military
+Girl Guides
+Global
+Government
+Group
+Guards;type=military
+Home Guard;type=military
+Hospice
+Hospital;type=medical
+Infirmary;type=medical
+Institute;type=academic
+Intergovernmental
+Laboratory
+Lancers;type=military
+League
+Light Infantry;type=military
+Ministry
+Museum
+Navy
+Office;prefix=yes
+Organisation
+Organization
+Panel
+Partnership
+Party
+Police
+Prison
+Regiment;type=military
+Regiment of Foot;type=military
+School;type=educational
+Scouts
+Service
+Society
+Synod
+Force
+Union
+Unit
+University;type=educational
+Trust

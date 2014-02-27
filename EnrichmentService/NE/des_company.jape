@@ -1,0 +1,222 @@
+/*
+* Filename: 	des_company.jape
+* Author:		Paul Appleby
+* Description:	Annotates companies
+* Date created:	01/06/2010
+* This version:	0.14
+* 
+*/
+
+
+Phase:	Company
+Input:  Token Lookup LineBreak Sentence TempDashGroup
+Options: control = appelt negationGrouping = false
+
+
+/* Company names in the UK are very flexible (details are on the Companies House website).
+We will only look for a subset of the possibilities */
+
+Macro: POSSESSION
+(
+	(
+		(
+			{Token.string == "\u2019"} |
+			{Token.string == "'"}
+		)
+		{Token.root == "s"}
+	) |
+	{Token.root == "'s"}
+)
+
+
+Macro: COMPANYTERMFIRST
+(
+	(
+		(
+			(
+				{Token.orth == upperInitial, !Lookup.minorType == not_company, !Lookup.minorType == position,!Lookup.minorType == ministerial} |
+				{Token.orth == mixedCaps, !Lookup.minorType == not_company, !Lookup.minorType == position, !Lookup.minorType == ministerial}
+			)
+			{Token.string == "."}
+		)+
+	) |
+	(
+		(
+			{Token.category == DT, Token.orth == upperInitial, !Lookup.minorType == not_company, !Lookup.minorType == position, !Lookup.minorType == ministerial} |
+			{Token.category == CD, Token.length < 4, !Lookup.minorType == not_company, !Lookup.minorType == position} |
+			{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.minorType == not_company, !Lookup.minorType == position, !Lookup.minorType == ministerial} |
+			{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.minorType == not_company, !Lookup.minorType == position, !Lookup.minorType == ministerial, TempDashGroup} |
+			{Token.orth == mixedCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.minorType == not_company, !Lookup.minorType == position, !Lookup.minorType == ministerial}
+		)
+		(POSSESSION)?
+	) |
+	{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation, !Lookup.minorType == not_company, !Lookup.minorType == position, !Lookup.minorType == ministerial} |		
+	{Token.string == "&"} |		
+	(
+		(
+			{Token.orth == allCaps, Token.category == DT, !Lookup.minorType == not_company, !Lookup.minorType == position, !Lookup.minorType == ministerial} |
+			{Token.category == CD, Token.length < 4, !Lookup.minorType == not_company, !Lookup.minorType == position} |
+			{Token.orth == allCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation",
+				!Lookup.minorType == organisation, !Lookup.minorType == not_company, !Lookup.minorType == position, !Lookup.minorType == ministerial}
+		)
+		(POSSESSION)?
+	)
+
+)
+
+
+Macro: COMPANYTERM
+(
+	(
+		(
+			(
+				{Token.orth == upperInitial, !Lookup.minorType == not_company, !Lookup.minorType == company_type} |
+				{Token.orth == mixedCaps, !Lookup.minorType == not_company, !Lookup.minorType == company_type}
+			)
+			{Token.string == "."}
+		)+
+	) |
+	(
+		(
+			{Token.category == DT, !Lookup.minorType == not_company, !Lookup.minorType == company_type} |
+			{Token.category == CD, !Lookup.minorType == not_company, !Lookup.minorType == company_type} |
+			{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.minorType == not_company, !Lookup.minorType == company_type} |
+			{Token.orth == mixedCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.minorType == not_company, !Lookup.minorType == company_type}
+		)
+		(POSSESSION)?
+	) |
+	{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation, !Lookup.minorType == not_company, !Lookup.minorType == company_type} |		
+	{Token.string == "&"} |		
+	(
+		(
+			{Token.orth == allCaps, Token.category == DT, !Lookup.minorType == not_company, !Lookup.minorType == company_type} |
+			{Token.category == CD, !Lookup.minorType == not_company, !Lookup.minorType == company_type} |
+			{Token.orth == allCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.minorType == not_company, !Lookup.minorType == company_type}
+		)
+		(POSSESSION)?
+	)
+
+)
+
+
+Macro: COMPANYTERMPOSTCOMMA
+(
+	(
+		(
+			(
+				{Token.orth == upperInitial} |
+				{Token.orth == mixedCaps}
+			)
+			{Token.string == "."}
+		)+
+	) |
+	(
+		(
+			{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation} |
+			{Token.orth == mixedCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation}
+		)
+		(
+			(
+				{Token.string == "\u2019"} |
+				{Token.string == "'"}
+			)
+			{Token.string == "s"}
+		)?
+	) |
+	{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation} |		
+	{Token.string == "&"} |		
+	(
+		{Token.orth == allCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation}
+		(
+			(
+				{Token.string == "\u2019"} |
+				{Token.string == "'"}
+			)
+			{Token.string == "S"}
+		)?
+	)
+
+)
+
+// This macro has had to be tweaked because of an apparent bug in GATE caused by document daily-telegraph-9
+Macro: COMPANYTERMSEQ
+(
+	(COMPANYTERMFIRST)
+	(
+		(
+			{Token.string == "("}
+			(COMPANYTERM)[1,5]
+			{Token.string == ")"}
+		) |
+		(COMPANYTERM)
+	)[0,7]
+)
+
+/* Ambiguous indicates that the term is used as a common company type but is not unique enough to only be used for that*/
+/* e.g. partners - could be Sapphire Partners but wrongly european partners */
+Macro: COMPANYTYPE
+(
+	{Lookup.majorType == organisation, Lookup.minorType == company_type, Lookup.ambiguous != "true"}
+)
+
+
+/* Pick up lookup companies */
+Rule: CompanyListed
+(
+	{Lookup.majorType == organisation, Lookup.minorType == company, !Lookup.minorType == ministerial}
+	(COMPANYTYPE)?
+):company
+-->
+	:company.Company = {symbol =:company.Lookup.symbol, rule = "CompanyListed", context =:company.Lookup.context}
+
+/* Organisations such as the ... */
+Rule: ConjuctedCompany
+(
+	({Token.category == DT, Token.orth == lowercase})?
+	(
+		(COMPANYTERMSEQ)
+		{Token.category == CC}
+		(
+			{Token.orth == upperInitial, Token.category == DT} |
+			{Token.orth == upperInitial, Token.category == CD} |
+			{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation"} |
+			{Token.orth == upperInitial, Token.category == JJ} |		
+			{Token.orth == allCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation"}
+		)+
+		(COMPANYTYPE)
+	):company
+)
+-->
+	:company.Company = {rule = "ConjunctedCompany"}
+
+
+/* Avoid matches like 'The Company' */
+Rule: CompanyAvoid
+Priority: 20
+(
+	({Token.category == DT})+
+	(COMPANYTYPE)
+)
+-->{}
+
+/* Match a company name but allow for odd case where a lower case DT is at the front - don't want that */
+Rule: CompanyAfter
+(
+	({Token.category == DT, Token.orth == lowercase})
+	(
+		(COMPANYTERMSEQ)
+		(COMPANYTYPE)
+	):company
+)
+-->
+	:company.Company = {rule = "CompanyAfter"}
+	
+
+Rule: CompanyWithType
+(
+	(COMPANYTERMSEQ)
+	(COMPANYTYPE)
+):company
+-->
+	:company.Company = {rule = "CompanyWithType"}
+	

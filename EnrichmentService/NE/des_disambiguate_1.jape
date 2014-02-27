@@ -1,0 +1,206 @@
+/*
+* Filename: 	des_disambiguate_1.jape
+* Author:	Paul Appleby
+* Description:	Start the process of disambiguation
+* Date created:	31/08/10
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 19/11/11	0.2		PA		Improved LocalInternational algorithm
+*/
+
+
+Phase:	Disambiguation1
+Input:  Person Country Token Place
+Options: control = appelt negationGrouping = false
+
+
+/* It is quite possible that a place will be both a UK place and an international place */
+/* We will hopefully have identified both and now need to work out which one it should be */
+/* It is also possible we'll have multiple local places of multiple global places with same name */
+/* Disambiguation of that happens in disambiguate_2 */
+Rule: LocalInternational
+Priority: 10
+(
+	{Place.type == globalCity}
+):place
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+	// Simply get the first - doesn't matter what it is
+	Annotation placeAnn = placeSet.iterator().next();
+	Long locStart = placeAnn.getStartNode().getOffset();
+	Long locEnd = placeAnn.getEndNode().getOffset();
+	AnnotationSet tokenSet = inputAS.get("Place", locStart, locEnd);
+
+	// If more than one then disambiguate
+
+	if (tokenSet.size() > 1) {
+		String locName = "";
+
+		// Get the surrounding paragraph
+		AnnotationSet paragraphSet = inputAS.get("Paragraph", locStart, locEnd);	
+		Long paragraphStart = paragraphSet.firstNode().getOffset();
+		Long paragraphEnd = paragraphSet.lastNode().getOffset();
+		//System.out.println("Paragraph is: " + gate.Utils.stringFor(doc, paragraphSet));
+		
+		String thisPlace = gate.Utils.stringFor(doc, placeSet);
+		//System.out.println("Place is: " + thisPlace);
+
+		// Get country mentions in paragraph
+		AnnotationSet countrySet = inputAS.get("Country");	
+		AnnotationSet countryParagraphSet = inputAS.get("Country", paragraphStart, paragraphEnd);	
+
+		Integer localCount = 0;
+		Integer globalCount = 0;
+		Integer localParagraphCount = 0;
+		Integer globalParagraphCount = 0;
+		Integer countryCount = countrySet.size();
+		Integer countryParagraphCount = countryParagraphSet.size();
+
+		// Get local/global counts for entire document
+		// And for local paragraph
+		for (Annotation locAnn: inputAS.get("Place")) {
+			locStart = locAnn.getStartNode().getOffset();
+			locEnd = locAnn.getEndNode().getOffset();
+			String locType = locAnn.getFeatures().get("type").toString();
+			String locRule = locAnn.getFeatures().get("rule").toString();
+			// Don't check ambiguous other places
+			if (!locRule.equals("OtherAmbiguous")) {
+				try {
+					locName = doc.getContent().getContent(locStart, locEnd).toString();
+				}
+				catch (Exception e) {
+				}
+				// Only check if not London and not itself - that could point to either
+				if (!locName.toLowerCase().equals("london") && !locName.toLowerCase().equals(thisPlace.toLowerCase())) {
+					//System.out.println("Place: " + locName + ", Type: " + locType);
+					if (locType.equals("globalCity"))  {
+						globalCount++;
+						if (locStart >= paragraphStart && locEnd <= paragraphEnd) globalParagraphCount++;
+					}
+					else
+					{
+						localCount++;
+						if (locStart >= paragraphStart && locEnd <= paragraphEnd) localParagraphCount++;
+					}
+				}
+			}
+		}
+
+		// Okay, so we've done a basic count on whether the paragraph/document is local or global
+		// Now disambiguate based on that
+		
+		// There is still plenty of scope to imrove this algorithm:
+		// We could include city count too - not just local/global
+		// We could include a distance component from mention
+		
+		//System.out.println("Global place: " + globalCount + ", Local place: " + localCount);
+		//System.out.println("Global paragraph place: " + globalParagraphCount + ", Local paragraph place: " + localParagraphCount);
+		//System.out.println("Global country: " + countryCount);
+		//System.out.println("Paragraph country: " + countryParagraphCount);
+		
+		Boolean isGlobal = false;
+		// If there are equal or more global references in this paragraph assume global
+		if (globalParagraphCount + countryParagraphCount > 0 &&
+			globalParagraphCount + countryParagraphCount >= localParagraphCount) {
+			//System.out.println("Rule 1");
+			isGlobal = true;
+		}
+		// Else if equal globall/locally for paragraph do a document comparison
+		else if (globalParagraphCount.equals(localParagraphCount) && globalCount >= localCount) {
+			//System.out.println("Rule 2");
+			isGlobal = true;
+		}
+		// Else if no local informaton and number of countries mentioned is greater than number of local places
+		// indicates the document has a global theme
+		else if (localParagraphCount == 0 && countryCount >= localCount) {
+			//System.out.println("Rule 3");
+			isGlobal = true;
+		}
+
+		//System.out.println("Is global: " + isGlobal);
+		Iterator<Annotation> isPlaceItr = tokenSet.iterator();
+		while (isPlaceItr.hasNext()) {
+			Annotation locAnn = isPlaceItr.next();
+			String locType = locAnn.getFeatures().get("type").toString();
+			Boolean remove = false;
+			if (locType.equals("globalCity") && !isGlobal) remove = true;
+			if (!locType.equals("globalCity") && isGlobal) remove = true;
+			if (remove) {
+				//System.out.println("Removing: " + locType);
+				doc.getAnnotations("DES").remove(locAnn);
+			}
+		}
+	}	
+
+}
+
+
+/* Place within country. If an ambiguous other place check to see if is actually the country */
+Rule: PlaceInCountry
+Priority: 30
+(
+	({Place within Country, Place.type == other, Place.rule == OtherAmbiguous}):place
+)
+-->
+{
+
+	Iterator<Annotation> placeItr = inputAS.get("Place").iterator();
+	Integer otherPlaceCount = 0;
+	while (placeItr.hasNext()) {
+		Annotation placeAnn = placeItr.next();
+		// Is it other and not ambiguous?
+		if (placeAnn.getFeatures().get("type").equals("other") && placeAnn.getFeatures().get("rule").equals("Other")) {
+			otherPlaceCount++;
+		}
+	}
+
+	// If no other 'other' unambiguous places mentioned weight of probability is that it is a country so remove
+	if (otherPlaceCount == 0) {
+		AnnotationSet placeSet = bindings.get("place");
+		outputAS.removeAll(placeSet);
+	}
+}
+
+
+/* Places that are ambiguous and actually part of people's names */
+Rule: PlaceAsName
+(
+	({Place.type == other, Place.rule == OtherAmbiguous}):place
+)
+-->
+{
+	try {
+		AnnotationSet placeSet = bindings.get("place");
+		Annotation placeAnn = placeSet.iterator().next();
+		String place = doc.getContent().getContent(placeAnn.getStartNode().getOffset(), placeAnn.getEndNode().getOffset()).toString();
+		//System.out.println("PlaceAsName Testing: " + place);
+
+		Iterator<Annotation> firstNameItr = inputAS.get("FirstName").iterator();
+		Iterator<Annotation> surnameItr = inputAS.get("Surname").iterator();
+
+		// If we find a matching first name or surname we'll assume it's a name and remove	
+		Boolean isMatch = false;
+		while ((firstNameItr.hasNext() || surnameItr.hasNext()) && isMatch == false) {
+			Annotation nameAnn = (firstNameItr.hasNext()) ? firstNameItr.next() : surnameItr.next();
+			//System.out.println("Testing annotation type: " + nameAnn.getType().toString());
+			String name = doc.getContent().getContent(nameAnn.getStartNode().getOffset(), nameAnn.getEndNode().getOffset()).toString();
+			//System.out.println("Testing name: " + name);
+			if (name.equals(place)) {
+				isMatch = true;
+				System.out.println("Removing: " + name);
+			}
+		}
+
+		if (isMatch) outputAS.removeAll(placeSet);
+	}
+	catch (Exception e) {
+		System.err.println("An error has occurred: " + e.getMessage());
+	}
+}

@@ -1,0 +1,39 @@
+/*
+* Filename: 	des_vehicle.jape
+* Author:	Paul Appleby
+* Description:	Annotates vehicles
+* Date created:	24/09/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 14/10/10	0.2		PA		Changed to use vehicle type	
+*/
+
+
+Phase:	Vehicle
+Input:  Split Token Lookup Date LineBreak
+Options: control = appelt negationGrouping = false
+
+
+/* Vehicles such as 'HMS Ark Royal' */
+Rule: Vehicle
+(
+	{Lookup.majorType == vehicle, Lookup.minorType == vehicle}
+):vehicle
+-->
+	:vehicle.Vehicle = {rule = "Vehicle", type =:vehicle.Lookup.type, context =:vehicle.Lookup.context}
+	
+
+/* Vehicle makes such as 'Ford Fiesta' */
+Rule: VehicleProduct
+(
+	{Lookup.majorType == vehicle_type, Lookup.minorType == vehicle_type}
+):product
+-->
+	:product.Product = {rule = "VehicleProduct", type = "vehicle", context =:product.Lookup.context}
+	

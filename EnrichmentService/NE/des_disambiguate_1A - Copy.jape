@@ -1,0 +1,401 @@
+/*
+* Filename: 	des_disambiguate_1A.jape
+* Author:		Paul Appleby
+* Description:	Disambiguate between various combinations of place, location and XXX
+* Date created:	31/08/10
+* This version:	0.4
+* 
+*/
+
+
+Phase:	Disambiguation1A
+Input:  Company Token Place Location Country Continent County Publication Day
+Options: control = appelt negationGrouping = false
+
+
+/* Disambiguate between companies and global places . There may be more than one place! */
+Rule: PlaceCompany
+(
+	{Place.type == globalCity, Company}
+):place
+-->
+{
+	AnnotationSet annotationSet = bindings.get("place");
+	AnnotationSet placeSet = annotationSet.get("Place");
+	// Simply get the first place - doesn't matter what it is
+	Annotation placeAnn = placeSet.iterator().next();
+	Long locStart = placeAnn.getStartNode().getOffset();
+	Long locEnd = placeAnn.getEndNode().getOffset();
+
+	String locName = "";
+
+	// Get the surrounding paragraph
+	AnnotationSet paragraphSet = inputAS.get("Paragraph", locStart, locEnd);	
+	Long paragraphStart = paragraphSet.firstNode().getOffset();
+	Long paragraphEnd = paragraphSet.lastNode().getOffset();
+	//System.out.println("Paragraph is: " + gate.Utils.stringFor(doc, paragraphSet));
+
+	String thisPlace = gate.Utils.stringFor(doc, placeSet);
+	//System.out.println("Place is: " + thisPlace);
+
+	// Get place mentions in paragraph
+	AnnotationSet placeGlobalSet = inputAS.get("Place");	
+	AnnotationSet placeParagraphSet = inputAS.get("Place", paragraphStart, paragraphEnd);	
+
+	// Get company mentions in paragraph
+	AnnotationSet companyGlobalSet = inputAS.get("Company");	
+	AnnotationSet companyParagraphSet = inputAS.get("Company", paragraphStart, paragraphEnd);	
+
+	Integer placeGlobalCount = placeGlobalSet.size();
+	Integer placeParagraphCount = placeParagraphSet.size();
+	Integer companyGlobalCount = companyGlobalSet.size();
+	Integer companyParagraphCount = companyParagraphSet.size();
+
+	// Okay so this is pretty dumb but we can always improve as needed
+
+	Boolean isPlace = false;
+	// If there are more paragraph places than companies select places
+	if (placeParagraphCount > companyParagraphCount) {
+		isPlace = true;
+	}
+
+	if (isPlace) {
+		outputAS.removeAll(annotationSet.get("Company"));
+		// Are there more than one Place annotations?
+		Annotation keepAnn = null;
+		Integer maxCountryCount = 0;
+		AnnotationSet placeTestSet = inputAS.get("Place", locStart, locEnd);	
+		if (placeTestSet.size() > 1) {
+			// Check country origins to see which place has most co-occurring country places
+			for (Annotation placeTestAnn: placeTestSet) {
+				if (placeTestAnn.getFeatures().get("country") != null) {
+					String placeCountry = placeTestAnn.getFeatures().get("country").toString();
+					Integer countryCount = 0;
+					for (Annotation placeParagraphAnn : placeParagraphSet) {
+						if (placeParagraphAnn.getFeatures().get("country").toString().equals(placeCountry))
+							countryCount++;		
+					}
+					//System.out.println("Place: " + gate.Utils.stringFor(doc, placeTestAnn) + "; Count: " + countryCount);
+					if (countryCount > maxCountryCount) {
+						keepAnn =  placeTestAnn;
+						maxCountryCount = countryCount;
+					}
+				}
+			}
+			// Now remove unwanted places
+			if (keepAnn != null) {
+				for (Annotation placeTestAnn: placeTestSet) {
+					if (placeTestAnn != keepAnn) {
+						outputAS.remove(placeTestAnn);
+					}
+				}
+			}
+		}
+	}
+
+}
+
+/* Disambiguate between companies and smaller places . There may be more than one place! */
+Rule: PlaceCompanyLocal
+(
+	{Place.type != globalCity, Company}
+):place
+-->
+{
+	AnnotationSet annotationSet = bindings.get("place");
+	AnnotationSet placeSet = annotationSet.get("Place");
+	// Simply get the first place - doesn't matter what it is
+	Annotation placeAnn = placeSet.iterator().next();
+	Long locStart = placeAnn.getStartNode().getOffset();
+	Long locEnd = placeAnn.getEndNode().getOffset();
+
+	String locName = "";
+
+	// Get the surrounding paragraph
+	AnnotationSet paragraphSet = inputAS.get("Paragraph", locStart, locEnd);	
+	Long paragraphStart = paragraphSet.firstNode().getOffset();
+	Long paragraphEnd = paragraphSet.lastNode().getOffset();
+	System.out.println("Paragraph is: " + gate.Utils.stringFor(doc, paragraphSet));
+
+	String thisPlace = gate.Utils.stringFor(doc, placeSet);
+	// System.out.println("Place is: " + thisPlace);
+
+	// Get place mentions in paragraph
+	AnnotationSet placeGlobalSet = inputAS.get("Place");	
+	AnnotationSet placeParagraphSet = inputAS.get("Place", paragraphStart, paragraphEnd);	
+
+	// Get street mentions in paragraph
+	AnnotationSet streetGlobalSet = inputAS.get("Street");	
+	AnnotationSet streetParagraphSet = inputAS.get("Street", paragraphStart, paragraphEnd);	
+
+	// Get company mentions in paragraph
+	AnnotationSet companyGlobalSet = inputAS.get("Company");	
+	AnnotationSet companyParagraphSet = inputAS.get("Company", paragraphStart, paragraphEnd);	
+
+	Integer placeGlobalCount = placeGlobalSet.size();
+	Integer placeParagraphCount = placeParagraphSet.size();
+	Integer streeGlobalCount = streetGlobalSet.size();
+	Integer streetParagraphCount = streetParagraphSet.size();
+	Integer companyGlobalCount = companyGlobalSet.size();
+	Integer companyParagraphCount = companyParagraphSet.size();
+
+	// Okay so this is pretty dumb but we can always improve as needed
+
+	System.out.println("Place paragraph: " + placeParagraphCount);
+	System.out.println("Street paragraph: " + streetParagraphCount);
+	System.out.println("Company paragraph: " + companyParagraphCount);
+
+	Boolean isPlace = false;
+	// If there are more paragraph places or streets than companies select places
+	if (placeParagraphCount + streetParagraphCount > companyParagraphCount) {
+		System.out.println("Place wins");
+		isPlace = true;
+	}
+
+	if (isPlace) {
+		// Remove all similarly named companies
+		AnnotationSet fullCompanySet = inputAS.get("Company");	
+		for (Annotation companyAnn: fullCompanySet) {
+			String thisCompany = gate.Utils.stringFor(doc, companyAnn);		
+			if (thisCompany.equals(thisPlace)) outputAS.remove(companyAnn);
+		}
+
+	}
+
+}
+
+
+/* Disambiguate between country and location */
+Rule: LocationCountry
+(
+	{Location, Country}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet locationSet = annotationSet.get("Location");
+	// Simply get the first location - doesn't matter what it is
+	Annotation locationAnn = locationSet.iterator().next();
+	Long locStart = locationAnn.getStartNode().getOffset();
+	Long locEnd = locationAnn.getEndNode().getOffset();
+
+	String locName = "";
+
+	// Get the surrounding paragraph
+	AnnotationSet paragraphSet = inputAS.get("Paragraph", locStart, locEnd);	
+	Long paragraphStart = paragraphSet.firstNode().getOffset();
+	Long paragraphEnd = paragraphSet.lastNode().getOffset();
+	//System.out.println("Paragraph is: " + gate.Utils.stringFor(doc, paragraphSet));
+
+	String thisLocation = gate.Utils.stringFor(doc, locationSet);
+	//System.out.println("Location is: " + thisLocation);
+
+	// Get place mentions in paragraph
+	AnnotationSet locationGlobalSet = inputAS.get("Location");	
+	AnnotationSet locationParagraphSet = inputAS.get("Location", paragraphStart, paragraphEnd);	
+
+	// Get country mentions in paragraph
+	AnnotationSet countryGlobalSet = inputAS.get("Country");	
+	AnnotationSet countryParagraphSet = inputAS.get("Country", paragraphStart, paragraphEnd);	
+
+	Integer	locationGlobalCount = locationGlobalSet.size();
+	Integer locationParagraphCount = locationParagraphSet.size();
+	Integer countryGlobalCount = countryGlobalSet.size();
+	Integer countryParagraphCount = countryParagraphSet.size();
+
+	// Okay so this is pretty dumb but we can always improve as needd
+
+	Boolean isLocation = false;
+	// If there are more paragraph locations than countries select location
+	if (locationParagraphCount > countryParagraphCount) {
+		isLocation = true;
+	}
+
+	if (isLocation) {
+		outputAS.removeAll(annotationSet.get("Country"));
+		// Are there more than one Place annotations?
+		Annotation keepAnn = null;
+		Integer maxCountryCount = 0;
+		AnnotationSet locationTestSet = inputAS.get("Location", locStart, locEnd);	
+		if (locationTestSet.size() > 1) {
+			// Check country origins to see which location has most co-occurring country places
+			for (Annotation locationTestAnn: locationTestSet) {
+				if (locationTestAnn.getFeatures().get("country") != null) {
+					String locationCountry = locationTestAnn.getFeatures().get("country").toString();
+					Integer countryCount = 0;
+					for (Annotation locationParagraphAnn : locationParagraphSet) {
+						if (locationParagraphAnn.getFeatures().get("country").toString().equals(locationCountry))
+							countryCount++;		
+					}
+					//System.out.println("Location: " + gate.Utils.stringFor(doc, locationTestAnn) + "; Count: " + countryCount);
+					if (countryCount > maxCountryCount) {
+						keepAnn =  locationTestAnn;
+						maxCountryCount = countryCount;
+					}
+				}
+			}
+			// Now remove unwanted locations
+			if (keepAnn != null) {
+				for (Annotation locationTestAnn: locationTestSet) {
+					if (locationTestAnn != keepAnn) {
+						outputAS.remove(locationTestAnn);
+					}
+				}
+			}
+		}
+	}
+
+}
+
+
+/* Disambiguate between country and continent, e.g. Australia! */
+Rule: ContinentCountry
+(
+	{Continent, Country}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet continentSet = annotationSet.get("Continent");
+	// Simply get the first continent - doesn't matter what it is
+	Annotation continentAnn = continentSet.iterator().next();
+	Long locStart = continentAnn.getStartNode().getOffset();
+	Long locEnd = continentAnn.getEndNode().getOffset();
+
+	String locName = "";
+
+	// Get the surrounding paragraph
+	AnnotationSet paragraphSet = inputAS.get("Paragraph", locStart, locEnd);	
+	Long paragraphStart = paragraphSet.firstNode().getOffset();
+	Long paragraphEnd = paragraphSet.lastNode().getOffset();
+	//System.out.println("Paragraph is: " + gate.Utils.stringFor(doc, paragraphSet));
+
+	String thiscontinent = gate.Utils.stringFor(doc, continentSet);
+	//System.out.println("Continent is: " + thiscontinent);
+
+	// Get place mentions in paragraph
+	AnnotationSet continentGlobalSet = inputAS.get("Continent");	
+	AnnotationSet continentParagraphSet = inputAS.get("Continent", paragraphStart, paragraphEnd);	
+
+	// Get country mentions in paragraph
+	AnnotationSet countryGlobalSet = inputAS.get("Country");	
+	AnnotationSet countryParagraphSet = inputAS.get("Country", paragraphStart, paragraphEnd);	
+
+	Integer continentGlobalCount = continentGlobalSet.size();
+	Integer continentParagraphCount = continentParagraphSet.size();
+	Integer countryGlobalCount = countryGlobalSet.size();
+	Integer countryParagraphCount = countryParagraphSet.size();
+
+	// Okay so this is pretty dumb but we can always improve as needd
+
+	Boolean isContinent = false;
+	// If there are more paragraph continents than countries select continent
+	if (continentParagraphCount > countryParagraphCount) {
+		isContinent = true;
+	}
+	else if (continentParagraphCount == countryParagraphCount && continentGlobalCount > countryGlobalCount) {
+		isContinent = true;
+	}
+
+	//System.out.println("Continent? " + isContinent);
+	if (isContinent) {
+		outputAS.removeAll(annotationSet.get("Country"));
+	}
+	else {
+		outputAS.removeAll(annotationSet.get("Continent"));
+	}
+
+}
+
+
+
+/* Disambiguate between company and county, e.g. City of London! */
+Rule: ContinentCountry
+(
+	{Company, County}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet entitySet = inputAS.get("Entity",
+		annotationSet.firstNode().getOffset(), annotationSet.lastNode().getOffset());
+	AnnotationSet entityGroupSet = inputAS.getCovering("Entity",
+		annotationSet.firstNode().getOffset(), annotationSet.lastNode().getOffset());
+	Annotation entityAnn = entitySet.iterator().next();;
+	String entityId = entityAnn.getFeatures().get("ml-id").toString();
+	if (entityGroupSet.size() > 0) {
+		for (Annotation entityGroupAnn : entityGroupSet) {
+			String entityGroupId = entityGroupAnn.getFeatures().get("ml-id").toString();
+			if (entityGroupId.equals(entityId)) {
+				AnnotationSet entityGroupProbSet = inputAS.getCovering("EntityGroup",
+					entityGroupAnn.getStartNode().getOffset(), entityGroupAnn.getEndNode().getOffset());
+				for (Annotation entityGroupProbAnn : entityGroupProbSet) {	
+					if (entityGroupProbAnn.getFeatures().get("prob") != null) {
+						String type = entityGroupProbAnn.getFeatures().get("type").toString();
+						String prob = entityGroupProbAnn.getFeatures().get("prob").toString();
+						//System.out.println(type + " "  + prob);
+						if (type.equals("Place") || type.equals("County")) {
+							outputAS.removeAll(annotationSet.get("Company"));
+						}
+						else {
+							outputAS.removeAll(annotationSet.get("County"));
+						}
+						break;
+					};
+				}
+				break;
+			}
+		}
+	}
+
+}
+
+/*
+
+Publications can be quite ambiguous, e.g. 'the Sun' newspaper
+Days of the week can be too, e.g. 'the Irish Sun' where the publication isn't picked up
+If entity learning implies same entity type with a prob > 0.7 as already annotated then keep else dump
+
+*/
+Rule: MLdisambiguation
+(
+	{Publication.rule == "Publication"} |
+	{Day.rule == "DayOfWeek"}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet entityGroupSet = inputAS.getCovering("EntityGroup",
+		annotationSet.firstNode().getOffset(), annotationSet.lastNode().getOffset());		
+
+	if (entityGroupSet.size() > 0) {
+		AnnotationSet entitySet = inputAS.getCovering("Entity",
+			annotationSet.firstNode().getOffset(), annotationSet.lastNode().getOffset());
+		Annotation entityAnn = entitySet.iterator().next();
+		String entityId = entityAnn.getFeatures().get("ml-id").toString();
+
+		for (Annotation entityGroupAnn : entityGroupSet) {
+			if (entityGroupAnn.getFeatures().get("ml-id") != null) {
+				String entityGroupId = entityGroupAnn.getFeatures().get("ml-id").toString();
+				if (entityGroupId.equals(entityId)) {
+					AnnotationSet entityGroupProbSet = inputAS.getCovering("EntityGroup",
+						entityGroupAnn.getStartNode().getOffset(), entityGroupAnn.getEndNode().getOffset());
+					for (Annotation entityGroupProbAnn : entityGroupProbSet) {	
+						if (entityGroupProbAnn.getFeatures().get("prob") != null) {
+							String type = entityGroupProbAnn.getFeatures().get("type").toString();
+							Double prob = Double.parseDouble(entityGroupProbAnn.getFeatures().get("prob").toString());
+							Annotation testedAnn = annotationSet.iterator().next();
+							String testedType = testedAnn.getType();
+							if (!(type.equals(testedType) && prob > 0.7)) {
+								outputAS.removeAll(annotationSet);
+							}
+							break;
+						};
+					}
+					break;
+				};
+			}
+		}
+	}
+
+}

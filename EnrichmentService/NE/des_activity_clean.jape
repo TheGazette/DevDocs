@@ -1,0 +1,51 @@
+/*
+* Filename: 	des_activity_clean.jape
+* Author:	Paul Appleby
+* Description:	Removes false positives for activities
+* Date created:	02/09/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 10/90/10	0.2		PA		Added ActivityRemove2
+*/
+
+
+Phase:	ActivityClean
+Input:  Activity Company Token LineBreak Street Person Event Number Lookup Facility Place County Country
+Options: control = appelt negationGrouping = false
+
+
+/* Activity within ... */
+Rule: ActivityRemove1
+(
+	{Activity within Facility} |
+	{Activity within Event}
+):activity
+-->
+{
+	AnnotationSet activitySet = bindings.get("activity");
+ 	outputAS.removeAll(activitySet);
+}
+
+/* For activities identified as places, e.g. Rugby */
+Rule: ActivityRemove2
+(
+	({Activity within Place}):activity
+	({Token.string == ","})?
+	(
+		{Place} |
+		{County} |
+		{Country}
+	)
+)
+-->
+{
+	AnnotationSet activitySet = bindings.get("activity");
+ 	outputAS.removeAll(activitySet);
+}
+

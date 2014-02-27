@@ -1,0 +1,13 @@
+hundred;count=100
+Hundred;count=100
+thousand;count=1000
+Thousand;count=1000
+M;count=1000000
+million;count=1000000
+Million;count=1000000
+B;count=1000000000
+bn;count=1000000000
+billion;count=1000000000
+Billion;count=1000000000
+trillion;count=1000000000000
+Trillion;count=1000000000000

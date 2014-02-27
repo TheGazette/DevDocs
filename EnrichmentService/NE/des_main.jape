@@ -1,0 +1,112 @@
+/*  
+* Filename: 	des_main.jape
+* Author:		Paul Appleby
+* Description:	Generic JAPE rules files for Named Entity Extraction.
+*				Ordering can be important to avoid overlapping annotations
+* Date created:	24/05/2010
+* This version:	0.29
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 21/11/11	0.29		PA		Add disambiguate_1A, location_2 and location_3 and nationality_clean
+* 25/10/11	0.28		PA		Reworking ready for identifier split
+* 22/10/11	0.27		PA		Various changes
+* 16/05/11	0.26		PA		Added medical
+* 21/02/11	0.25		PA		Added des_II_award
+* 19/12/10	0.24		PA		Added in adjust_tokens
+* 22/11/10	0.23		PA		Added in more identifiers and honours
+* 16/11/10	0.22		PA		Added awards
+* 04/10/10	0.21		PA		Added position clean
+* 28/09/10	0.20		PA		Added des_II_time and des_II_organisation and des_assign_place_id and des_link
+* 24/09/10	0.19		PA		Added des_vehicle and des_location_clean_4 and des_publication_clean
+* 14/09/10	0.18		PA		Added space_control and reorganised phases
+* 10/09/10	0.17		PA		Added in URL clean
+* 31/08/10	0.16		PA		Added in natural features and disambiguate_2 and feature_clean
+*						Added activities and publications and various other changes
+* 22/08/10	0.15		PA		Added spacetoken_clean
+* 16/08/10	0.14		PA		Added in person_clean, changed role to position
+* 13/08/10	0.13		PA		Added in events
+* 12/08/10	0.12		PA		Added location_2 and renamed location_more to location_3
+* 05/08/10	0.11		PA		Added role clean
+* 02/08/10	0.10		PA		Added facilities
+* 29/07/10	0.9		PA		Added in location_clean_4
+* 01/07/10	0.8		PA		Added in coref_1
+* 28/06/10	0.7		PA		Added in location_clean_3 and value_clean
+* 21/06/10	0.6		PA		Added person confirmation
+* 16/06/10	0.5		PA		Added roles
+* 15/06/10	0.4		PA		Added company_clean and moved location_clean before disambiguation
+* 11/06/10	0.3		PA		Added date_clean
+* 24/05/10	0.2		PA		Address phase added
+*/
+
+MultiPhase:	DesMain
+Phases:
+
+des_linebreaks
+des_space_control
+des_token_adjust
+des_hyphen
+des_lookup_cleanup
+
+/* 
+The location processing is grouped together
+The first phase is independent but the other phases may depend upon annotations being added by the first phase
+*/
+
+des_location
+des_location_2
+des_location_3
+des_location_other
+des_location_non_UK_cities
+des_location_natural_feature
+
+des_admingeo
+des_company
+des_organisation
+des_facility
+des_event
+des_award
+des_activity
+des_term_abbrev
+des_term_abbrev_resolution
+des_quotes
+des_number
+des_number_cleanup
+des_value
+des_price
+des_date
+des_notable_day
+des_day
+des_day_resolution
+des_time
+des_duration
+des_postcode
+des_telephone
+des_url
+des_person
+des_person_resolution
+des_person_confirmation
+des_position
+des_legislation
+des_legislation_2
+des_secondary_legislation
+des_publication
+des_vehicle
+des_history
+des_medical
+des_technology
+
+/* Code dependent upon earlier phases (i.e. annotations being added) */
+
+des_position_2
+des_address
+des_facility_2
+
+/* Some tests are sensitive to document position to mark */
+des_document_position
+
+/* des_ml-entity-learning */
+

@@ -1,0 +1,194 @@
+/*
+* Filename: 	des_date_clean.jape
+* Author:	Paul Appleby
+* Description:	Remove false positives for dates
+* Date created:	11/06/2010
+* This version:	0.9
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 07/03/11	0.9		PA		Removed Date in Person
+* 04/10/10	0.8		PA		Removed Data in Link
+* 27/09/10	0.7		PA		Added MonthRemove3 and MonthRemove4 and tightened YearRemove2 and YearRemove3
+* 14/09/10	0.6		PA		Removed date in phone numbers. Add in SpaceToken
+* 02/09/10	0.5		PA		Removed day in publications
+* 15/08/10	0.4		PA		Removed dates in facilities
+* 05/08/10	0.3		PA		Improvements to MonthRemove2 and added DayRemove
+* 02/08/10	0.2		PA		Added in MonthRemove2 and YearRemove1
+*/
+
+
+Phase:	DateClean
+Input:  Month Person Token Year Date Day LineBreak SpaceToken Lookup Facility Time Link Telephone Street Publication
+Options: control = appelt negationGrouping = false
+
+
+/* Remove dates within ..., e.g Theresa May */
+Rule: DateRemove
+(
+	{Date within Facility} |
+	{Date within Time} |
+	{Date within Link} |
+	{Date within Person} |
+	{Date within Telephone}
+):date
+-->
+{
+	AnnotationSet dateSet = bindings.get("date");
+ 	outputAS.removeAll(dateSet);
+}
+
+
+/* Remove months in names */
+/* e.g Theresa May */
+Rule: MonthNameRemove
+(
+	{Month within Person}
+):month
+-->
+{
+	AnnotationSet monthSet = bindings.get("month");
+ 	outputAS.removeAll(monthSet);
+}
+
+
+Rule: DayRemove
+(
+	{Day within Street} |
+	{Day within Publication}
+):day
+-->
+{
+	AnnotationSet daySet = bindings.get("day");
+ 	outputAS.removeAll(daySet);
+}
+
+/* Remove days mistakenly marked, e.g. 'the Sun' */
+Rule: DayRemove
+(
+	{Token.category == DT}
+	{SpaceToken}
+	({Day, Token.length < 4}):day
+)
+-->
+{
+	AnnotationSet annotSet = bindings.get("day");
+	AnnotationSet daySet = annotSet.get("Day");
+ 	outputAS.removeAll(daySet);
+}
+
+
+/* Try to pick up non date uses of months like May */
+Rule: MonthRemove2
+(
+	(
+		{Token.category == NN} |
+		{Token.category == NNP, !Month}
+	)
+	{SpaceToken}
+	({Month}):month
+	{SpaceToken}
+	(
+		{Token.category == VB} |
+		{Token.category == NNP, !Month}
+	)
+)
+-->
+{
+	AnnotationSet monthSet = bindings.get("month");
+ 	outputAS.removeAll(monthSet);
+}
+
+
+
+/* Remove animate use of month terms, e.g. 'May said' */
+Rule: MonthRemove3
+(
+	({Month}):month
+	{SpaceToken}
+	{Lookup.minorType == animate}
+)
+-->
+{
+	AnnotationSet monthSet = bindings.get("month");
+ 	outputAS.removeAll(monthSet);
+}
+
+
+/* Remove animate use of month terms, e.g. 'said May' */
+Rule: MonthRemove4
+(
+	{Lookup.minorType == animate}
+	{SpaceToken}
+	({Month}):month
+)
+-->
+{
+	AnnotationSet monthSet = bindings.get("month");
+ 	outputAS.removeAll(monthSet);
+}
+
+
+
+/* Try and remove years that are part of reference numbers */
+Rule: YearRemove1
+(
+	({Date, Token.category == CD}):year
+	{Token.string == "/"}
+	{Token.category != CD}
+)
+-->
+{
+	AnnotationSet yearSet = bindings.get("year");
+ 	outputAS.removeAll(yearSet);
+}
+
+
+/* Try and remove years that are simply codes */
+Rule: YearRemove2
+(
+	(
+		{Token.string == ":"} |
+		{Token.string == "="}
+	)
+	({SpaceToken})?
+	({Date, Token.category == CD, Token.length == 4}):year
+	{LineBreak}
+)
+-->
+{
+	AnnotationSet yearSet = bindings.get("year");
+ 	outputAS.removeAll(yearSet);
+}
+
+
+/* Try and remove years that are simply codes. Remove any similar examples in document */
+Rule: YearRemove3
+(
+	(
+		{Token.orth == allCaps} |
+		(
+			{Token.string == "No"}
+			({Token.string == "."})?
+			({SpaceToken})?
+		)
+	)
+	({Date}):year
+)
+-->
+{
+	AnnotationSet dateSet = bindings.get("year");
+ 	outputAS.removeAll(dateSet);
+
+ 	String date = gate.Utils.stringFor(doc, dateSet);
+	AnnotationSet dateToTestSet = inputAS.get("Date");
+	// Iterate over all date annotations to see if we have a match
+	for (Annotation dateAnn: dateToTestSet)	{
+		String dateToTest = gate.Utils.stringFor(doc, dateAnn);
+		if (dateToTest.equals(date)) doc.getAnnotations("DES").remove(dateAnn);
+	} 	
+}

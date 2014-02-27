@@ -1,0 +1,69 @@
+/*  
+* Filename: 	des_day.jape
+* Author:	Paul Appleby
+* Description:	Applies Day and Month information along with context
+* Date created:	21/12/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version	Author	Description
+* ==========================================================================
+*
+*/
+
+Phase: Day
+Input: Lookup  Token
+Options: control = appelt negationGrouping = false
+
+Rule: AvoidDayOfWeek
+(
+	{Lookup.majorType == date, Lookup.minorType == dayofweek, Token.length < 4}
+	{Token.string == "-"}
+	{!Lookup.minorType == dayofweek}
+)
+-->{}
+
+
+/* This matches against look-ups and then calculate the URI for the concept */
+Rule: DayofWeek
+(
+	{Lookup.majorType == date, Lookup.minorType == dayofweek}
+):day
+-->
+{
+	gate.AnnotationSet day = (gate.AnnotationSet)bindings.get("day");
+	gate.Annotation dayAnn = (gate.Annotation)day.iterator().next();
+	gate.FeatureMap features = Factory.newFeatureMap();
+	features.put("value", dayAnn.getFeatures().get("day"));
+	features.put("rule", "DayOfWeek");
+	String days[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+	
+	features.put("context", "http://www.w3.org/TR/owl-time#" +
+		days[Integer.parseInt(dayAnn.getFeatures().get("day").toString()) - 1]);
+		
+	outputAS.add(day.firstNode(), day.lastNode(), "Day", features);
+}
+
+
+Rule: Month
+(
+	{Lookup.majorType == date, Lookup.minorType == month}
+):month
+-->
+{
+	gate.AnnotationSet month = (gate.AnnotationSet)bindings.get("month");
+	gate.Annotation monthAnn = (gate.Annotation)month.iterator().next();
+	gate.FeatureMap features = Factory.newFeatureMap();
+	features.put("value", monthAnn.getFeatures().get("month"));
+	features.put("rule", "Month");
+	String months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September",
+		"October", "November", "December"};
+	
+	features.put("context", "http://reference.data.gov.uk/def/intervals/" +
+		months[Integer.parseInt(monthAnn.getFeatures().get("month").toString()) - 1]);
+		
+	outputAS.add(month.firstNode(), month.lastNode(), "Month", features);
+}
+

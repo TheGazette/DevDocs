@@ -1,0 +1,324 @@
+/*
+* Filename: 	des_disambiguate_2.jape
+* Author:	Paul Appleby
+* Description:	Resolve conflicts between feature types.
+* Date created:	01/09/10
+* This version:	0.2
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 20/11/11	0.2		PA		Tweaked NestedPlaces
+*/
+
+
+Phase:	Disambiguation2
+Input:  Place
+Options: control = appelt negationGrouping = false
+
+Rule: NestedPlaces
+(
+	{Place.type != "globalCity"}
+):annotation
+-->
+{
+
+	// When more than one place has the same name use the place closest to the centroid for all co-or mentions within the document
+	// In this stage we just try to remove conflicting types
+	// So output from this stage will leave the annotation type containing the most likely place
+	// But we won't select the place - that happens in the next stage when the removed information should make things more accurate
+
+	// This code expects a comma-separated list for easting, northing and contextOptions where ambiguity exists
+	// context should contains the base part of the URI to which the resolved value will be appended
+
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet placeSet = inputAS.get("Place", annotationSet.firstNode().getOffset(),
+		annotationSet.lastNode().getOffset());
+
+	// Get the surrounding paragraph
+	AnnotationSet paragraphSet = inputAS.get("Paragraph", annotationSet.firstNode().getOffset(),
+		annotationSet.lastNode().getOffset());	
+	Long paragraphStart = paragraphSet.firstNode().getOffset();
+	Long paragraphEnd = paragraphSet.lastNode().getOffset();
+	//System.out.println("Paragraph is: " + gate.Utils.stringFor(doc, paragraphSet));
+		
+	if (placeSet.size() > 1) {
+		//System.out.println("Found nested Place annotations");
+		
+		Long locationStart = placeSet.firstNode().getOffset();
+		Long locationEnd = placeSet.lastNode().getOffset();
+
+		Double northingCentroid = 0.0;
+		Double eastingCentroid = 0.0;
+		Double itemCount = 0.0;
+
+		// Get annotations that can have co-ordinates
+		LinkedHashSet<String> coorsList = new LinkedHashSet<String>();
+		coorsList.add(new String("Organisation"));
+		coorsList.add(new String("Place"));
+		coorsList.add(new String("Feature"));
+		coorsList.add(new String("Postcode"));
+		Iterator<Annotation> coorsItr = inputAS.get(coorsList).iterator();
+
+		Integer maxDistance = 0;
+
+		// Iterate over all geo information to calculate maximum distance in tokens of any mentions
+		while (coorsItr.hasNext()) {
+			Annotation locAnn = coorsItr.next();
+			if (locAnn.getFeatures().get("easting") != null) {
+				String locEasting = locAnn.getFeatures().get("easting").toString();
+				if (locEasting.indexOf(",") < 0) {
+					// Calculate how far away this mention is from our mention
+					Long locStart = locAnn.getStartNode().getOffset();
+					// Get the annotations at the geo annotation location - we need to check if they are also nested and ignore
+					// This only really applies to Place annotations for now
+					AnnotationSet nestedTestSet = inputAS.get(locAnn.getType(), locStart, locAnn.getEndNode().getOffset());
+					// Don't get the nested annotations
+					if (!locStart.equals(locationStart) && nestedTestSet.size() == 1) {
+						Long locEnd = locAnn.getStartNode().getOffset();				
+						try {
+							//System.out.println("Adding distance for: " + doc.getContent().getContent(locStart, locAnn.getEndNode().getOffset()).toString());
+						}
+						catch (Exception e) {
+						}
+						locStart = (locStart < locationStart) ? locStart : locationStart; 
+						locEnd = (locEnd > locationEnd) ? locEnd : locationEnd; 
+						AnnotationSet toks = inputAS.get("Token", locStart, locEnd);
+						List<Annotation> orderedToks = gate.Utils.inDocumentOrder(toks);
+						Integer locDistance = orderedToks.size();				
+						if (locDistance > maxDistance) maxDistance = locDistance;
+					}
+					else {
+						try {
+							//System.out.println("Ignoring nested annotation: " + doc.getContent().getContent(locStart, locAnn.getEndNode().getOffset()).toString());
+						}
+						catch (Exception e) {
+						}
+					}
+				}
+			}
+		}
+
+		//System.out.println("Max mention distance is: " + maxDistance);	
+		coorsItr = inputAS.get(coorsList).iterator();
+		// We'll keep a weighted count of each place type
+		long placeTypeOther = 0;
+		long placeTypeTown = 0;
+		long placeTypeCity = 0;
+
+		// Iterate over all geo information to calculate centroid for this location in the document
+		while (coorsItr.hasNext()) {
+			Annotation locAnn = coorsItr.next();
+			if (locAnn.getFeatures().get("easting") != null) {
+				String locEasting = locAnn.getFeatures().get("easting").toString();
+				// Only include non-ambiguous eastings
+				if (locEasting.indexOf(",") < 0) {
+					String locNorthing = locAnn.getFeatures().get("northing").toString();		
+					// Calculate how far away this mention is from our mention
+					Long locStart = locAnn.getStartNode().getOffset();
+					AnnotationSet nestedTestSet = inputAS.get(locAnn.getType(), locStart, locAnn.getEndNode().getOffset());
+					// Don't get the nested annotations or those starting where we're testing
+					if (!locStart.equals(locationStart) && nestedTestSet.size() == 1) {
+						Long locEnd = locAnn.getStartNode().getOffset();				
+						locStart = (locStart < locationStart) ? locStart : locationStart; 
+						locEnd = (locEnd > locationEnd) ? locEnd : locationEnd; 
+						AnnotationSet toks = inputAS.get("Token", locStart, locEnd);
+						List<Annotation> orderedToks = gate.Utils.inDocumentOrder(toks);
+						Integer locDistance = orderedToks.size();
+						try {
+							//System.out.println("Calculating distance for: " + doc.getContent().getContent(locAnn.getStartNode().getOffset(), locAnn.getEndNode().getOffset()).toString());
+						}
+						catch (Exception e) {
+						}
+						//System.out.println("Easting: " + locEasting + ", Northing: " + locNorthing);
+						//System.out.println("Mention distance is: " + locDistance);
+						
+						// Get weighting - we'll use the square root of (maxDistance - distance)
+						Double weighting = (double) (maxDistance/java.lang.Math.pow(locDistance, 2.0));
+						//System.out.println("Weighting is: " + weighting);
+						northingCentroid += Double.valueOf(locNorthing).doubleValue() * weighting;
+						eastingCentroid += Double.valueOf(locEasting).doubleValue() * weighting;
+						itemCount += weighting;
+						
+						// If type exists then use that
+						if (locAnn.getFeatures().get("type") != null) {
+							String locType = locAnn.getFeatures().get("type").toString();
+							// format="nobility"System.out.println("Location type is: " + locType);
+							if (locType.equals("other")) placeTypeOther += weighting;
+							if (locType.equals("town")) placeTypeTown += weighting;
+							if (locType.equals("city")) placeTypeCity += weighting;
+						}
+					}
+				}
+			}
+		}
+
+
+		// Calculate final centroid values
+		//System.out.println("Total item count is: " + itemCount);
+		//System.out.println("Total easting count is: " + eastingCentroid);
+		//System.out.println("Total northing count is: " + northingCentroid);
+		
+		//System.out.println("Other count is: " + placeTypeOther);
+		//System.out.println("Town count is: " + placeTypeTown);
+		//System.out.println("City count is: " + placeTypeCity);
+		
+		if (northingCentroid != 0) {
+			northingCentroid = java.lang.Math.floor(northingCentroid/itemCount);
+			eastingCentroid = java.lang.Math.floor(eastingCentroid/itemCount);
+
+			//System.out.println("Centroid calculated as: " + "Easting: " + eastingCentroid + ", Northing: " + northingCentroid);
+
+			// Now find which of the co-ordinate items in the organisation list are closest to centroid
+			String eastingList = "";
+			String northingList = "";
+			String contextList = "";
+
+			//System.out.println("Appending details for nodes: " + placeSet.size());		
+			
+			// Now append all the easting, etc, for conflicted places
+			// This will give us a list of all possible candidate co-ords
+			Iterator<Annotation> placeSetItr = placeSet.iterator();
+			while (placeSetItr.hasNext()) {
+				Annotation placeSetAnn = placeSetItr.next();
+				
+				// Prepend commas if necessary
+				eastingList = eastingList.isEmpty() ? eastingList : eastingList + ",";
+				northingList = northingList.isEmpty() ? northingList : "," + northingList + ",";
+				contextList = contextList.isEmpty() ? contextList : "," + contextList + ",";
+				
+				// Now add details for this place
+				eastingList += placeSetAnn.getFeatures().get("easting").toString();
+				northingList += placeSetAnn.getFeatures().get("northing").toString();
+				// If no context options add '0' to keep balance in positions for other facets
+				if (placeSetAnn.getFeatures().get("contextOptions") != null)
+					contextList += placeSetAnn.getFeatures().get("contextOptions").toString();
+				else {
+					contextList += "0";
+				}
+			}
+			
+			//System.out.println("Easting list: " + eastingList);
+
+			// Tokenise lists
+			StringTokenizer eastingTokens = new StringTokenizer(eastingList, ",");
+			StringTokenizer northingTokens = new StringTokenizer(northingList, ",");
+			StringTokenizer contextTokens = new StringTokenizer(contextList, ",");
+
+			// Set initial distance way beyond anything possible	
+			Double minDistanceFromCentroid = 100000000.0;
+			Double northingCalculated = 0.0;
+			Double eastingCalculated = 0.0;
+			String contextCalculated = "";
+
+			// Now find candidate co-ords closest to calculated centre of places
+			while (eastingTokens.hasMoreTokens()) {
+				Double easting = Double.valueOf(eastingTokens.nextToken()).doubleValue();
+				Double northing = Double.valueOf(northingTokens.nextToken()).doubleValue();
+				String context = contextTokens.nextToken();
+				//System.out.println("Easting: " + easting + ", Northing: " + northing);
+
+				// Use pythagoras theorem to calculate distance from centroid
+				Double distanceFromCentroid = java.lang.Math.pow(java.lang.Math.pow(easting - eastingCentroid, 2.0) +
+					java.lang.Math.pow(northing - northingCentroid, 2.0), 0.5);
+				//System.out.println("Distance from centroid: " + distanceFromCentroid);
+				if (distanceFromCentroid < minDistanceFromCentroid) {
+					northingCalculated = northing;
+					eastingCalculated = easting;
+					contextCalculated = context;
+					minDistanceFromCentroid = distanceFromCentroid;
+				}
+			}
+
+			//System.out.println("Smallest distance from centroid is: " + minDistanceFromCentroid);
+			
+			// Okay so we've now calculated the easting for the place which is closest
+			// We need to look through the list and find which place annotation it is from
+
+			try {
+				// We won't actually resolve any conflict on annotation that is left
+				// That will be done in the next round
+				//System.out.println("Calculated easting is: " + eastingCalculated);
+				placeSetItr = placeSet.iterator();
+				Integer mostLikelyId = 0;
+				Integer matchedId = 0;
+				List<Annotation> toRemoveSet = new ArrayList<Annotation>();
+				while (placeSetItr.hasNext()) {
+					Boolean isMatch = false;
+					Annotation placeSetAnn = placeSetItr.next();
+					eastingList = placeSetAnn.getFeatures().get("easting").toString();
+					//System.out.println("Checking easting list: " + eastingList);
+					eastingTokens = new StringTokenizer(eastingList, ",");			
+					while (eastingTokens.hasMoreTokens() && !isMatch) {
+						Double easting = Double.valueOf(eastingTokens.nextToken()).doubleValue();
+						//System.out.println("Testing easting: " + easting + " against " + eastingCalculated);
+						if (easting.equals(eastingCalculated)) {
+							//System.out.println("Found match: " + easting);
+							isMatch = true;
+							matchedId = placeSetAnn.getId();
+						}
+
+					}
+					// Record the most likely on place 'size'
+					String placeType = placeSetAnn.getFeatures().get("type").toString();							
+					if (placeType.equals("town") || placeType.equals("city")) {
+						mostLikelyId = placeSetAnn.getId();
+					}
+
+					// Does not match the calculated easting so remove
+					if (!isMatch) toRemoveSet.add(placeSetAnn);
+				}
+				
+				// Calculate weighting of place type against distance from centroid
+				// Over 100000 we'll allow place type to kick in if it's an other place
+				
+				// Note we're NOT yet using the type stats gathered above
+				//System.out.println("Matched Id: " + matchedId);
+				//System.out.println("Most likely Id: " + mostLikelyId);
+				if (minDistanceFromCentroid > 100000 && mostLikelyId != 0 && !mostLikelyId.equals(matchedId)) {
+					//System.out.println("Preferring bigger place (Reason 1) annotation with ID: " + mostLikelyId);
+					toRemoveSet.remove(placeSet.get(mostLikelyId));
+					toRemoveSet.add(placeSet.get(matchedId));					
+				}
+				// Or if the place is more than 30000 away and other count is 0
+				// So basically it will need to be really close for other to be used
+				else if (minDistanceFromCentroid > 30000 && mostLikelyId != 0 && !mostLikelyId.equals(matchedId) && placeTypeOther == 0) {
+					//System.out.println("Preferring bigger place (Reason 2) annotation with ID: " + mostLikelyId);
+					toRemoveSet.remove(placeSet.get(mostLikelyId));
+					toRemoveSet.add(placeSet.get(matchedId));					
+				}
+
+				
+				outputAS.removeAll(toRemoveSet);
+				
+			} catch (Exception e) {
+				// Something went wrong here but we want to continue
+				System.err.println("An error occurred: " + e.getMessage());
+			}
+		}
+		else {
+			// Okay, so everything is ambiguous - just get the biggest place
+			Iterator<Annotation> placeSetItr = placeSet.iterator();
+			Integer mostLikelyId = 0;
+			List<Annotation> toRemoveSet = new ArrayList<Annotation>();
+			while (placeSetItr.hasNext()) {
+				Annotation placeSetAnn = placeSetItr.next();
+				String placeType = placeSetAnn.getFeatures().get("type").toString();							
+				if (placeType.equals("town") || placeType.equals("city")) {
+					mostLikelyId = placeSetAnn.getId();
+				}
+				toRemoveSet.add(placeSetAnn);
+			}
+			if (mostLikelyId != 0) {
+				//System.out.println("Preferring ambiguous annotation with ID: " + mostLikelyId);
+				Annotation preferredPlace = placeSet.get(mostLikelyId);
+				toRemoveSet.remove(preferredPlace);
+			}
+			outputAS.removeAll(toRemoveSet);
+		}
+
+
+	}	
+}

@@ -1,0 +1,751 @@
+/*
+* Filename: 	des_location_clean.jape
+* Author:		Paul Appleby
+* Description:	Removes false positives for locations
+* Date created:	24/05/2010
+* This version:	0.31
+* 
+*/
+
+
+Phase:	LocationClean
+Input:  Place Token Country Street County Organisation Emirate Person Company Link Facility Lookup Legislation BuildingNumber Event Feature LineBreak Location Constituency AdminArea Continent Date Month Landmark Product FirstName Surname MiddleNames Publication
+Options: control = all negationGrouping = false
+
+
+/* We'll start by processing some common terms patterns that occur in documents but cannot be places */
+
+/* Remove York in "New York" or Jersey in "New Jersey", etc */
+/* Also 'c/o ...' - never going to be place. */
+Rule: PlaceRemove1
+(
+	(
+		(
+			{Token.root == "c"}
+			{Token.string == "/"}
+			{Token.root == "o"}
+		) |
+		{Token.string == "New"} |
+		{Token.root == "st."} |
+		{Token.root == "st"}
+	)
+	(
+		{Place} |
+		{Country}
+	):place
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+
+/* Handle situations like '<Place> of ... ' and 'the <Place> on ...' and '. Read the ' */
+/* DT {Place} organisation_type indicates that Place is a person irrespective of org type case */
+/* Also remove any similar places in document. Unlikely to be place name as well as other use */
+Rule: PlaceRemove2
+(
+	(
+		{LineBreak}
+		(
+			{Token.string == "\u201c"} |
+			{Token.kind == punctuation}
+		)?
+		{Place}
+		{Token.root == "the"}
+	) |
+	(
+		{Place.documentPosition == "paraStart"}
+		{Token.root == "the"}
+	) |
+	(
+		(
+			{Token.string == ":"} |
+			{Token.string == ";"} |
+			{Token.string == "-"} |
+			{Token.string == ")"} |
+			{Token.string == "/"} |
+			{Token.string == "]"} |
+			{Token.string == "."}
+		)
+		{Place.documentPosition == "paraStart"}
+		{Token.root == "the"}
+	) |
+	(
+		{!Token.root == "in"}
+		{Place.type == "other"}
+		{Token.root == "of"}
+	) |
+	(
+		{!Token.root == "in"}
+		{Place.type == "other"}
+		{Token.root == "of"}
+	) |	
+	(
+		{Token.category == DT}
+		{Place.type == "other"}
+		(
+			{Token.category == IN} |
+			{Token.category == POS}
+		)
+	)
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet placeSet = annotationSet.get("Place");
+ 	String place = gate.Utils.stringFor(doc, placeSet);
+	AnnotationSet placeToTestSet = inputAS.get("Place");
+	// Iterate over all places annotations to see if we have a match
+	for (Annotation placeAnn: placeToTestSet)	{
+		String placeToTest = gate.Utils.stringFor(doc, placeAnn);
+		if (placeToTest.equals(place)) doc.getAnnotations("DES").remove(placeAnn);
+	}	
+
+}
+
+Rule: PlaceRemove2AA
+(
+	{Token.category == DT}
+	({Place.rule == "OtherAmbiguous"}):place
+	{Lookup.minorType == organisation_type}
+):annotation
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+	outputAS.removeAll(placeSet);
+}
+
+
+/* Handle situations like 'PO Box ... ' */
+Rule: PlaceRemove2A
+(
+	{Token.orth == allCaps, !Organisation}
+	(
+		{Place, Token.orth == upperInitial} |
+		{AdminArea, Token.orth == upperInitial}
+	):place
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+
+/* Handle situations like 'The Old Mill,' - a sentence will never end 'The {Place}' */
+Rule: PlaceRemove2B
+(
+	{Token.root == "the"}
+	({Place}):place
+	(
+		{Token.string == ","} |
+		{Token.string == ";"} |
+		{Token.string == "."}
+	)
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+/* Handle situations like 'the East of England Development Agency' - where the leading 'the' causes crossover */
+Rule: PlaceRemove2B
+(
+	({Token.root == "the", Token within Location}):location
+	{Organisation}
+)
+-->
+{
+	AnnotationSet annotationSet = bindings.get("location");
+	AnnotationSet locationSet = inputAS.get("Location", annotationSet.firstNode().getOffset(), annotationSet.lastNode().getOffset());
+ 	outputAS.removeAll(locationSet);
+}
+
+
+/* Places within a date of some type */
+Rule: PlaceRemove3
+(
+	{Place within Date} |
+	{Place within Month}
+):place
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+
+/* Places followed by a hyphen */
+Rule: PlaceRemove4
+(
+	({Place, Token.string =~ "-$"}):place
+	{Token.orth == upperInitial}
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+/* Places within a street, organisation, person, company, event  or facility */
+Rule: PlaceRemove5
+(
+	{Place within Position} |
+	{Place within Person, !Lookup.minorType == non_uk_city} |
+	{Place within Person, Place within Surname} |
+	{Place within Person, Place within MiddleNames} |
+	{Place within Person, Place within FirstName} |
+	{Place within Street} |
+	{Place within Location, Place.type != globalCity} |
+	{Place within Organisation} |
+	{Place within Publication} |
+	{Place within AdminArea, !AdminArea within Place} |	
+	{Place within County} |	
+	{Place within Country, !Country within Place} |
+	{Place within Activity} |
+	{Place within Landmark} |
+	{Place within Facility} |
+	{Place within Event} |
+	{Place within Link} |
+	{Place within Product} |
+	{Place within Company, !Company within Place} |
+	{Place.type == "other", Place within Company} |
+	{Place within Legislation, Place.rule == "OtherAmbiguous"} |
+	{Place within {Lookup.majorType == misc}} |
+	{Place within {Lookup.minorType == titleMale}} |
+	{Place within {Lookup.minorType == titleFemale}}	
+):place
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+	//System.out.println("Removing place: " + gate.Utils.stringFor(doc, placeSet));
+ 	outputAS.removeAll(placeSet);
+}
+
+
+/* Places within a place partially in a feature */
+Rule: PlaceRemove5A
+(
+	(
+		({Token within Feature})+
+		({Place within Feature})
+	) |
+	(
+		({Place within Feature})
+		({Token within Feature})+
+	)
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet placeSet = annotationSet.get("Place");
+ 	outputAS.removeAll(placeSet);
+}
+
+
+/* Counties inside people or links or facilities */
+Rule: PlaceRemove6
+(
+	{County within Person} |
+	{County within Facility} |
+	{County within AdminArea, !AdminArea within County} |
+	{County within Event} |
+	{County within Street} |
+	{County within Link}
+):county
+-->
+{
+	AnnotationSet countySet = bindings.get("county");
+ 	outputAS.removeAll(countySet);
+}
+
+
+/* Certain places have names that are single common words, such as 'Bay'. These are in an ambiguity list */
+/* Unless we can show positively that they are places we'll remove - highly unlikely to be the place */
+Rule: PlaceRemove7
+(
+	{Place, Lookup.minorType == location_ambiguity}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet placeSet = annotationSet.get("Place");
+	Annotation placeAnn = placeSet.iterator().next();
+	String placeText = gate.Utils.stringFor(doc, placeSet);
+	String placeType = placeAnn.getFeatures().get("type").toString();
+	
+	Long locStart = placeAnn.getStartNode().getOffset();
+	Long locEnd = placeAnn.getEndNode().getOffset();
+
+	AnnotationSet lookupSet = annotationSet.get("Lookup");
+	String lookupText = gate.Utils.stringFor(doc, lookupSet);
+	
+	AnnotationSet paragraphSet = inputAS.get("Place", locStart, locEnd);	
+
+	Boolean removePlace = true;
+	
+	// First of all check place and ambiguity actually match
+	if (!placeText.equals(lookupText)) {
+		removePlace = false;
+	}
+	else {
+		// For global cities try and be a bit smarter. Are there any other places of the same type in the paragraph?
+		if (placeType.equals("globalCity")) {
+			for (Annotation otherAnn: paragraphSet) {
+				if (otherAnn.getFeatures().get("type").toString().equals(placeType)) removePlace = false;
+			}
+		}
+	}
+	
+	if (removePlace) {
+		outputAS.removeAll(placeSet);
+	}
+}
+
+
+/* Remove context on places that are in Britain and Ireland */
+Rule: PlaceRemove8
+(
+	{Place, Lookup.minorType == ireland, Place.type == "other"}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet placeSet = annotationSet.get("Place");
+	AnnotationSet lookupSet = annotationSet.get("Lookup");
+	if (placeSet.lastNode().getOffset().equals(lookupSet.lastNode().getOffset())) {
+		outputAS.removeAll(placeSet);
+		FeatureMap features = Factory.newFeatureMap();
+		features.put("rule", "BritainIreland");
+		features.put("type", "other");
+		outputAS.add(placeSet.firstNode(), placeSet.lastNode(), "Place", features);
+	}
+}
+
+/* Single Word places in impossible POS situations, but avoid 'Brundall-based' removal */
+Rule: PlaceRemove9
+Priority: 10
+(
+	(
+		{Place.documentPosition == "paraStart", Token.category == VBG}
+	) |
+	(
+		{Token.category != IN, Token.orth != lowercase, Token.kind != punctuation}
+		{Place, Token.category == VBG}
+	) |
+	(
+		{Token.orth == lowercase}
+		({Place.type == "other", !Token.string =~ "-based"})
+		{Token.orth == upperInitial}
+	) |
+	(
+		{Token.orth == upperInitial}
+		({Place.type == "other"})
+		{Token.orth == lowercase}
+	) |
+	(
+		{Token.orth == upperInitial, !Token within Facility, !Token within Place}
+		({Place.type == "other"})
+		{Token.kind == punctuation}
+	)	
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet placeSet = annotationSet.get("Place");
+	Annotation placeAnn = placeSet.iterator().next();
+	String placeName = gate.Utils.stringFor(doc, placeAnn);
+	if (placeName.indexOf(" ") == -1) outputAS.removeAll(placeSet);
+}
+
+
+/* Single Word admin areas in impossible POS situations, but avoid 'Brundall-based' removal */
+Rule: PlaceRemove9Z
+Priority: 10
+(
+	(
+		{AdminArea.documentPosition == "paraStart", Token.category == VBG}
+	) |
+	(
+		{Token.category != IN, Token.orth != lowercase, Token.kind != punctuation}
+		{AdminArea, Token.category == VBG}
+	)	
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet areaSet = annotationSet.get("AdminArea");
+	Annotation areaAnn = areaSet.iterator().next();
+	String areaName = gate.Utils.stringFor(doc, areaAnn);
+	if (areaName.indexOf(" ") == -1) outputAS.removeAll(areaSet);
+}
+
+
+/* Organisation within a county */
+Rule: PlaceRemove7a
+Priority: 10
+(
+	{Organisation within County}
+):organisation
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	outputAS.removeAll(organisationSet);
+}
+
+/* Country within ... */
+Rule: PlaceRemove8
+(
+	{Country within Company} |
+	{Country within Continent, !Continent within Country} |
+	{Country within Location, !Location within Country} |
+	{Country within Person, !Country within Position, !Person within Country} |
+	{Country within Street}
+):country
+-->
+{
+	AnnotationSet countrySet = bindings.get("country");
+ 	outputAS.removeAll(countrySet);
+}
+
+
+/* Country within Place */
+Rule: PlaceRemove9
+(
+	{Country within Place, !Place within Country}
+):country
+-->
+{
+	AnnotationSet countrySet = bindings.get("country");
+ 	outputAS.removeAll(countrySet);
+}
+
+
+
+/* Administrative boroughs within ... */
+Rule: PlaceRemove9A
+(
+	{AdminArea within Place} |
+	{AdminArea within Publication} |
+	{AdminArea within Person} |
+	{AdminArea within Facility, AdminArea.type == "other"} |
+	{AdminArea within Organisation, AdminArea.type == "other"} |
+	{AdminArea within County} |
+	{AdminArea within Constituency, !Constituency within AdminArea}
+):borough
+-->
+{
+	AnnotationSet boroughSet = bindings.get("borough");
+ 	outputAS.removeAll(boroughSet);
+}
+
+
+/* City or Town in a foreign place */
+Rule: PlaceRemove10
+(
+	( 
+		{Place.type == "city"} |
+		{Place.type == "town"}
+	):place
+	{Token.string == ","}
+	(
+		{Emirate} |
+		{Location.type == world}
+	)
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+
+/* Conjunctions */
+Rule: PlaceRemove11
+(
+	({Place.type == other, Place.rule == "OtherAmbiguous", Lookup.majorType == name}):annotation
+	{Token.category == CC}
+	(
+		{Person} |
+		(
+			{Token.orth == upperInitial}
+			{Token.kind == punctuation}
+		)
+	)
+)
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet placeSet = annotationSet.get("Place");
+ 	outputAS.removeAll(placeSet);
+}
+
+Rule: PlaceRemove11A
+(
+	(
+		{Person} |
+		{Token.orth == upperInitial, !Token within Place, !Token within County, !Token within Feature}
+	)
+	{Token.category == CC}
+	({Place.type == other, Place.rule == "OtherAmbiguous"}):annotation
+)
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet placeSet = annotationSet.get("Place");
+ 	outputAS.removeAll(placeSet);
+}
+
+
+/* Street within ... */
+Rule: PlaceRemove12
+(
+	{Street within Publication} |
+	{Street within Organisation} |
+	{Street within Facility} |
+	{Street within Event} |
+	{Street within Legislation}
+):street
+-->
+{
+	AnnotationSet streetSet = bindings.get("street");
+ 	outputAS.removeAll(streetSet);
+}
+
+
+/* Street that is actually a facility */
+Rule: PlaceRemove12AA
+(
+	{Street}
+	{Lookup.minorType == facility_type, Token.orth == upperInitial}
+):street
+-->
+{
+	AnnotationSet streetSet = bindings.get("street");
+ 	outputAS.removeAll(streetSet);
+}
+
+
+/* Location within ... */
+Rule: PlaceRemove12A
+(
+	{Location within Organisation} |
+	{Location within Facility} |
+	{Location within Link} |
+	{Location within Legislation}
+):location
+-->
+{
+	AnnotationSet locationSet = bindings.get("location");
+ 	outputAS.removeAll(locationSet);
+}
+
+/* Continent within ... */
+Rule: PlaceRemoveContinent
+(
+	{Continent within Country, !Country within Continent} |
+	{Continent within Location, !Location within Continent}
+):continent
+-->
+{
+	AnnotationSet continentSet = bindings.get("continent");
+ 	outputAS.removeAll(continentSet);
+}
+
+
+/* Constituency within ... */
+Rule: ConstituencyRemove1
+(
+	{Constituency within Organisation} |
+	{Constituency within Person} |
+	{Constituency within AdminArea} |
+	{Constituency within Place} |
+	{Constituency within Feature} |
+	{Constituency within Street} |
+	{Constituency within Facility} |
+	{Constituency within Legislation}
+):constituency
+-->
+{
+	AnnotationSet constituencySet = bindings.get("constituency");
+ 	outputAS.removeAll(constituencySet);
+}
+
+
+/* Ambiguous constituency name, such as 'Gordon' */
+/* We will look for other first names with same lexical value *
+/* But only if not unlikely surrounding orthography */
+Rule: ConstituencyRemove2
+(
+	({Constituency}):constituency
+)
+-->
+{
+	AnnotationSet constituencySet = bindings.get("constituency");
+	Annotation constituencyAnn = constituencySet.iterator().next();
+	String constituencyName = gate.Utils.stringFor(doc, constituencyAnn);
+	//System.out.println("Checking constituency: " + constituencyName);
+
+	// Only process constituencies with single word names
+	if (constituencyName.indexOf(" ") == -1) {
+		if (constituencyAnn.getFeatures().get("variableOrth") != null) {
+			outputAS.removeAll(constituencySet);
+		}
+		else {
+			Iterator<Annotation> itr = inputAS.get("FirstName").iterator();	
+			//System.out.println("Checking against: " + inputAS.get("FirstName").size() + " first names");
+			Boolean isMatch = false;
+			// Iterate over all names to see if we have a match
+			while (itr.hasNext() && !isMatch)	{
+				Annotation nameAnn = itr.next();
+				String nameText = gate.Utils.stringFor(doc, nameAnn);
+				if (nameText.equals(constituencyName)) isMatch = true;
+			}
+
+			if (isMatch) outputAS.removeAll(constituencySet);
+		}
+	}
+}
+
+/* Building number within legislation */
+Rule: PlaceRemove13
+(
+	{BuildingNumber within Legislation}
+):building
+-->
+{
+	AnnotationSet buildingSet = bindings.get("building");
+ 	outputAS.removeAll(buildingSet);
+}
+
+/* Sentence initial ambiguous place name, such as 'Well' */
+/* We will look for other mentions of the place name within the document but not sentence initial */
+/* We'll allow for puncutation (i.e. a quote or bullet) at the start of the line too */
+/* And starting sentences will dodgy POS combinations */
+Rule: PlaceRemove15
+(
+	(
+		{LineBreak}
+		(
+			{Token.string == "\u201c"} |
+			{Token.kind == punctuation}
+		)?
+		(
+			{Place.type == other, Place.rule == "OtherAmbiguous"} |
+			{Place.type == town}
+		)
+		{!LineBreak}
+	) |
+	(
+		{Place.documentPosition == "paraStart", Place.type == other}
+		{!LineBreak}
+	) |
+	(
+		(
+			{Token.string == ":"} |
+			{Token.string == ";"} |
+			{Token.string == "-"} |
+			{Token.string == ")"} |
+			{Token.string == "/"} |
+			{Token.string == "]"} |
+			{Token.string == "."}
+		)
+		(
+			(
+				{Place.type == other, Place.rule == "OtherAmbiguous"}
+				(
+					{Token.root == "the"} |
+					{Token.category == IN} |	
+					{Token.category == NN} |
+					{Token.category == NNP} |
+					{Token.category == CC} |
+					{Token.category == JJR}
+				)
+			) |
+			(
+				{Place.type == other, Place.rule == "OtherAmbiguous", Token.category == JJR}
+			)
+		)
+	) |
+	(
+		{Token.string == "/"}
+		{Place.type == town, Lookup.minorType == street_name}
+	)
+):placeText
+-->
+{
+	AnnotationSet placeTextSet = bindings.get("placeText");
+	AnnotationSet placeSet = placeTextSet.get("Place");
+	Annotation placeAnn = placeSet.iterator().next();
+
+	String placeName = "";
+	Long thisPlaceStart = placeAnn.getStartNode().getOffset();
+	Long thisPlaceEnd = placeAnn.getEndNode().getOffset();
+	try {
+		placeName = doc.getContent().getContent(thisPlaceStart, thisPlaceEnd).toString();
+	}
+	catch (Exception e) {
+	}
+
+	// Only process places with single word names
+	//System.out.println("Offsets: " + thisPlaceStart + ", " + thisPlaceEnd);
+	//System.out.println("Name: " + placeName);
+	//System.out.println("Space: " + placeName.indexOf(" "));
+	if (placeName.indexOf(" ") == -1) {
+		Iterator<Annotation> itr = doc.getAnnotations("DES").get("Place").iterator();	
+		Boolean isMatch = false;
+
+		// Iterate over all places to see if we have a match
+		while (itr.hasNext() && !isMatch)	{
+			placeAnn = itr.next();
+			String placeContent = "";
+			Long placeStart = placeAnn.getStartNode().getOffset();
+			Long placeEnd = placeAnn.getEndNode().getOffset();
+			if (placeStart != thisPlaceStart && placeEnd != thisPlaceEnd) {
+				try {
+					placeContent = doc.getContent().getContent(placeStart, placeEnd).toString();
+					//System.out.println(placeContent);
+				}
+				catch (Exception e) {
+				}
+
+				// First check names match up
+				if (placeName.equals(placeContent)) {
+					// Check back for linebreaks within 50 characters
+					Long backTrack = placeStart - 50;
+					if (backTrack < 0) backTrack = placeStart - placeStart;
+					AnnotationSet linebreakSet = inputAS.get("LineBreak", backTrack,
+						placeStart);
+					// Now get any tokens between last linebreak and place
+					Long linebreakPosition = new Long(0);
+					if (linebreakSet.size() > 0) {
+						linebreakPosition = linebreakSet.lastNode().getOffset();
+					}
+					//System.out.println("Linebreak position: " + linebreakPosition + ", backtrack: " + backTrack + ", start: " + placeStart);
+					AnnotationSet tokenSet = inputAS.get("Token", linebreakPosition, placeStart);
+					// If no tokens then sentence initial
+					//System.out.println("Set to test size: " + tokenSet.size());
+					if (tokenSet.size() == 0) {
+						isMatch = false;
+					}
+					// If only one token and only one character long
+					else if (tokenSet.size() == 1) {
+						Iterator<Annotation> tokenItr = tokenSet.iterator();	
+						Annotation tokenAnn = tokenItr.next();
+						if (tokenAnn.getEndNode().getOffset() - tokenAnn.getStartNode().getOffset() > 1) {
+							isMatch = true;
+						}
+					}
+					else isMatch = true;
+					
+				}
+			}
+		}
+		
+		//System.out.println(isMatch);
+		if (!isMatch) outputAS.removeAll(placeSet);
+	}
+}

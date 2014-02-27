@@ -1,0 +1,95 @@
+/*
+	These rules pick up generic RDFaOutput and RDFaOutputLiteral annotations
+	and assert them into the jena model associated with the document.
+	The java RHS code needs to be robust to missing features and only
+	try to construct triple if there is enough information in the 
+	annotation.
+*/
+Imports: {
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.datatypes.TypeMapper;
+}
+Phase: rdfaOutput2  
+Input: RDFaOutput RDFaOutputLiteral
+Options: control = all
+
+Rule: RDFaOutput
+(
+  {RDFaOutput}
+):match
+-->
+{
+	FeatureMap docFM= doc.getFeatures();
+	Model m= (Model) docFM.get("jenamodel");
+
+	AnnotationSet matchAnnots = bindings.get("match").get("RDFaOutput");
+	Annotation rdfaAnn = matchAnnots.iterator().next();
+	FeatureMap rdfaAnnFM= rdfaAnn.getFeatures();
+	
+	String subjStr= (String) rdfaAnnFM.get("subject");
+	if (subjStr==null) { 
+		subjStr= (String) rdfaAnnFM.get("subjectLocalName");
+		if (subjStr!=null) subjStr="this:"+subjStr;
+	}
+	String predStr= (String) rdfaAnnFM.get("predicate");
+	String objStr= (String) rdfaAnnFM.get("object");
+	if (objStr==null) { 
+		objStr= (String) rdfaAnnFM.get("objectLocalName");
+		if (objStr!=null) objStr="this:"+objStr;
+	}
+	String typeStr= (String) rdfaAnnFM.get("typeof");
+
+	if (m!=null && subjStr!=null && predStr!=null && objStr!=null) {
+		Resource subj= m.getResource(m.expandPrefix(subjStr));
+		Property pred= m.getProperty(m.expandPrefix(predStr));
+		Resource obj= m.getResource(m.expandPrefix(objStr));
+		m.add(subj,pred,obj);
+		if (typeStr!=null) {
+			Resource type= m.getResource(m.expandPrefix(typeStr));
+			m.add(obj,RDF.type,type);
+		}
+	}
+}
+
+Rule: RDFaOutputLiteral
+(
+  {RDFaOutputLiteral}
+):match
+-->
+{
+	FeatureMap docFM= doc.getFeatures();
+	Model m= (Model) docFM.get("jenamodel");
+
+	AnnotationSet matchAnnots = bindings.get("match").get("RDFaOutputLiteral");
+	Annotation rdfaAnn = matchAnnots.iterator().next();
+	FeatureMap rdfaAnnFM= rdfaAnn.getFeatures();
+	
+	String subjStr= (String) rdfaAnnFM.get("subject");
+	if (subjStr==null) { 
+		subjStr= (String) rdfaAnnFM.get("subjectLocalName");
+		if (subjStr!=null) subjStr="this:"+subjStr;
+	}
+	String predStr= (String) rdfaAnnFM.get("predicate");
+	String litStr= (String) rdfaAnnFM.get("literal");
+	String datatypeStr= (String) rdfaAnnFM.get("datatype");
+	RDFDatatype datatype= null;
+	if (datatypeStr!=null) {
+			datatype= TypeMapper.getInstance().getSafeTypeByName(m.expandPrefix(datatypeStr));
+	}
+
+	if (m!=null && subjStr!=null && predStr!=null && litStr!=null) {
+		Resource subj= m.getResource(m.expandPrefix(subjStr));
+		Property pred= m.getProperty(m.expandPrefix(predStr));
+		if (datatype!=null) { 
+			m.add(subj,pred,litStr,datatype); 
+		} else {
+			m.add(subj,pred,litStr);
+		}
+	}
+}

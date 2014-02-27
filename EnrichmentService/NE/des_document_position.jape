@@ -1,0 +1,135 @@
+/*
+* Filename: 	des_document_position.jape
+* Author:		Paul Appleby
+* Description:	Annotations that are in crucial position within the document
+* Date created:	02/09/2010
+* This version:	0.5
+* 
+*/
+
+
+Phase:	DocumentPosition
+Input:  Paragraph LineBreak Place AdminArea Company Token Sentence Constituency
+Options: control = all negationGrouping = false
+
+
+Rule: ParagraphStartPlace
+Priority: 10
+(
+	{Paragraph, Place}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet placeSet = annotationSet.get("Place");
+	Annotation placeAnn = placeSet.iterator().next();
+ 	placeAnn.getFeatures().put("documentPosition", "paraStart");
+}
+
+Rule: ParagraphStartCompany
+Priority: 10
+(
+	{Paragraph, Company}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet companySet = annotationSet.get("Company");
+	Annotation companyAnn = companySet.iterator().next();
+ 	companyAnn.getFeatures().put("documentPosition", "paraStart");
+}
+
+
+Rule: VariableOrthographyAnnotation
+Priority: 10
+(
+	(
+		{Token.orth == upperInitial, !Paragraph, !Sentence}
+		(
+			{Company} |
+			{Constituency}
+		)
+		{Token.orth == lowercase}
+	) |
+	(
+		{Token.orth == lowercase}
+		{Company}
+		{Token.orth == upperInitial}		
+	)	
+):annotation
+-->
+{
+	LinkedHashSet<String> orthList = new LinkedHashSet<String>();
+	orthList.add(new String("Company"));
+	orthList.add(new String("Constituency"));
+
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet foundSet = annotationSet.get(orthList);
+	Annotation annotationAnn = foundSet.iterator().next();
+ 	annotationAnn.getFeatures().put("variableOrth", "UL");
+}
+
+Rule: ParagraphStartAdminArea
+Priority: 10
+(
+	{Paragraph, AdminArea}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet areaSet = annotationSet.get("AdminArea");
+	Annotation areaAnn = areaSet.iterator().next();
+ 	areaAnn.getFeatures().put("documentPosition", "paraStart");
+}
+
+Rule: ParagraphStartToken
+(
+	{Paragraph}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	Long annotationStart = annotationSet.firstNode().getOffset();
+	Long annotationEnd = annotationSet.lastNode().getOffset();
+	AnnotationSet tokenSet = inputAS.get("Token", annotationStart, annotationEnd);
+	try {
+		List<Annotation> orderedTokenList = gate.Utils.inDocumentOrder(tokenSet);
+		Annotation tokenAnn = orderedTokenList.iterator().next();
+		tokenAnn.getFeatures().put("documentPosition", "paraStart");
+	}
+	catch (Exception e) {
+	}
+}
+
+Rule: SentenceStartToken
+Priority: 10
+(
+	{Sentence}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	Long annotationStart = annotationSet.firstNode().getOffset();
+	Long annotationEnd = annotationSet.lastNode().getOffset();
+	AnnotationSet tokenSet = inputAS.get("Token", annotationStart, annotationEnd);
+	try {
+		List<Annotation> orderedTokenList = gate.Utils.inDocumentOrder(tokenSet);
+		Annotation tokenAnn = orderedTokenList.iterator().next();
+		tokenAnn.getFeatures().put("sentencePosition", "sentenceStart");
+	}
+	catch (Exception e) {
+	}
+}
+
+Rule: LineBreakFollowToken
+Priority: 10
+(
+	{LineBreak}
+	({Token}):token
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("token");
+	Annotation tokenAnn = annotationSet.iterator().next();
+ 	tokenAnn.getFeatures().put("lineBreakPosition", "lineStart");
+}

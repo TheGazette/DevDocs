@@ -1,0 +1,79 @@
+/*
+* Filename: 	des_person_honours.jape
+* Author:	Paul Appleby
+* Description:	With names now known split up honours
+* Date created:	21/06/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 29/06/10	0.2		PA		Changed Name to Person
+*/
+
+
+Phase:	PersonHonours
+Input:  Lookup LineBreak Honours
+Options: control = appelt negationGrouping = false
+
+
+Rule: SplitHonoursWithinPerson
+Priority: 10
+(
+	{Lookup.minorType == honour, Lookup within Honours, Lookup within Person}
+):honour
+-->
+	:honour.Honour = {title = :honour.Lookup.full, rule = "HonourWithinPerson"}
+	
+
+Rule: SplitQualificationsWithinPerson
+Priority: 10
+(
+	{Lookup.minorType == qualification, Lookup within Honours, Lookup within Person}
+):qualification
+-->
+	:qualification.Qualification = {title = :qualification.Lookup.full, rule = "QualificationWithinPerson"}
+
+
+Rule: SplitHonours
+(
+	{Lookup.minorType == honour, Lookup within Honours}
+):honour
+-->
+{
+	AnnotationSet honourSet = bindings.get("honour");
+	Annotation honourAnn = honourSet.iterator().next();
+	AnnotationSet honoursSet = inputAS.get("Honours", honourSet.firstNode().getOffset(), honourSet.lastNode().getOffset());
+	Annotation honoursAnn = honoursSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "Honour");
+	features.put("title", honourAnn.getFeatures().get("full").toString());
+	if (honoursAnn.getFeatures().get("personRef") != null) {
+		features.put("personRef", honoursAnn.getFeatures().get("personRef").toString());
+	}
+	outputAS.add(honourSet.firstNode(), honourSet.lastNode(), "Honour", features);
+}
+	
+
+Rule: SplitQualifications
+(
+	{Lookup.minorType == qualification, Lookup within Honours}
+):qualification
+-->
+{
+	AnnotationSet honourSet = bindings.get("qualification");
+	Annotation honourAnn = honourSet.iterator().next();
+	AnnotationSet honoursSet = inputAS.get("Honours", honourSet.firstNode().getOffset(), honourSet.lastNode().getOffset());
+	Annotation honoursAnn = honoursSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "Qualification");
+	features.put("title", honourAnn.getFeatures().get("full").toString());
+	if (honoursAnn.getFeatures().get("personRef") != null) { 
+		features.put("personRef", honoursAnn.getFeatures().get("personRef").toString());
+	}
+	outputAS.add(honourSet.firstNode(), honourSet.lastNode(), "Honour", features);
+
+}

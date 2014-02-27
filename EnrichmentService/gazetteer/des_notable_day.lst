@@ -1,0 +1,8 @@
+
+Christmas Day;month=12;day=25;context=http://dbpedia.org/resource/Christmas_Day
+Boxing Day;month=12;day=26;context=http://dbpedia.org/resource/Boxing_Day
+New Year's Day;month=01;day=01;context=http://dbpedia.org/resource/New_Year's_Day
+New Year's Eve;month=12;day=31;context=http://dbpedia.org/resource/New_Year's_Eve
+Good Friday;context=http://dbpedia.org/resource/Good_Friday
+Remembrance Sunday;context=http://dbpedia.org/resource/Remembrance_Sunday
+Rosh Hashanah;context=http://dbpedia.org/resource/Rosh_Hashanah

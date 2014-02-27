@@ -1,0 +1,126 @@
+/*
+* Filename: 	des_position.jape
+* Author:	Paul Appleby
+* Description:	Annotates positions of people
+* Date created:	16/06/2010
+* This version:	0.8
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 21/12/11	0.8		PA		Tweaked former
+* 18/11/11	0.7		PA		Alloed prefix in Minister
+* 07/11/11	0.6		PA		Simplified down
+*/
+
+
+Phase:	Positions
+Input:  Token LineBreak Lookup Position
+Options: control = appelt negationGrouping = false
+
+Macro: FORMER
+(
+	{Lookup.majorType == position, Lookup.minorType == former}
+)
+
+
+Rule: ShadowMinisterialPosition
+(
+	{Token.root == "shadow"}
+	{Lookup.majorType == position, Lookup.minorType == ministerial}
+):position
+-->
+	:position.Position = {type = "shadowMinisterial", rule = "ShadowMinisterialPosition", format = "political"}
+
+
+Rule: MinisterialPosition
+(
+	{Lookup.majorType == position, Lookup.minorType == ministerial}
+):position
+-->
+	:position.Position = {type = "ministerial", rule = "MinisterialPosition", format = "political"}
+
+
+Rule: MinisterialPositionGeneral
+(
+	(
+		{Token.string == "Minister"} |
+		{Token.string == "Secretary"}
+	)
+	{Token.root == "of"} 
+	{Token.string == "State"}
+	{Token.root == "for"} 
+	(
+		(
+			({Token.orth == upperInitial})+
+			{Token.string == ","}
+			({Token.orth == upperInitial})+
+			{Token.category == CC}
+			({Token.orth == upperInitial, !Lookup.minorType == firstMale, !Lookup.minorType == firstFemale,
+				!Lookup.minorType == titleMale, !Lookup.minorType == titleFemale})+
+		) |
+		(
+			({Token.orth == upperInitial})+
+			{Token.category == CC}
+			({Token.orth == upperInitial, !Lookup.minorType == firstMale, !Lookup.minorType == firstFemale,
+				!Lookup.minorType == titleMale, !Lookup.minorType == titleFemale})+
+		) |
+		({Token.orth == upperInitial, !Lookup.majorType == position})+
+	)
+):position
+-->
+	:position.Position = {type = "ministerial", rule = "MinisterialPositionGeneral", format = "generic"}
+
+
+Rule: ShadowMinisterialPositionGeneral
+(
+	{Token.string == "Shadow"}
+	(
+		{Token.string == "Minister"} |
+		{Token.string == "Secretary"}
+	)
+	{Token.root == "of"} 
+	{Token.string == "State"}
+	{Token.root == "for"} 
+	(
+		(
+			({Token.orth == upperInitial})+
+			{Token.string == ","}
+			({Token.orth == upperInitial})+
+			{Token.category == CC}
+			({Token.orth == upperInitial, !Lookup.minorType == firstMale, !Lookup.minorType == firstFemale,
+				!Lookup.minorType == titleMale, !Lookup.minorType == titleFemale})+
+		) |
+		(
+			({Token.orth == upperInitial})+
+			{Token.category == CC}
+			({Token.orth == upperInitial, !Lookup.minorType == firstMale, !Lookup.minorType == firstFemale,
+				!Lookup.minorType == titleMale, !Lookup.minorType == titleFemale})+
+		) |
+		({Token.orth == upperInitial, !Lookup.minorType == firstMale, !Lookup.minorType == firstFemale,
+				!Lookup.minorType == titleMale, !Lookup.minorType == titleFemale})+
+	)
+):position
+-->
+	:position.Position = {type = "shadowMinisterial", rule = "ShadowMinisterialPositionGeneral", format = "generic"}
+
+
+Rule: GeneralPosition
+(
+	{Lookup.majorType == position, Lookup.minorType == misc}
+):position
+-->
+	:position.Position = {type = "general", rule = "GeneralPosition", format = "generic"}
+
+Rule: FormerGeneralPosition
+(
+	(FORMER)
+	({Lookup.majorType == position, Lookup.minorType == misc}):position
+)
+-->
+	:position.Position = {type = "formerGeneral", rule = "FormerGeneralPosition", format = "generic"}
+
+

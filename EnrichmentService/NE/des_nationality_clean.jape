@@ -1,0 +1,33 @@
+/*
+* Filename: 	des_nationality_clean.jape
+* Author:	Paul Appleby
+* Description:	Removes false positives related to nationality
+* Date created:	22/11/11
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	NationalityClean
+Input:  Nationality Token LineBreak Person Country Link
+Options: control = appelt negationGrouping = false
+
+/* Nationality within ... */
+Rule: Remove1A
+(
+	{Nationality within Person} |
+	{Nationality within Country} |
+	{Nationality within Link}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+ 	outputAS.removeAll(annotationSet);
+}
+

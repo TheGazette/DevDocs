@@ -1,0 +1,61 @@
+/*  
+* Filename: 	des_day_resolution.jape
+* Author:	Paul Appleby
+* Description:	Applies Day and Month information along with context
+* Date created:	22/03/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version	Author	Description
+* ==========================================================================
+*
+* 21/12/11	0.3	PA	Removed day stuff
+* 9/06/11	0.2	PA	Added in data ranges
+*/
+
+Phase: DayResolution
+Input: TempDate TempDateRange
+Options: control = all negationGrouping = false
+
+Rule: Date
+(
+	{TempDate}
+):date
+-->
+{
+	gate.AnnotationSet date = (gate.AnnotationSet)bindings.get("date");
+	gate.Annotation dateAnn = (gate.Annotation)date.iterator().next();
+	gate.FeatureMap features = Factory.newFeatureMap();
+	String year = "";
+	String month = "";
+	String day = "";
+	if (dateAnn.getFeatures().get("year") != null) {
+		year = dateAnn.getFeatures().get("year").toString();
+		features.put("year", year);
+	}
+	if (dateAnn.getFeatures().get("month") != null) {
+		month = dateAnn.getFeatures().get("month").toString();
+		features.put("month", month);
+	}
+	if (dateAnn.getFeatures().get("day") != null) {
+		day = dateAnn.getFeatures().get("day").toString();
+		if (day.length() == 1) day = "0" + day;
+		features.put("day", day);
+	}
+	features.put("rule", "Date");	
+	if (!year.isEmpty() && year.length() == 4 && !month.isEmpty() && !day.isEmpty()) {
+		features.put("context", "http://reference.data.gov.uk/id/day/" +
+			year + "-" + month + "-" + day);
+	}
+				
+	outputAS.add(date.firstNode(), date.lastNode(), "Date", features);
+}
+   
+Rule: DateRange
+(
+	{TempDateRange}
+):date
+-->
+	:date.DateRange =  {rule = "DateRange"}

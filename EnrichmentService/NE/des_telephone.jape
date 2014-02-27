@@ -1,0 +1,251 @@
+/*
+*  
+* Filename: 	des_telephone.jape
+* Author:	Paul Appleby
+* Description:	Annotates telephone numbers.
+*		Mostly borrowed from the rules supplied with GATE.  
+*	  	"Copyright (c) 1998-2004, The University of Sheffield.
+*		This file is part of GATE (see http://gate.ac.uk/), and is free
+*		software, licenced under the GNU Library General Public License,
+*		Version 2, June 1991 (in the distribution as file licence.html,
+*		and also available at http://gate.ac.uk/gate/licence.html)."
+* Date created:	05/03/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+Phase:	Telephone
+Input:  Split Token Lookup
+Options: control = appelt negationGrouping = false
+
+
+/** MACROS **/
+
+Macro: PHONE_COUNTRYCODE
+// +44
+
+({Token.string == "+"}
+ {Token.kind == number,Token.length == "2"}
+)	
+
+Macro: PHONE_AREACODE
+// 081 (for the old style codes)
+// 01234
+// (0123)
+
+(
+ ({Token.kind == number,Token.length == "3"} |
+  {Token.kind == number,Token.length == "4"} |
+  {Token.kind == number,Token.length == "5"}) 
+|
+ ({Token.string == "("} 
+  ({Token.kind == number,Token.length == "3"} |
+   {Token.kind == number,Token.length == "4"} |
+   {Token.kind == number,Token.length == "5"}) 
+  ({Token.string == ")"})
+ )
+)
+
+Macro: PHONE_REG
+// 222 1481
+// 781932
+
+(
+  ({Token.kind == number,Token.length == "3"}
+
+  ({Token.kind == number,Token.length == "3"} |
+   {Token.kind == number,Token.length == "4"}) 
+  )
+                                              |
+
+  ({Token.kind == number,Token.length == "5"}|
+   {Token.kind == number,Token.length == "6"})
+)
+ 
+Macro: PHONE_EXT
+// x1234
+// ext. 1234/5
+
+(
+ (({Token.string == "x"})		|
+  ({Token.string == "x"}{Token.string == "."}) |
+  ({Token.string == "ext"})	|
+  ({Token.string == "ext"}{Token.string == "."})
+ )  
+ ({Token.kind == number, Token.length == "4"}|
+  {Token.kind == number, Token.length == "5"}|
+  {Token.kind == number, Token.length == "6"})
+ ({Token.string == "/"}{Token.kind == number})?
+)
+	
+
+Macro: PHONE_PREFIX
+//Tel:
+
+(
+ {Lookup.majorType == phone_prefix}
+ ({Lookup.majorType == phone_prefix})?
+ ({Token.string == ":"})?
+)
+  
+/** RULES **/
+
+
+// Added by MS
+// (020) 7798 1972
+// 020 7798 1972
+Rule: LondonAlternative
+Priority: 50
+(
+  
+  ( {Token.string == "("} ) ?
+  {Token.string == "020"} 
+  ( {Token.string == ")"} ) ? 
+  {Token.kind == number}
+  {Token.kind == number}
+
+  /* for some reason, 
+     Token.length == 4 doesn't work for those last two numbers, 
+     even through the GUI shows that it is a property of the annotation. 
+   */
+
+) :phoneNumber
+-->
+:phoneNumber.Telephone = {rule = "LondonAlternative"}
+
+
+
+Rule:PhoneReg
+Priority: 20
+// regular types of number
+// 01234 123 456
+// (01234) 123456
+(
+
+ (PHONE_AREACODE)
+ (PHONE_REG)
+)
+:phoneNumber -->
+ :phoneNumber.Telephone = {rule = "PhoneReg"}
+
+
+
+Rule: PhoneRegContext
+Priority: 100
+// tel: 0114 222 1929
+(
+ (PHONE_PREFIX)
+)
+(
+ (PHONE_AREACODE)
+ (PHONE_REG)
+)
+:phoneNumber -->
+ :phoneNumber.Telephone = {rule = "PhoneRegContext"}
+
+
+Rule:PhoneFull
+Priority: 50
+// +44 161 222 1234
+// +44 (0)161 222 1234
+(
+ (PHONE_PREFIX)?
+)
+(
+ ((PHONE_COUNTRYCODE) |
+  ({Token.string == "("} 
+   (PHONE_COUNTRYCODE)
+   {Token.string == ")"})
+ )
+
+ ({Token.string == "("} 
+   {Token.string == "0"} 
+   {Token.string == ")"})?
+
+ ({Token.kind == number,Token.length == "3"}|
+  {Token.kind == number,Token.length == "4"})
+      
+ (PHONE_REG)
+)
+:phoneNumber -->
+ :phoneNumber.Telephone = {rule = "PhoneFull"}
+
+
+
+Rule:PhoneExt
+Priority: 20
+
+// extension number only
+// ext. 1234
+(
+ (PHONE_EXT)
+)
+:phoneNumber --> 
+ :phoneNumber.Telephone = {rule = "PhoneExt"}
+
+Rule:PhoneRegExt
+Priority: 40
+
+// 01234 12345 ext. 1234
+// 01234 12345 x1234/5
+
+(
+
+ (PHONE_AREACODE)?
+ (PHONE_REG)
+ (PHONE_EXT)
+)
+:phoneNumber -->
+ :phoneNumber.Telephone = {rule = "PhoneRegExt"}
+
+
+Rule:PhoneRegExtContext
+Priority: 40
+// tel: 12345 ext. 1234
+(
+ (PHONE_PREFIX)
+)
+(
+ (PHONE_AREACODE)?
+ (PHONE_REG)
+ (PHONE_EXT)
+)
+:phoneNumber -->
+ :phoneNumber.Telephone = {rule = "PhoneRegExtContext"}
+
+Rule:PhoneNumberOnly
+Priority: 20
+// Phone 123456
+// Fax: 123 456
+// Tel. No. 123456
+// only recognise numbers like this when preceded by clear context.
+
+(PHONE_PREFIX)
+(
+ (PHONE_REG)
+)
+:phoneNumber -->
+ :phoneNumber.Telephone = {rule = "PhoneNumberOnly"}
+
+
+Rule: PhoneOtherContext
+// sometimes they're unusual
+// tel: 0124 1963
+
+(
+ (PHONE_PREFIX)
+)
+(
+ {Token.kind == number}
+ ({Token.kind == number})*
+)
+:phoneNumber 
+-->
+ :phoneNumber.Telephone = {rule = "PhoneOtherContext"}
+

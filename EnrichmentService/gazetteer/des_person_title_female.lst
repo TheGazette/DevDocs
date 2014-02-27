@@ -1,0 +1,26 @@
+Baroness;format=nobility
+Crown Princess;format=nobility
+Dame;format=standard
+Duchess;format=nobility
+First Lady;format=standard
+Frau;format=standard
+Lady;format=nobility
+Madam;format=standard
+Madame;format=standard
+Mademoiselle;format=standard
+Miss;format=standard
+Mlle;format=standard
+Mme;format=standard
+Mme.;format=standard
+Mrs;format=standard
+Mrs.;format=standard
+Ms;format=standard
+Ms.;format=standard
+Princess;format=nobility
+Queen;format=nobility
+Sheikha;format=nobility
+Her Excellency;format=nobility
+Her Highness;format=nobility
+Her Royal Highness;format=nobility
+H.H.;format=nobility;format=nobility;full=Her Highness
+H.R.H.;format=nobility;format=nobility;full=Her Royal Highness

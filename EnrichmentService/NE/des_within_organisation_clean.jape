@@ -1,0 +1,32 @@
+/*
+* Filename: 	des_within_organisation_clean.jape
+* Author:	Paul Appleby
+* Description:	Removes certain annotations within organisations
+* Date created:	20/10/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	WithinOrganisationClean
+Input:  Organisation Company Token LineBreak
+Options: control = appelt negationGrouping = false
+
+
+/* Within Organisation */
+Rule: OrganisationClean
+(
+	{Company within Organisation}
+):organisation
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	outputAS.removeAll(organisationSet);
+}
+

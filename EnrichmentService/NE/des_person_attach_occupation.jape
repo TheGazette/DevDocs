@@ -1,0 +1,44 @@
+/*
+* Filename: 	des_person_attach_occupation.jape
+* Author:	Paul Appleby
+* Description:	Do some additional processing on stuff around names
+* Date created:	06/10/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	PersonAttachOccupation
+Input:  Person Lookup Token LineBreak Position
+Options: control = appelt negationGrouping = false
+
+/* Extend names to include any prefixed occupation */
+Rule: PositionPerson
+(
+	({Lookup.minorType == "occupation", !Lookup within Position}):occupation
+	({Person}):person
+)
+-->
+{
+ 	AnnotationSet occupationSet = bindings.get("occupation");
+ 	AnnotationSet personSet = bindings.get("person");
+ 	
+	Annotation personAnn = personSet.iterator().next();
+	String personId = "";
+	// We'll try for an id but may be a co-referred mention to pick up ref if not
+	if (personAnn.getFeatures().get("id") != null) {
+		personId = personAnn.getFeatures().get("id").toString();
+	}
+	else if (personAnn.getFeatures().get("ref") != null) {
+		personId = personAnn.getFeatures().get("ref").toString();
+	}
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("personRef", personId);	
+	outputAS.add(occupationSet.firstNode(), occupationSet.lastNode(), "Occupation", features); 	
+}

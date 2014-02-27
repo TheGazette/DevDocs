@@ -1,0 +1,33 @@
+/*
+* Filename: 	des_award_clean.jape
+* Author:	Paul Appleby
+* Description:	Removes false positives for awards
+* Date created:	16/11/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	AwardClean
+Input:  Facility Company Token LineBreak Street Person Event Number Lookup Organisation
+Options: control = appelt negationGrouping = false
+
+
+/* Award within ... */
+Rule: AwardRemove1
+(
+	{Event within Facility} |
+	{Event within Organisation}
+):event
+-->
+{
+	AnnotationSet awardSet = bindings.get("award");
+ 	outputAS.removeAll(awardSet);
+}
+

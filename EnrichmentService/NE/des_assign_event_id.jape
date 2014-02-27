@@ -1,0 +1,36 @@
+/*
+* Filename: 	des_assign_event_id.jape
+* Author:	Paul Appleby
+* Description:	Assign ids to every event that makes sense
+* Date created:	09/02/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	AssignEventIdentifiers
+Input:  Event 
+Options: control = once negationGrouping = false
+
+
+Rule: AssignEventID
+(
+	{Event}
+):event
+-->
+{
+	AnnotationSet eventSet = inputAS.get("Event");
+	List<Annotation> orderedEvent = gate.Utils.inDocumentOrder(eventSet);
+	Integer count = 0;
+	for (Annotation event: orderedEvent) {
+		event.getFeatures().put("id", "event-" + count);
+		count++;
+	}
+}
+

@@ -1,0 +1,36 @@
+/*
+* Filename: 	des_assign_company_id.jape
+* Author:	Paul Appleby
+* Description:	Assign ids to every company that makes sense
+* Date created:	22/11/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	AssignCompanyIdentifiers
+Input:  Company 
+Options: control = once negationGrouping = false
+
+
+Rule: AssignCompanyID
+(
+	{Company}
+):company
+-->
+{
+	AnnotationSet companySet = inputAS.get("Company");
+	List<Annotation> orderedCompany = gate.Utils.inDocumentOrder(companySet);
+	Integer count = 0;
+	for (Annotation company: orderedCompany) {
+		company.getFeatures().put("id", "company-" + count);
+		count++;
+	}
+}
+

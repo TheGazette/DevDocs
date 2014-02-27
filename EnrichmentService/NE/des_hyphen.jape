@@ -1,0 +1,29 @@
+/*  
+* Filename: 	des_hyphen.jape
+* Author:		Paul Appleby
+* Description:	Special processing to handle hyphens
+* Date created:	18/07/2012
+* This version:	0.1
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase: Hyphen
+Input: SpaceToken Token
+Options: control = appelt negationGrouping = false
+	
+
+Rule: HyphenSeparator
+(
+	{Token.string != "-"}
+	{Token.string == "-"}
+	{Token.string != "-"}
+):dash
+-->
+	:dash.TempDashGroup = {}
+

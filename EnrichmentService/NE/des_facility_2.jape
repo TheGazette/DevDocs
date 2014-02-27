@@ -1,0 +1,40 @@
+/*
+* Filename: 	des_facility_2.jape
+* Author:	Paul Appleby
+* Description:	Annotates more facilities based on combinations of annotations
+* Date created:	05/09/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Facility
+Input:  Split Token Lookup LineBreak Place Street Facility
+Options: control = appelt negationGrouping = false
+
+
+/* Facilities such as St Peter's brewery - will help to pick up lower case keys */
+/* Any preceding DT POS will indicate it is not a specific facility to give it a miss */
+Rule: LocationFacilityWithKey
+(
+	(
+		{Token.category != DT} |
+		{LineBreak} |
+		{Split}
+	)
+	(
+		(
+			{Place} |
+			{Street}
+		)
+		{Lookup.majorType == facility, Lookup.minorType == facility_type, !Lookup within Facility}
+	):facility
+)
+-->
+	:facility.Facility = {rule = "LocationFacilityWithKey"}

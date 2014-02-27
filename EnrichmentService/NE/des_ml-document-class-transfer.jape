@@ -1,0 +1,35 @@
+/*
+* Filename: 	des_ml-document-class-transfer.jape
+* Author:	Paul Appleby
+* Description:	Transfer the classification annotation to be a document feature
+* Date created:	23/12/11
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	DocumentClass
+Input:  Document
+Options: control = all negationGrouping = false
+
+
+Rule: Class1
+(
+	{Document}
+):document
+-->
+{
+	AnnotationSet documentSet = bindings.get("document");
+	Annotation documentAnn = documentSet.iterator().next();
+	if (documentAnn.getFeatures().get("prob") != null) {
+		doc.getFeatures().put("category", documentAnn.getFeatures().get("category"));
+		doc.getFeatures().put("categoryProbability", documentAnn.getFeatures().get("prob"));
+	}
+	outputAS.remove(documentAnn);
+}

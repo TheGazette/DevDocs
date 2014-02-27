@@ -1,0 +1,27 @@
+/*
+* Filename: 	des_notable_day.jape
+* Author:	Paul Appleby
+* Description:	Annotates notable days on the calendar
+* Date created:	29/03/2010
+* This version:	0.1
+*  
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+Phase:	NotableDay
+Input:  Split Token Lookup
+Options: control = appelt negationGrouping = false
+
+Rule: NotableDay
+(
+  {Lookup.majorType == date, Lookup.minorType == notable_day}
+):notable_day
+-->
+	:notable_day.NotableDay = {month=:notable_day.Lookup.month,
+		day=:notable_day.Lookup.day,
+		context=:notable_day.Lookup.context,
+		rule="NotableDay" }

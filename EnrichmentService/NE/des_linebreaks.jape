@@ -1,0 +1,64 @@
+/*  
+* Filename: 	des_linebreaks.jape
+* Author:	Paul Appleby
+* Description:	Annotate line break control characters and paragraphs, these can be matched for structural markup later
+* Date created:	05/03/2010
+* This version:	0.2
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 31/08/10	0.2		PA		Added in tabs
+*/
+
+/* It is important to note that we are assuming that a line break in the file indicates a new paragraph */
+
+Phase: Linebreaks
+Input: SpaceToken Token
+Options: control = appelt negationGrouping = false
+
+Rule: Break
+( 
+	({SpaceToken.kind == control, SpaceToken.string != "\t"})+
+):break
+-->
+	:break.LineBreak = {}
+
+Rule: Tab
+( 
+	{SpaceToken.kind == control, SpaceToken.string == "\t"}
+):tab
+-->
+	:tab.Tab = {}
+
+Rule: Paragraph
+(
+	(
+		{Token} |
+		{SpaceToken.kind != control} |
+		{SpaceToken.kind == control, SpaceToken.string == "\t"}
+	)+
+	:paragraph
+	(
+		({SpaceToken.kind == control, SpaceToken.string != "\t"})+
+	):break
+)
+-->
+	:paragraph.Paragraph = {},
+	:break.LineBreak = {}
+
+
+/* This is to pick up the last paragraph where there is no carriage return */
+Rule: LastParagraph
+(
+	(
+		{Token} |
+		{SpaceToken.kind != control} |
+		{SpaceToken.kind == control, SpaceToken.string == "\t"}
+	)+
+	:paragraph
+)
+-->
+	:paragraph.Paragraph = {}

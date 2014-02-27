@@ -1,0 +1,72 @@
+/*
+* Filename: 	des_attach_position.jape
+* Author:		Paul Appleby
+* Description:	Attachs positions to various annotations
+* Date created:	28/08/2010
+* This version:	0.7
+* 
+*/
+
+
+Phase:	AttachPosition
+Input:  Token Lookup LineBreak Position Company Organisation Publication Facility Person
+Options: control = appelt negationGrouping = false
+
+
+/* We'll connect a position to a company/organisation etc */
+Rule: PositionIdentified
+(
+	({Lookup.majorType == position, Lookup.minorType == former})?:condition
+	(
+		(
+			{Lookup.majorType == position, Lookup.minorType == position_prefix}
+			{Lookup.majorType == position, Lookup.minorType == occupation}
+		) |
+		{Lookup.majorType == position, Lookup.minorType == position} |
+		{Lookup.majorType == position, Lookup.minorType == misc, Lookup.prefix == yes} |
+		{Position}
+	):position
+	(
+		{Token.root == "of"} |
+		{Token.root == "for"} |		
+		{Token.root == "with"} |
+		{Token.root == "at"} |
+		(
+			{Token.root == "to"}
+			{Token.root == "the"}
+		)
+	)?
+	({Token.root == "the"})?
+	(
+		{Company} |
+		{Organisation} |
+		{Facility} |
+		{Publication}
+	):thing
+	{!Token.orth == apostrophe, !Token.string == "\u2019"}
+)
+-->
+{
+	AnnotationSet positionSet = bindings.get("position");
+	Annotation positionAnn = positionSet.iterator().next();
+	AnnotationSet thingSet = bindings.get("thing");
+	Annotation thingAnn = thingSet.iterator().next();	
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "PositionIdentified");
+	features.put("format", "generic");
+	features.put("positionForRef", thingAnn.getFeatures().get("id").toString());
+	if (bindings.get("condition") != null) {
+		AnnotationSet conditionSet = bindings.get("condition");
+		if (conditionSet.size() > 0) {
+			features.put("type", "formerOrganisational");
+		}
+		else {
+			features.put("type", "organisational");
+		}
+	}
+	AnnotationSet oldPositionSet = inputAS.get("Position", positionSet.firstNode().getOffset(), positionSet.lastNode().getOffset());	
+	outputAS.removeAll(oldPositionSet);
+	outputAS.add(positionSet.firstNode(), positionSet.lastNode(), "Position", features); 	
+}
+	
+

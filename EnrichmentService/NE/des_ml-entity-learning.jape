@@ -1,0 +1,133 @@
+/*
+* Filename: 	des_ml-entity-learning.jape
+* Author:		Paul Appleby
+* Description:	Identifies annotations to disambiguate
+* Date created:	24/04/12
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	EntityLearning
+Input:  Company Place County Facility Publication Organisation Day
+Options: control = appelt
+
+
+Rule: Entity1
+(
+	{Company} |
+	{Day} |
+	{Organisation} |
+	{Place} |
+	{County} |
+	{Facility} |
+	{Publication}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");	
+	Annotation annotationAnn = annotationSet.iterator().next();
+	long startAnn = annotationAnn.getStartNode().getOffset();
+	long endAnn = annotationAnn.getEndNode().getOffset();
+	long lastAnn = inputAS.get("Token").lastNode().getOffset();
+
+	AnnotationSet prevTokenSet = inputAS.get("Token", new Long(0), startAnn);
+	AnnotationSet afterTokenSet = inputAS.get("Token", endAnn, lastAnn);
+
+	AnnotationSet paragraphSet = inputAS.getCovering("Paragraph", startAnn, endAnn);
+	if (paragraphSet.size() == 0) {
+		System.out.println("No paragraph found");
+		return;
+	}
+	Annotation paragraphAnn = paragraphSet.iterator().next();
+	long startParagraphAnn = paragraphAnn.getStartNode().getOffset();
+	long endParagraphAnn = paragraphAnn.getEndNode().getOffset();
+	
+	String categories = "";
+	String orths = "";
+	long startNode = startAnn;
+	long endNode = endAnn;
+	int windowSize = 1;	// The size of the ngram window on either side of annotation
+	
+	String paraDayCount = Integer.toString(inputAS.get("Day", startParagraphAnn, endParagraphAnn).size());
+	String paraCompanyCount = Integer.toString(inputAS.get("Company", startParagraphAnn, endParagraphAnn).size());
+	String paraOrganisationCount = Integer.toString(inputAS.get("Organisation", startParagraphAnn, endParagraphAnn).size());
+	String paraPlaceCount = Integer.toString(inputAS.get("Place", startParagraphAnn, endParagraphAnn).size());
+	String paraCountyCount = Integer.toString(inputAS.get("County", startParagraphAnn, endParagraphAnn).size());
+	String paraFacilityCount = Integer.toString(inputAS.get("Facility", startParagraphAnn, endParagraphAnn).size());
+	String paraPublicationCount = Integer.toString(inputAS.get("Publication", startParagraphAnn, endParagraphAnn).size());
+	
+	if (prevTokenSet.size() > 0) {
+		List<Annotation> orderedTokenList = gate.Utils.inDocumentOrder(prevTokenSet);
+		for (int i = 1; i < (windowSize + 1); i++) {
+			if (orderedTokenList.size() >= i) {
+				if (!categories.isEmpty()) categories += "_";
+				if (orderedTokenList.get(orderedTokenList.size() - i).getFeatures().get("category") != null) {
+					categories += orderedTokenList.get(orderedTokenList.size() - i).getFeatures().get("category").toString();
+				}
+				else {
+					categories += "#";
+				}
+				startNode = orderedTokenList.get(orderedTokenList.size() - i).getStartNode().getOffset();
+				if (!orths.isEmpty()) orths += "_";
+				if (orderedTokenList.get(orderedTokenList.size() - i).getFeatures().get("orth") != null) {
+					orths += orderedTokenList.get(orderedTokenList.size() - i).getFeatures().get("orth").toString();
+				}
+				else {
+					orths += "#";
+				}
+			}
+		}
+	}	
+
+	if (afterTokenSet.size() > 0) {
+		categories += "-";
+		orths += "-";
+		List<Annotation> orderedTokenList = gate.Utils.inDocumentOrder(afterTokenSet);
+		for (int i = 0; i < windowSize; i++) {
+			if (orderedTokenList.size() > i) {
+				if (!categories.isEmpty()) categories += "_";
+				if (orderedTokenList.get(i).getFeatures().get("category") != null) {
+					categories += orderedTokenList.get(i).getFeatures().get("category").toString();
+				}
+				else {
+					categories += "#";
+				}
+				endNode = orderedTokenList.get(i).getEndNode().getOffset();
+				if (!orths.isEmpty()) orths += "_";
+				if (orderedTokenList.get(i).getFeatures().get("orth") != null) {
+					orths += orderedTokenList.get(i).getFeatures().get("orth").toString();
+				}
+				else {
+					orths += "#";
+				}
+			}
+		}
+	}	
+
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("type", annotationAnn.getType());
+	features.put("categories", categories);
+	features.put("dayCount", paraDayCount);
+	features.put("companyCount", paraCompanyCount);
+	features.put("organisationCount", paraOrganisationCount);
+	features.put("placeCount", paraPlaceCount);
+	features.put("countyCount", paraCountyCount);
+	features.put("facilityCount", paraFacilityCount);
+	features.put("publicationCount", paraPublicationCount);
+	features.put("orths", orths);
+	features.put("ml-id", annotationAnn.getId());
+	try {
+		outputAS.add(annotationSet.firstNode(), annotationSet.lastNode(), "Entity", features); 	
+		outputAS.add(startNode, endNode, "EntityGroup", features); 	
+	}
+	catch(Exception e) {
+	}
+}
+

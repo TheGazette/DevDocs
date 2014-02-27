@@ -1,0 +1,481 @@
+/*  
+* Filename: 	des_lookup_cleanup.jape
+* Author:	Paul Appleby
+* Description:	Sorts out capitalisation problems caused by using case-insensitive gazetteers
+* Date created:	24/05/2010
+* This version:	0.31
+* 
+* Change history
+* ==========================================================================
+* Date	Version	Author	Description
+* ==========================================================================
+* 
+* 22/02/12	0.31	PA		Added world regions
+* 21/10/11	0.30	PA		Stopped lowerase company type being cleaned and removed lookups part spanning hyphenated tokens
+* 29/06/11	0.29	PA		Allowed lowercase positions but tagged orthography
+* 07/02/11	0.28	PA		Fixed to nested position removal
+* 02/02/11	0.27	PA		Tweaked HyphenatedLocation
+* 31/01/11	0.26	PA		Stopped positions in hyphenated words
+* 17/01/11	0.25	PA		Removed location incorrectly part of hyphenated token
+*/
+
+
+Phase: Orthography
+Input: Lookup Token Paragraph
+Options: control = all negationGrouping = false
+
+Rule: CotnainsLinebreak
+( 
+	{Lookup contains LineBreak}
+):lookup
+-->
+{
+	AnnotationSet lookupSet = bindings.get("lookup");
+ 	outputAS.removeAll(lookupSet);
+}
+
+
+/* Remove countries that are all lowercase or mixed case confused instances of 'Us' etc. */
+Rule: Country
+( 
+	{Lookup.majorType == location, Lookup.minorType == country, Lookup within {Token.orth == lowercase}} |
+	{Lookup.majorType == location, Lookup.minorType == country, Token.orth == upperInitial,
+		Token.length == 2, Token.string != "El", Token.string != "St"}
+):country
+-->
+{
+	AnnotationSet countrySet = bindings.get("country");
+ 	AnnotationSet lookupSet = countrySet.get("Lookup");
+	outputAS.removeAll(lookupSet);
+}
+
+
+/* Remove other settlements that are all lowercase */
+/* Apart from ' in ' or '-in-' or 'on' etc. First words cannot be lowercase */
+Rule: Other
+( 
+	{Lookup.majorType == location, Lookup.minorType == other, Token.category == JJR} |
+	{Lookup.majorType == location, Lookup.minorType == other, Token.category == RBR} |
+	{Lookup.majorType == location, Lookup.minorType == other, Token.orth == lowercase} |
+	{Lookup.majorType == location, Lookup.minorType == other, Lookup within {Token.orth == lowercase}} |
+	{Lookup.majorType == location, Lookup.minorType == other, Lookup contains {Token.orth == lowercase}}
+):other
+-->
+{
+	try {
+		AnnotationSet otherSet = bindings.get("other");
+		AnnotationSet lookupSet = otherSet.get("Lookup");
+		// Now get the tokens
+		AnnotationSet tokenSet = inputAS.get("Token", lookupSet.firstNode().getOffset(), lookupSet.lastNode().getOffset());
+		List<Annotation> orderedTokenList = gate.Utils.inDocumentOrder(tokenSet);
+		
+		Boolean isMatch = false;
+		Boolean isFirst = true;
+		for (Annotation tokenAnn : orderedTokenList) {
+			String text = gate.Utils.stringFor(doc, tokenAnn);
+			if (isFirst ||
+				(text.length() > 2 && !text.equals("bho") && !text.equals("nan") && !text.equals("next") && !text.equals("upon")
+				&& !text.equals("the"))) {
+				if (text.charAt(0) >= 95 && text.charAt(0) <= 121) isMatch = true;
+			}
+			isFirst = false;
+		}
+		if (isMatch) outputAS.removeAll(lookupSet);
+	}
+	catch (Exception e) {
+	}
+}
+
+
+/* Remove towns that are all lowercase */
+Rule: Town
+( 
+	{Lookup.majorType == location, Lookup.minorType == town, Token.orth == lowercase} |
+	{Lookup.majorType == location, Lookup.minorType == town, Lookup within {Token.orth == lowercase}}
+):town
+-->
+{
+	AnnotationSet townSet = bindings.get("town");
+	AnnotationSet lookupSet = townSet.get("Lookup");
+ 	outputAS.removeAll(lookupSet);
+}
+
+
+/* Remove regions that are all lowercase */
+Rule: Region
+( 
+	{Lookup.majorType == location, Lookup.minorType == world_region, Token.orth == lowercase} |
+	{Lookup.majorType == location, Lookup.minorType == world_region, Lookup within {Token.orth == lowercase}}
+):region
+-->
+{
+	AnnotationSet citySet = bindings.get("region");
+	AnnotationSet lookupSet = citySet.get("Lookup");
+ 	outputAS.removeAll(lookupSet);
+}
+
+/* Remove cities that are all lowercase */
+Rule: City
+( 
+	{Lookup.majorType == location, Lookup.minorType == city, Token.orth == lowercase} |
+	{Lookup.majorType == location, Lookup.minorType == city, Lookup within {Token.orth == lowercase}}
+):city
+-->
+{
+	AnnotationSet citySet = bindings.get("city");
+	AnnotationSet lookupSet = citySet.get("Lookup");
+ 	outputAS.removeAll(lookupSet);
+}
+
+/* Remove lookups of various types that are contained in a hyphenated token */
+Rule: HyphenatedLookup
+( 
+	{Lookup.majorType == location, Lookup within {Token.string ==~ "[A-Z][a-z]+[-][A-Za-z]+[-][A-Za-z]+"}} |
+	{Lookup.majorType == location, Lookup within {Token.string ==~ "[A-Z][a-z]+[-][A-Za-z]+"}} |
+	{Lookup.minorType == position, Lookup within {Token.string ==~ "[A-Za-z]+[-][A-Za-z]+"}} |
+	{Lookup.minorType == company_type, Lookup within {Token.string ==~ "[A-Za-z]+[-][A-Za-z]+"}}
+):annotation
+-->
+{
+	try {
+		AnnotationSet annotationSet = bindings.get("annotation");
+		AnnotationSet lookupSet = annotationSet.get("Lookup");
+		// Now get the tokens
+		AnnotationSet tokenSet = inputAS.get("Token", lookupSet.firstNode().getOffset(), lookupSet.lastNode().getOffset());
+		if (tokenSet.firstNode().getOffset() < lookupSet.firstNode().getOffset()) outputAS.removeAll(lookupSet);
+	}
+	catch (Exception e) {
+	}
+}
+
+
+/* Remove lookups that finish part-way through a hyphenated token */
+Rule: LookupInHyphen
+( 
+	{Token.string ==~ "[A-Za-z]+[-][A-Za-z]+"}
+):annotation
+-->
+{
+	try {
+		AnnotationSet annotationSet = bindings.get("annotation");
+		AnnotationSet tokenSet = annotationSet.get("Token");
+		Annotation tokenAnn = tokenSet.iterator().next();
+		//System.out.println("Testing for lookups in: " + gate.Utils.stringFor(doc, tokenAnn));
+		// Get lookups that span the start of the token
+		AnnotationSet lookupSet = inputAS.get("Lookup", tokenSet.firstNode().getOffset(), tokenSet.firstNode().getOffset() + 1);
+		Long tokenStart = tokenAnn.getStartNode().getOffset();
+		Long tokenEnd = tokenAnn.getEndNode().getOffset();
+		for (Annotation lookupAnn : lookupSet) {
+			Long lookupStart = lookupAnn.getStartNode().getOffset();		
+			Long lookupEnd = lookupAnn.getEndNode().getOffset();		
+			if (lookupStart < tokenStart && lookupEnd > tokenStart && lookupEnd < tokenEnd) {
+				outputAS.remove(lookupAnn);
+			}
+		}
+	}
+	catch (Exception e) {
+		System.err.println("Cannot process hyphenated token: " + e.getMessage());
+	}
+}
+
+
+/* Remove street names that are all lowercase */
+Rule: Street
+( 
+	{Lookup.majorType == location, Lookup.minorType == street_name, Lookup within {Token.orth == lowercase}}
+):street
+-->
+{
+	AnnotationSet streetSet = bindings.get("street");
+	AnnotationSet lookupSet = streetSet.get("Lookup");
+ 	outputAS.removeAll(lookupSet);
+}
+
+
+/* Remove constituency names that are all lowercase */
+Rule: Constituency
+( 
+	{Lookup.majorType == location, Lookup.minorType == constituency, Lookup contains {Token.orth == lowercase}}
+):constituency
+-->
+{
+	AnnotationSet constituencySet = bindings.get("constituency");
+	AnnotationSet lookupSet = constituencySet.get("Lookup");
+ 	outputAS.removeAll(lookupSet);
+}
+
+
+/* Remove names that are all lowercase and sentence initial names that are very unlikely */
+Rule: Name
+( 
+	{Lookup.majorType == name, Lookup.minorType == firstMale, Token.orth == lowercase} |
+	{Lookup.majorType == name, Lookup.minorType == firstFemale, Token.orth == lowercase} |
+	{Paragraph, Lookup.majorType == name, Lookup.minorType == not_SI_firstname}
+):name
+-->
+{
+	AnnotationSet nameSet = bindings.get("name");
+	AnnotationSet lookupSet = nameSet.get("Lookup");
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("majorType", "name");
+	AnnotationSet tokenSet1 = inputAS.get(lookupSet.firstNode().getOffset(), lookupSet.lastNode().getOffset());
+	AnnotationSet tokenSet2 = tokenSet1.get("Lookup", features);
+ 	outputAS.removeAll(tokenSet2);
+}
+
+
+/* Remove months that are all lowercase */
+Rule: Month
+( 
+	{Lookup.majorType == date, Lookup.minorType == month, Token.orth == lowercase}
+):month
+-->
+{
+	AnnotationSet monthSet = bindings.get("month");
+ 	AnnotationSet lookupSet = monthSet.get("Lookup");
+	outputAS.removeAll(lookupSet);
+}
+
+
+
+/* Remove honorifics that are all lowercase */
+Rule: Honorific
+( 
+	{Lookup.majorType == name, Lookup.minorType == titleMale, Token.orth == lowercase} |
+	{Lookup.majorType == name, Lookup.minorType == titleFemale, Token.orth == lowercase}
+):honorific
+-->
+{
+	AnnotationSet honorificSet = bindings.get("honorific");
+ 	AnnotationSet lookupSet = honorificSet.get("Lookup");
+	outputAS.removeAll(lookupSet);
+}
+
+
+/* Mark positions that are all lowercase and are abbreviations */
+Rule: Position
+( 
+	{Lookup.majorType == position, Lookup.minorType == position, Token.orth == lowercase}
+):position
+-->
+{
+	AnnotationSet positionSet = bindings.get("position");
+ 	AnnotationSet lookupSet = positionSet.get("Lookup"); 	
+	Annotation lookupAnn = lookupSet.iterator().next();
+	lookupAnn.getFeatures().put("orthography", "lowercase");
+}
+
+
+/* Remove positions that are all lowercase and are abbreviations */
+/*Rule: Position
+( 
+	{Lookup.majorType == position, Lookup.minorType == position, Lookup contains {Token.orth == lowercase}}
+):position
+-->
+{
+	AnnotationSet positionSet = bindings.get("position");
+ 	AnnotationSet lookupSet = positionSet.get("Lookup"); 	
+	outputAS.removeAll(lookupSet);
+}*/
+
+
+/* Remove companies that are all lowercase */
+Rule: Company
+( 
+	{Lookup.majorType == organisation, Lookup.minorType == company, Token.orth == lowercase}
+):company
+-->
+{
+	AnnotationSet companySet = bindings.get("company");
+ 	AnnotationSet lookupSet = companySet.get("Lookup");
+	outputAS.removeAll(lookupSet);
+}
+
+
+/* Remove facilities that are all lowercase */
+Rule: Facility
+( 
+	{Lookup.majorType == facility, Lookup.minorType == facility, Token.orth == lowercase}
+):facility
+-->
+{
+	AnnotationSet facilitySet = bindings.get("facility");
+ 	AnnotationSet lookupSet = facilitySet.get("Lookup");
+	outputAS.removeAll(lookupSet);
+}
+
+
+/*Rule: FacilityKey
+( 
+	{Lookup.majorType == facility, Lookup.minorType == facility_type, Token.orth == lowercase}
+):facility
+-->
+{
+	AnnotationSet facilitySet = bindings.get("facility");
+ 	AnnotationSet lookupSet = facilitySet.get("Lookup");
+	outputAS.removeAll(lookupSet);
+}*/
+
+
+Rule: EventKey
+( 
+	{Lookup.majorType == event, Lookup.minorType == event_type, Token.orth == lowercase}
+):event
+-->
+{
+	AnnotationSet eventSet = bindings.get("event");
+ 	AnnotationSet lookupSet = eventSet.get("Lookup");
+	outputAS.removeAll(lookupSet);
+}
+
+
+/* Remove lookups that are all lowercase apart from stop words or permissible lower case terms */
+Rule: NameFilter
+( 
+	{Lookup.majorType == organisation, Token, Lookup.minorType != company, Lookup.minorType != company_type, Lookup.minorType != organisation_type, Lookup contains {Token.orth == lowercase}} |
+	{Lookup.majorType == organisation, Token.orth == lowercase, Lookup.minorType != company, Lookup.minorType != company_type, Lookup.minorType != organisation_type} |
+	{Lookup.majorType == admingeo, Token, Lookup contains {Token.orth == lowercase}} |
+	{Lookup.majorType == publication, Lookup.minorType == publication, Lookup contains {Token.orth == lowercase}}
+):annotation
+-->
+{
+	// So basically we're looking for words that start lower case in the name
+	// But that are not stop words
+	AnnotationSet annotationSet = bindings.get("annotation");
+	Annotation lookupAnn = annotationSet.get("Lookup").iterator().next();
+	Long nameStart = lookupAnn.getStartNode().getOffset();
+	Long nameEnd = lookupAnn.getEndNode().getOffset();
+	AnnotationSet tokenSet = inputAS.get("Token", nameStart, nameEnd);
+	List<Annotation> orderedTokenSet = gate.Utils.inDocumentOrder(tokenSet);
+
+	Boolean isOkay = true;
+	Boolean allowLeadingDT = false;
+	if (lookupAnn.getFeatures().get("majorType").toString().equals("publication")) allowLeadingDT = true;
+	String tokenText = "";
+	String tokenOrth = "";
+	
+	Iterator<Annotation> itr = orderedTokenSet.iterator();
+	Integer position = 0;
+	while (itr.hasNext() && isOkay) {
+		Annotation tokenAnn = itr.next();
+		position++;
+		try {
+			tokenText = tokenAnn.getFeatures().get("string").toString();
+			//System.out.println("Testing token: " + tokenText);
+			tokenOrth = tokenAnn.getFeatures().get("orth").toString();
+			if (tokenOrth.equals("lowercase")) {
+				if (allowLeadingDT && position == 1 && tokenText.equals("the")) {
+				}
+				// Handle special terms
+				else if (tokenText.equals("al")) {
+				}
+				// Stop words
+				else if (
+					(!tokenText.equals("s") && !tokenText.equals("of")
+				 	&& !tokenText.equals("on") && !tokenText.equals("in")
+					&& !tokenText.equals("and") && !tokenText.equals("for")
+				 	&& !tokenText.equals("the")
+				 	) || position == 1) {
+					isOkay = false;
+				}
+			}
+		}
+		catch (Exception e) {
+			// This will happen when it's something like punctuation
+		}
+
+	}	
+	if (!isOkay) {
+	 	AnnotationSet lookupSet = annotationSet.get("Lookup");
+		outputAS.removeAll(lookupSet);
+	}
+	
+}
+
+
+/* Remove days that are all lowercase */
+Rule: Day
+( 
+	{Lookup.majorType == date, Lookup.minorType == dayofweek, Token.orth == lowercase}
+):day
+-->
+{
+	AnnotationSet daySet = bindings.get("day");
+ 	AnnotationSet lookupSet = daySet.get("Lookup");
+	outputAS.removeAll(lookupSet);
+}
+
+/* Number within units, e.g. m as first part of m.p.h. */
+Rule: NonNumberUnit
+(
+	( 
+		{Lookup.majorType == number}
+	):lookup
+	{Token.string == "."}
+	{Token.length == 1}
+)
+-->
+{
+	AnnotationSet lookupSet = bindings.get("lookup");
+ 	AnnotationSet nestedLookupSet = lookupSet.get("Lookup");
+	outputAS.removeAll(nestedLookupSet);
+}
+
+
+/* ========== Remove lookups inside lookups ========== */
+
+/* Organisation inside units! */
+Rule: NestedLookup1
+( 
+	{Lookup.majorType == organisation, Lookup within {Lookup.majorType == units}}
+):lookup
+-->
+{
+	AnnotationSet lookupSet = bindings.get("lookup");
+ 	AnnotationSet nestedLookupSet = lookupSet.get("Lookup");
+	outputAS.removeAll(nestedLookupSet);
+}
+
+
+/* Time within units */
+Rule: NestedLookup2
+( 
+	{Lookup.majorType == time, Lookup within {Lookup.majorType == units}}	
+):lookup
+-->
+{
+	AnnotationSet lookupSet = bindings.get("lookup");
+ 	AnnotationSet nestedLookupSet = lookupSet.get("Lookup");
+	outputAS.removeAll(nestedLookupSet);
+}
+
+
+/* Nested postcode lookups */
+Rule: NestedLookup3
+( 
+	{Lookup.majorType == postcode}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet inputSet = inputAS.getContained(annotationSet.firstNode().getOffset(), annotationSet.lastNode().getOffset() - 1);
+	AnnotationSet shortPostcodeSet = inputSet.get("Lookup");
+	outputAS.removeAll(shortPostcodeSet);
+}
+
+
+/* Nested position lookups */
+Rule: NestedLookup4
+( 
+	{Lookup.minorType == position}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet inputSet = inputAS.getContained(annotationSet.firstNode().getOffset(), annotationSet.lastNode().getOffset() - 1);
+	
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("minorType", "position");
+	AnnotationSet positionSet = inputSet.get("Lookup", features);
+	outputAS.removeAll(positionSet);
+}

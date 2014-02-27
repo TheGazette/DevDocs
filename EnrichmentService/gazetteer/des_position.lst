@@ -1,0 +1,316 @@
+2nd Lieutenant;format=military
+ATpr;format=military;full=Air Trooper
+Abbot;format=religious;subFormat=firstName
+Able Seaman;format=military
+Admiral of the fleet;format=military
+Admiral;format=military
+Air Chief Marshal;format=military
+Air Commodore;format=military
+Air Marshal;format=military
+Air Trooper;format=military
+Air Vice-Marshal;format=military
+Alderman;format=political
+Ambassador;format=political
+Archbishop;format=religious;subFormat=firstName
+Artistic Director;format=standard
+Assistant Chief Constable;format=standard
+Assistant Chief Executive;format=standard
+Assistant Commissioner;format=standard
+Assistant Director;format=standard
+Assistant Divisional Officer;format=standard
+Associate Director;format=standard
+Associate Medical Director;format=standard
+Bombardier;format=military
+Brand Director;format=standard
+Brevet Colonel;format=military
+Brevet Lieutenant-Colonel;format=military
+Brevet Major;format=military
+Brevet-Colonel;format=military
+Brevet-Major;format=military
+Brig. Gen.;format=military;full=Brigadier-General
+Brig. General;format=military;full=Brigadier-General
+Brigadier General;format=military;full=Brigadier-General
+Brigadier-General;format=military
+Brigadier;format=military
+CEO;format=standard;full=Chief Executive Officer
+Interim CEO;format=standard;full=Interim Chief Executive Officer
+CFO;format=standard;full=Chief Finance Officer
+COO;format=standard;full=Chief Operating Officer
+CIO;format=standard;full=Chief Information Officer
+CTO;format=standard;full=Chief Technical Officer
+Cadet;format=military
+Campaign Director;format=standard
+Campaigns Director;format=standard
+Canon;format=religious
+Capt. Gen.;format=standard;full=Captain-General
+Capt.;format=standard;full=Captain
+Capt;format=standard;full=Captain
+Captain and Adjutant;format=standard
+Captain;format=standard
+Cardinal;format=religious
+Ch Supt;format=standard;full=Chief Superintendent
+Chair of Trustees;format=standard
+Chair;format=standard
+Chairman of the Board;format=standard
+Chairman;format=standard
+Chairman;format=standard
+Chairwoman;format=standard
+Chanceller;format=standard
+Chief Constable;format=standard
+Chief Dental Officer;format=standard
+Chief Economist;format=standard
+Chief Executive Officer;format=standard
+Chief Executive;format=standard
+Chief Finance Officer;format=standard
+Chief Financial Officer;format=standard
+Chief Information Offic;format=standarder
+Chief Inspector;format=standard
+Chief Investment Officer;format=standard
+Chief Operating Officer;format=standard
+Chief Petty Officer;format=military
+Chief Superintendent;format=standard
+Chief Technical Officer;format=standard
+Chief of the Air Staff;format=military
+Chief of the Defence Staff;format=military
+Chief of the General Staff;format=military
+Chief of Staff;format=military
+Chief-of-Staff;format=military;full=Chief of Staff
+Clinical Director;format=standard
+Cmdr;format=military;full=Commander
+Co-Chairman;format=standard
+Co-Founder;format=standard
+Col.;format=military;full=Colonel
+Col;format=military;full=Colonel
+Colonel;format=military
+Commander General;format=military
+Commander;format=military
+Commissioner;format=standard
+Commissioner;format=standard
+Commodore;format=military
+Company Sergeant Major;format=military
+Company Sgt Maj;format=military;full=Company Sergeant Major
+Congressman;format=political
+Constable;format=standard
+Corporal;format=military
+Councillor;format=political
+Cpl;format=military;full=Corporal
+Creative Director;format=standard
+Dayan;format=religious
+Defense Secretary;format=political
+Deputy Assistant Commissioner;format=standard
+Deputy Chairman;format=standard
+Deputy Chief Constable;format=standard
+Deputy Chief Executive;format=standard
+Deputy Chief Officer;format=standard
+Deputy Commissioner;format=standard
+Deputy Director General;format=standard
+Deputy Director;format=standard
+Deputy Group Leader;format=standard
+Deputy Head;format=standard
+Deputy PM;format=political;full=Deputy Prime Minister
+Deputy Prime Minister;format=political
+Det Ch Supt;format=standard;full=Detective Chief Superintendent
+Det Sgt;format=standard;full=Detective Sergeant
+Det Supt;format=standard;full=Detective Superintendent
+Det Const;format=standard;full=Detective Constable
+Detective Chief Superintendent;format=standard
+Detective Constable;format=standard
+Detective Sergeant;format=standard
+Detective Superintendent;format=standard
+Director General;format=standard;full=Director-General
+Director-General;format=standard
+Director;format=standard
+District Governor;format=standard
+District Judge;format=standard
+District Nursing Sister;format=standard
+Doctor;format=medical
+Dr;format=medical;full=Doctor
+Editor-in-Chief;format=standard
+Emeritus Professor;format=standard
+Emporer;format=standard
+Executive Chairman;format=standard
+Executive Director;format=standard
+Executive Head;format=standard
+Fashion Editor;format=standard
+Father;format=religious;subFormat=firstName
+Fellow;format=standard
+Field Marshall;format=military
+Field Marshal;format=military;full=Field Marshall
+Finance Director;format=standard
+First Sea Lord and Chief of Naval Staff;format=military
+Flight Lieutenant;format=military
+Flight Sergeant;format=military
+Flight Serjeant;format=military
+Flying Officer;format=military
+Founder;format=standard
+Fus;format=military;full=Fusilier
+Fusilier;format=military
+Gdn;format=military;full=Guardsman
+Gen;format=military;full=General
+Gen.;format=military;full=General
+General Counsel;format=standard
+General Manager;format=standard
+General Secretary;format=standard
+General Surgeon;format=standard
+General;format=military
+General Secretary;format=standard
+Gnr;format=military;full=Gunner
+Governor;format=standard
+Group Captain;format=military
+Group Chairman;format=standard
+Group Finance Director;format=standard
+Group Leader;format=standard
+Guardsman;format=military
+Gunner;format=military
+Head;format=standard
+Honorary Distinguished Professor;format=standard
+Honorary President;format=standard
+Honorary Professor;format=standard
+Information commissioner;format=standard
+Interior Secretary;format=political
+Labour Minister;format=political
+Judge;format=standard
+Justice;format=standard
+Kgn;format=military;full=Kingsman
+Kingsman;format=military
+L/Cpl;format=military;full=Lance-Corporal
+Lance Corporal;format=military;full=Lance-Corporal
+Lance-Bombardier;format=military
+Lance-Corporal;format=military
+Leader;format=standard
+Lieutenant Colonel;format=military;full=Lieutenant-Colonel
+Lieutenant Commander;format=military;full=Lieutenant-Commander
+Lieutenant General;format=military;full=Lieutenant-General
+Lieutenant and Adjutant;format=military
+Lieutenant and Quartermaster;format=military
+Lieutenant-Colonel;format=military
+Lieutenant-Commander;format=military
+Lieutenant-General;format=military
+Lieutenant;format=military
+Lord Mayor;format=political
+Lt Col;format=military;full=Lieutenant-Colonel
+Lt General;format=military;full=Lieutenant-General
+Lt Gen;format=military;full=Lieutenant-General
+Lt-Gen;format=military;full=Lieutenant-General
+Lt. Col.;format=military;full=Lieutenant-Colonel
+Lt. Colonel;format=military;full=Lieutenant-Colonel
+Lt. Commander;format=military;full=Lieutenant-Commander
+Lt. General;format=military;full=Lieutenant-General
+Lt.;format=military;full=Lieutenant
+Lt;format=military;full=Lieutenant
+Maj Gen;format=military;full=Major General
+Major General;format=military
+Major-General;format=military
+Maj;format=military;full=Major
+Maj.;format=military;full=Major
+Major;format=military
+Manager;format=standard
+Managing Director;format=standard
+Marshal of the Royal Air Force;format=military
+Mayor;format=political
+Medical Director;format=standard
+Midshipman;format=military
+Mother;format=religious;subFormat=firstName
+MP;format=political
+MEP;format=political
+News Editor;format=standard
+Non-Executive Director;format=standard
+Officer Cadet;format=military
+Operations Manager;format=standard
+Operations Director;format=standard
+Passenger Director;format=standard
+PC;format=standard;full=Police Constable
+PM;format=political;full=Primeminister
+Pastor;format=religious
+Petty Officer;format=military
+Pilot Officer;format=military
+Political Correspondent;format=standard
+Political Editor;format=standard
+Pope;format=religious;subFormat=firstName
+Portfolio Manager;format=standard
+Pr;format=education;full=Professor
+Premier;format=political
+President;format=standard
+Principal;format=standard
+Prime Minister;format=political
+Private;format=military
+Pro-Chancellor;format=education
+Pro-Chancellor;format=standard
+Prof.;format=education;full=Professor
+Prof;format=education;full=Professor
+Professor;format=education
+Professor;format=standard
+Prophet;format=religious
+Pte;format=military;full=Private
+Quartermaster-Serjeant;format=military
+Rabbi;format=religious
+Ranger;format=military
+Rear Admiral;format=military
+Rear-Admiral;format=military;full=Rear-Admiral
+Rebel Leader;format=standard
+Research Fellow;format=standard
+Rev.;format=religious;full=Reverend
+Reverend Canon;format=religious
+Reverend;format=religious
+Rfn;format=military;full=Rifleman
+Rgr;format=military;full=Ranger
+Rifleman;format=military
+Right Rev;format=religious;full=Right Reverend
+Rt Hon.;format=political;full=Right Honourable
+Rt Hon;format=political;full=Right Honourable
+Rt. Hon;format=political;full=Right Honourable
+Ruler;format=political
+Sapper;format=military
+Second Lieutenant;format=military
+Secretary General;format=political
+Secretary-General;format=political
+Senator;format=political
+Sergeant Major;format=military
+Sergeant;format=military
+Serjeant Major;format=military
+Serjeant;format=military
+Sgt Maj;format=military;full=Sergeant Major
+Sgt;format=military;full=Sergeant
+Sheriff;format=standard
+Sig;format=military;full=Signaller
+Signaller;format=military
+Sister;format=religious;subFormat=firstName
+Special Commandant;format=standard
+Special Constable;format=standard
+Special Deputy Chief Officer;format=standard
+Special Inspector;format=standard
+Special Sergeant;format=standard
+Special Superintendent;format=standard
+Spr;format=military;full=Sapper
+Squadron Leader;format=military
+Staff Sergeant;format=military
+Staff Sgt;format=military;full=Staff Sergeant
+State Councillor;format=political
+Sub-Lieutenant;format=military
+Superintendent;format=standard
+Supt;format=standard
+Surgeon-Major;format=military
+Taoiseach;format=political
+Team Manager;format=standard
+Tpr;format=military;full=Trooper
+Trader;format=standard
+Treasurer;format=standard
+Trooper;format=military
+Under Officer;format=military
+Vice Chairman;format=standard;full=Vice-Chairman
+Vice Chairman;format=standard
+Vice Chief of the Defence Staff;format=military
+Vice Premier;format=political;full=Vice-Premier
+Vice President;format=standard;full=Vice-President
+Vice Prime Minister;format=political
+Vice-Admiral;format=military
+Vice-Chairman;format=standard
+Vice-Chairman;format=standard
+Vice-Premier;format=political
+Vice-President;format=standard
+Warrant Officer Class 1;format=military
+Warrant Officer Class 2;format=military
+Warrant Officer Class I;format=military
+Warrant Officer Class II;format=military
+Warrant Officer;format=military
+Wing Commander;format=military

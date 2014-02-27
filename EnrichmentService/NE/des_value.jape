@@ -1,0 +1,65 @@
+/*
+*  
+* Filename: 	des_value.jape
+* Author:	Paul Appleby
+* Description:	Annotates number + Lookup to give valued numbers with units/types
+* Date created:	05/03/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Value
+Input:  Split Token Number Lookup LineBreak
+Options: control = appelt negationGrouping = false
+
+
+Rule: SI
+(
+	{Token.symbolkind != currency} |
+	{Split} |
+	{LineBreak}
+)
+(
+	(
+		(
+			(
+				{Token.kind == number} 
+				{Token.subkind == dashpunct} 
+			)?
+			{Token.kind == number} 
+		) |
+		{Number}
+	):num
+	(
+		{Lookup.majorType == units}
+	):unit
+):val
+-->
+	:val.Value = {type=:unit.Lookup.minorType, unit=:unit.Lookup.unit, number=:num.Number.number, rule="SI" }
+
+
+Rule: Percent
+(
+  (
+  	(
+  		(
+  			{Token.kind == number} 
+  			{Token.subkind == dashpunct} 
+  		)?
+  		{Token.kind == number} 
+  	) |
+  	{Number}
+  ):num
+  (
+  	{Lookup.majorType == symbols, Lookup.minorType == maths, Lookup.unit == "%"}
+  ):unit
+):val
+-->
+	:val.Value = {type=:unit.Lookup.minorType, unit=:unit.Lookup.unit, number=:num.Number.number, rule="Percent" }

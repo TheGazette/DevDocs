@@ -1,0 +1,36 @@
+/*
+* Filename: 	des_assign_place_id.jape
+* Author:	Paul Appleby
+* Description:	Assign ids to every Place that makes sense
+* Date created:	30/09/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	AssignPlaceIdentifiers
+Input:  Place 
+Options: control = once negationGrouping = false
+
+
+Rule: AssignPlaceID
+(
+	{Place}
+):place
+-->
+{
+	AnnotationSet placeSet = inputAS.get("Place");
+	List<Annotation> orderedPlaces = gate.Utils.inDocumentOrder(placeSet);
+	Integer count = 0;
+	for (Annotation place: orderedPlaces) {
+		place.getFeatures().put("id", "place-" + count);
+		count++;
+	}
+}
+

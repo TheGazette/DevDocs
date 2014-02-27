@@ -1,0 +1,54 @@
+/*
+* Filename: 	des_crossover_html.jape
+* Author:		Paul Appleby
+* Description:	Sort out crossovers for inline HTML tags
+* Date created:	16/06/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	CrossoverHTML
+Input:  Inline
+Options: control = appelt negationGrouping = false
+
+/* Where there is a crossover with an ampersand at the intersection that indicates separate entities so split again */
+Rule: Inline
+(
+	{Inline}
+):inline
+-->
+{
+	try {
+		AnnotationSet inlineSet = bindings.get("inline");
+		Long inlineStart = inlineSet.firstNode().getOffset();
+		Long inlineEnd = inlineSet.lastNode().getOffset();
+		Annotation inlineAnn = inlineSet.iterator().next();
+		String inlineText = gate.Utils.stringFor(doc, inlineAnn);		
+		//System.out.println("\nInline test: " + inlineText);
+		
+		AnnotationSet crossoverSet = inputAS.get(inlineStart, inlineEnd);
+		for (Annotation testAnn: crossoverSet)	{
+			String testType = testAnn.getType();
+			if (testAnn != inlineAnn && testType != "Lookup") {
+				Long testStart = testAnn.getStartNode().getOffset();
+				Long testEnd = testAnn.getEndNode().getOffset();
+				String testText = gate.Utils.stringFor(doc, testAnn);
+				//System.out.println("Testing HTML crossover: " + testText + "; " + testType);
+				if ((testStart < inlineStart && testEnd > inlineStart && testEnd < inlineEnd) || (testStart > inlineStart && testStart < inlineEnd  && testEnd > inlineEnd)) {
+					doc.getAnnotations("DES").remove(testAnn);				
+					System.out.println("Remove crossover annotation from HTML: " + inlineText + " - " + testType);
+				}
+			}
+		}
+	}
+	catch (Exception e) {
+	}	
+}
+

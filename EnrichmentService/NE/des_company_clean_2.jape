@@ -1,0 +1,56 @@
+/*
+* Filename: 	des_company_clean.jape
+* Author:	Paul Appleby
+* Description:	Removes false positives for companies
+* Date created:	28/06/2010
+* This version:	0.18
+* 
+*/
+
+
+Phase:	CompanyClean2
+Input:  Person Company Token LineBreak Paragraph Organisation Lookup Place Number Facility Activity Event Value Time Postcode Street Landmark AdminArea Country
+Options: control = appelt negationGrouping = false
+
+/* Avoid certain situations */
+/* Company ... occupation ... person indicates the first company is actually a company */
+Rule: CompanyRemoveAvoid
+Priority: 20
+(
+	({LineBreak})?
+	{Company, Person, Company within Person, Person within Company, Company.confirmed == "yes"}
+)
+-->{}
+
+/* Companies within ... or non-confirmed companies */
+Rule: CompanyRemove1
+Priority: 10
+(
+	({LineBreak})?
+	(
+		{Company within Person} |
+		{Company within Country} |
+		{Company within Landmark} |
+		{Company within AdminArea} |		
+		{Company within Number} |
+		{Company within Facility} |
+		{Company within Activity} |
+		{Company within Event} |
+		{Company within Value} |
+		{Company within Place, !Place within Company} |		
+		{Company within Time} |		
+		{Company within Postcode} |
+		{Company within Legislation} |	
+		{Company within Organisation, !Organisation within Company} |		
+		{Company within Street} |
+		{Company, !Company.confirmed == "yes"}
+	):company
+)
+-->
+{
+	AnnotationSet companySet = bindings.get("company");
+ 	outputAS.removeAll(companySet);
+}
+
+
+

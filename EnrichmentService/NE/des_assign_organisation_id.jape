@@ -1,0 +1,36 @@
+/*
+* Filename: 	des_assign_organisation_id.jape
+* Author:	Paul Appleby
+* Description:	Assign ids to every organisation that makes sense
+* Date created:	22/11/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	AssignOrganisationIdentifiers
+Input:  Organisation 
+Options: control = once negationGrouping = false
+
+
+Rule: AssignOrganisationID
+(
+	{Organisation}
+):organisation
+-->
+{
+	AnnotationSet organisationSet = inputAS.get("Organisation");
+	List<Annotation> orderedOrganisation = gate.Utils.inDocumentOrder(organisationSet);
+	Integer count = 0;
+	for (Annotation organisation: orderedOrganisation) {
+		organisation.getFeatures().put("id", "organisation-" + count);
+		count++;
+	}
+}
+

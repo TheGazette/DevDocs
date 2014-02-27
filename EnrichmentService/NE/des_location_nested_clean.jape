@@ -1,0 +1,32 @@
+/*
+* Filename: 	des_location_nested_clean.jape
+* Author:	Paul Appleby
+* Description:	Removes nested locations. Has to come first or odd things happen if locations are at the clean offset
+* Date created:	29/02/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date	Version	Author	Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	LocationClean
+Input:  Place Token Country Street County Organisation Emirate Person Company Link Facility Lookup Legislation BuildingNumber Event Feature LineBreak Location Constituency AdminArea Continent
+Options: control = all negationGrouping = false
+
+/* Remove nested Locations */
+Rule: NestedLocationRemove
+(
+	{Location}
+):location
+-->
+{
+	AnnotationSet annotationSet = bindings.get("location");
+	AnnotationSet containedSet = inputAS.getContained(annotationSet.firstNode().getOffset() + 1, annotationSet.lastNode().getOffset());
+	AnnotationSet locationSet = containedSet.get("Location");
+	outputAS.removeAll(locationSet);
+}

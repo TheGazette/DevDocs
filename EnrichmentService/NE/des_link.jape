@@ -1,0 +1,89 @@
+/*
+* Filename: 	des_assign_link.jape
+* Author:	Paul Appleby
+* Description:	Link things together that are connected
+* Date created:	30/09/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Link
+Input:  Facility Street Place County Country Token Postcode BuildingNumber
+Options: control = all negationGrouping = false
+
+/* Facility in a street */
+Rule: FacilityLink
+(
+	({Facility}):facility
+	{Token.string == ","}
+	({BuildingNumber})?
+	({Street}):street
+)
+-->
+{
+	AnnotationSet facilitySet = bindings.get("facility");
+	Annotation facilityAnn = facilitySet.iterator().next();
+	AnnotationSet streetSet = bindings.get("street");
+	Annotation streetAnn = streetSet.iterator().next();
+	facilityAnn.getFeatures().put("streetRef", streetAnn.getFeatures().get("id"));
+}
+
+
+/* Street in a place */
+Rule: StreetLink
+(
+	({Street}):street
+	{Token.string == ","}
+	({Place}):place
+)
+-->
+{
+	AnnotationSet streetSet = bindings.get("street");
+	Annotation streetAnn = streetSet.iterator().next();
+	AnnotationSet placeSet = bindings.get("place");
+	Annotation placeAnn = placeSet.iterator().next();
+	streetAnn.getFeatures().put("placeRef", placeAnn.getFeatures().get("id"));
+}
+
+
+/* Place with a postcode */
+Rule: PlaceLink
+(
+	({Place}):place
+	({Token.string == ","})?
+	({Postcode}):postcode
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+	Annotation placeAnn = placeSet.iterator().next();
+	AnnotationSet postcodeSet = bindings.get("postcode");
+	Annotation postcodeAnn = postcodeSet.iterator().next();
+	placeAnn.getFeatures().put("postcodeRef", postcodeAnn.getFeatures().get("id"));
+}
+
+
+/* Small place within a place with a postcode */
+Rule: SmallPlaceLink
+(
+	({Place}):place1
+	{Token.string == ","}
+	({Place}):place2
+	{Token.string == ","}
+	({Postcode}):postcode
+)
+-->
+{
+	AnnotationSet place1Set = bindings.get("place1");
+	Annotation place1Ann = place1Set.iterator().next();
+	AnnotationSet place2Set = bindings.get("place2");
+	Annotation place2Ann = place2Set.iterator().next();
+	place1Ann.getFeatures().put("placeRef", place2Ann.getFeatures().get("id"));
+}

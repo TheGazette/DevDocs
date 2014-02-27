@@ -1,0 +1,50 @@
+/*
+* Filename: 	des_event_clean.jape
+* Author:	Paul Appleby
+* Description:	Removes false positives for events
+* Date created:	13/08/2010
+* This version:	0.4
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 10/02/11	0.4		PA		Removed events in people
+* 14/09/10	0.3		PA		Removed events in organisations
+* 15/08/10	0.2		PA		Added EventRemove2
+*/
+
+
+Phase:	EventClean
+Input:  Facility Company Token LineBreak Street Person Event Number Lookup Organisation
+Options: control = appelt negationGrouping = false
+
+
+/* Event within ... */
+Rule: EventRemove1
+(
+	{Event within Facility} |
+	{Event within Person} |
+	{Event within Organisation}
+):event
+-->
+{
+	AnnotationSet eventSet = bindings.get("event");
+ 	outputAS.removeAll(eventSet);
+}
+
+
+/* Event that is notable day ... notable day takes precedence */
+Rule: EventRemove2
+(
+	{Event, Lookup.minorType == notable_day}
+):event
+-->
+{
+	AnnotationSet eventSet = bindings.get("event");
+ 	outputAS.removeAll(eventSet);
+}
+
+

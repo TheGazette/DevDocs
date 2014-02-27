@@ -1,0 +1,102 @@
+/*
+* Filename: 	des_location_other.jape
+* Author:	Paul Appleby
+* Description:	Annotates villages and other settlements
+* Date created:	12/08/2010
+* This version:	0.1
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 29/08/10	0.2		PA		Further work on other places
+*/
+
+
+Phase:	Location
+Input:  Split Lookup Token LineBreak Place
+Options: control = appelt negationGrouping = false
+
+
+/* ========== Other ========== */
+
+/* This rule is designed to hoover up instances that should NOT be marked as towns, e.g. Downing Street
+However, we'll allow other rules a higher priority because if they match at the same location and are 
+the same length we want the other annotation too
+*/
+Rule: OtherAvoid
+(
+	(
+		{Token.category == NNP}
+		{Lookup.majorType == location, Lookup.minorType == town}
+	) |
+	{Place}
+):otheravoid
+--> {}
+
+/* Avoid e.g. 'Charles said' */
+Rule: OtherAvoid2
+(
+	{Lookup.majorType == location}
+	{Lookup.majorType == verb, Lookup.minorType == animate}
+)
+--> {}
+
+
+
+/* For now we'll only match those followed by a city to improve disambiguation */
+Rule: Other
+Priority: 10
+(
+	{Lookup.majorType == location, Lookup.minorType == other}
+):other
+(	
+	{Token.string == ","}
+	{Place.type == city}
+)
+-->
+{
+	AnnotationSet otherSet = bindings.get("other");
+	Annotation otherAnn = otherSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	String context = "http://data.ordnancesurvey.co.uk/id/50kGazetteer/";
+	if (otherAnn.getFeatures().get("pc").toString().indexOf(",") < 0) {
+		context += otherAnn.getFeatures().get("pc");
+	}
+	else {
+		features.put("contextOptions", otherAnn.getFeatures().get("pc"));
+	}
+	features.put("context", context);
+	features.put("rule", "Other");
+	features.put("type", "other");
+	features.put("easting", otherAnn.getFeatures().get("easting"));
+	features.put("northing", otherAnn.getFeatures().get("northing"));
+	outputAS.add(otherSet.firstNode(), otherSet.lastNode(), "Place", features);
+}
+
+Rule: OtherAmbiguous
+Priority: 10
+(
+	{Lookup.majorType == location, Lookup.minorType == other, !Lookup.minorType == food}
+):other
+-->
+{
+	AnnotationSet otherSet = bindings.get("other");
+	Annotation otherAnn = otherSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	String context = "http://data.ordnancesurvey.co.uk/id/50kGazetteer/";
+	if (otherAnn.getFeatures().get("pc").toString().indexOf(",") < 0) {
+		context += otherAnn.getFeatures().get("pc");
+	}
+	else {
+		features.put("contextOptions", otherAnn.getFeatures().get("pc"));
+	}
+	features.put("context", context);
+	features.put("rule", "OtherAmbiguous");
+	features.put("type", "other");
+	features.put("easting", otherAnn.getFeatures().get("easting"));
+	features.put("northing", otherAnn.getFeatures().get("northing"));
+	outputAS.add(otherSet.firstNode(), otherSet.lastNode(), "Place", features);
+}
+

@@ -1,0 +1,35 @@
+/*
+* Filename: 	des_assign_postcode_id.jape
+* Author:	Paul Appleby
+* Description:	Assign ids to every postcode that makes sense
+* Date created:	30/09/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	AssignPostcodeIdentifiers
+Input:  Postcode
+Options: control = once negationGrouping = false
+
+
+Rule: AssignPostcodeID
+(
+	{Postcode}
+):postcode
+-->
+{
+	AnnotationSet postcodeSet = inputAS.get("Postcode");
+	List<Annotation> orderedPostcodes = gate.Utils.inDocumentOrder(postcodeSet);
+	Integer count = 0;
+	for (Annotation postcode: orderedPostcodes) {
+		postcode.getFeatures().put("id", "postcode-" + count);
+		count++;
+	}
+}

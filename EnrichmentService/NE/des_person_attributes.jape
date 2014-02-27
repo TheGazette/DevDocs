@@ -1,0 +1,80 @@
+/*
+* Filename: 	des_person_attributes.jape
+* Author:	Paul Appleby
+* Description:	Annotates people's names using existing annotations
+* Date created:	17/09/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 13/12/10	0.2		PA		Stopped age in Time
+*/
+
+
+Phase:	PersonAttributes
+Input:  Token Lookup LineBreak Person BuildingNumber Street Date Time
+Options: control = appelt negationGrouping = false
+
+
+/* Avoid getting age for person */
+Rule: AgePersonAvoid
+Priority: 10
+(
+	{Person}
+	({Token.string == ","})?
+	(
+		{Token.root == "one"} |
+		(
+			{Token.category == CD}
+			(
+				{Token.root == "st"} |
+				{Token.root == "nd"} |
+				{Token.root == "rd"} |
+				{Token.root == "th"}
+			)
+		) |
+		{Street} |
+		{BuildingNumber} |
+		{Date}
+	)
+)
+-->{}
+
+
+/* Get age for person */
+Rule: AgePerson
+(
+	({Person}):person
+	({Token.string == ","})?
+	({Token.category == CD, Token.length < 4, Token.kind == number, !Token within Time}):age
+)
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+	Annotation personAnn = personSet.iterator().next();
+	AnnotationSet ageSet = bindings.get("age");
+	String age = gate.Utils.stringFor(doc, ageSet);
+	personAnn.getFeatures().put("age", age);
+}
+
+
+/* Get age for person */
+Rule: PrefixAgePerson
+(
+	({Token.category == CD, Token.length < 4, Token.kind == number}):age
+	{Token.string == "-"}
+	{Token.root == "year-old"}
+	({Person}):person
+)
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+	Annotation personAnn = personSet.iterator().next();
+	AnnotationSet ageSet = bindings.get("age");
+	String age = gate.Utils.stringFor(doc, ageSet);
+	personAnn.getFeatures().put("age", age);
+}

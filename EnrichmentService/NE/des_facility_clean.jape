@@ -1,0 +1,72 @@
+/*
+* Filename: 	des_facility_clean.jape
+* Author:		Paul Appleby
+* Description:	Removes false positives for facilities
+* Date created:	02/08/2010
+* This version:	0.9
+* 
+*/
+
+
+Phase:	FacilityClean
+Input:  Facility Company Token LineBreak Street Person Feature Organisation Country Award Legislation
+Options: control = appelt negationGrouping = false
+
+
+/* Avoid removing facilities */
+/* In an address facility is more likely than organisation */
+Rule: FacilityAvoid
+Priority: 10
+(
+	{Facility within Organisation}
+	({Token.string == ","})?
+	{Street}
+)
+-->{}
+
+
+/* Facilities within ... */
+Rule: FacilityRemove1
+Priority: 10
+(
+	{Facility within Company, !Company within Facility} |
+	{Facility within Award} |
+	{Facility within Person} |
+	{Facility within Organisation} |
+	{Facility within Legislation} |	
+	{Facility within Street}
+):facility
+-->
+{
+	AnnotationSet facilitySet = bindings.get("facility");
+ 	outputAS.removeAll(facilitySet);
+}
+
+/* ... within Facility */
+Rule: FacilityRemove2
+(
+	{Person within Facility} |
+	{Feature within Facility}
+):annotation
+-->
+{
+	AnnotationSet annotSet = bindings.get("annotation");
+ 	outputAS.removeAll(annotSet);
+}
+
+
+/* Handle situations like '<Facility> of ... '  */
+Rule: FacilityRemove3
+(
+	(
+		{Facility}
+		{Token.root == "of"}
+		{Country}
+	)
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet facilitySet = annotationSet.get("Facility");
+	outputAS.removeAll(facilitySet);
+}

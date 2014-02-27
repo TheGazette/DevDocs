@@ -1,0 +1,6 @@
+Flyover;type=road
+Junction;type=road
+Motorway;type=road
+Roundabout;type=road
+Section;type=road
+T-Junction;type=road

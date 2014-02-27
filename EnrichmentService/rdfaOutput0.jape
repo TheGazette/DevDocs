@@ -1,0 +1,28 @@
+Phase: rdfaOutput0
+Input: Date Postcode PostcodeOwned
+Options: control = appelt
+
+Rule: ISO_Date
+(  
+  {Date.context=~".*/\\d\\d\\d\\d-\\d\\d-\\d\\d"}
+):match
+-->
+{
+	AnnotationSet matchAnnots = bindings.get("match").get("Date");
+	Annotation ann = matchAnnots.iterator().next();
+	FeatureMap annFM= ann.getFeatures();
+	
+	String context= (String) annFM.get("context");
+	String[] frags= context.split("/");
+	String isoDate= frags[frags.length-1];
+	annFM.put("isoDate",isoDate);
+}
+
+Rule: PostcodeNotOwned
+(
+  {Postcode,!PostcodeOwned}
+):match
+-->
+:match.PostcodeOwned = {
+	context=:match.Postcode.context
+}

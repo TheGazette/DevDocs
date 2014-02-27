@@ -1,0 +1,150 @@
+/*
+* Filename: 	des_location.jape
+* Author:	Paul Appleby
+* Description:	Annotates continents, countries, states/provinces, cities, etc
+* Date created:	07/05/2010
+* This version:	0.9
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 08/11/11	0.9		PA		Added category feature to Region. Added context to landmark
+* 28/09/10	0.8		PA		Tweaked TownAvoid to allow organisations
+* 22/09/10	0.7		PA		Updates to nationalities/denonyms
+* 13/09/10	0.6		PA		Added constituencies
+* 31/08/10	0.5		PA		Refactored code. Added in landmarks and locations
+* 27/08/10	0.4		PA		Fix to typo in ceremonial county
+* 28/06/10	0.3		PA		Added in provinces and LineBreak to input
+* 07/05/10	0.2		PA		Added in easting and northing detail for towns and cities
+*/
+
+
+Phase:	Location
+Input:  Split Lookup Token LineBreak
+Options: control = appelt negationGrouping = false
+
+
+/* ========== Find instances that are not locations but may match lookup */
+
+/* Here we are looking for location lookups followed by animate verbs. Obviously locations cannot talk or walk, etc.! */
+/*
+Rule: NotLocation
+Priority: 100
+(
+	{Lookup.majorType == location}
+	{Lookup.majorType == verb, Lookup.minorType == animate}
+)
+--> {}*/
+
+
+/* ========== Towns ========== */
+
+/* This rule is designed to hoover up instances that should NOT be marked as towns
+e.g. Downing Street
+*/
+
+Rule: TownAvoid
+(
+	  {Token.category == NNP, !Lookup.minorType == landmark, !Lookup.minorType == organisation}
+	  {Lookup.majorType == location, Lookup.minorType == town}
+):townavoid
+--> {}
+
+
+Rule: Town
+(
+	{Lookup.majorType == location, Lookup.minorType == town}
+):town
+-->
+{
+	AnnotationSet townSet = bindings.get("town");
+	Annotation townAnn = townSet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	String context = "http://data.ordnancesurvey.co.uk/id/50kGazetteer/";
+	if (townAnn.getFeatures().get("partial-context").toString().indexOf(",") < 0) {
+		context += townAnn.getFeatures().get("partial-context");
+	}
+	else {
+		features.put("contextOptions", townAnn.getFeatures().get("partial-context"));
+	}
+	features.put("context", context);
+	features.put("rule", "Town");
+	features.put("type", "town");
+	features.put("easting", townAnn.getFeatures().get("easting"));
+	features.put("northing", townAnn.getFeatures().get("northing"));
+	outputAS.add(townSet.firstNode(), townSet.lastNode(), "Place", features);
+}
+
+
+/* ========== Cities ========== */
+Rule: City
+(
+	{Lookup.majorType == location, Lookup.minorType == city}
+):city
+-->
+{
+	AnnotationSet citySet = bindings.get("city");
+	Annotation cityAnn = citySet.iterator().next();
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("context", "http://data.ordnancesurvey.co.uk/id/50kGazetteer/" + cityAnn.getFeatures().get("partial-context"));
+	features.put("rule", "City");
+	features.put("type", "city");
+	features.put("easting", cityAnn.getFeatures().get("easting"));
+	features.put("northing", cityAnn.getFeatures().get("northing"));
+	outputAS.add(citySet.firstNode(), citySet.lastNode(), "Place", features);
+}
+
+
+/* ========== Ceremonial Counties ========== */
+Rule: County
+(
+	{Lookup.majorType == location, Lookup.minorType == ceremonial_county}
+):county
+-->
+	:county.County = {rule = "County"}
+	
+
+/* ========== Constituencies ========== */
+Rule: Constituency
+(
+	{Lookup.majorType == location, Lookup.minorType == constituency}
+):constituency
+-->
+	:constituency.Constituency = {rule = "Constituency", context = :constituency.Lookup.context}
+
+
+/* ========== Nationalities ========== */
+
+Rule: Nationality
+(
+	{Lookup.majorType == property, Lookup.minorType == nationality}
+):nationality
+-->
+	:nationality.Nationality = {rule = "Nationality", context = :nationality.Lookup.context}
+
+Rule: Demonym
+(
+	{Lookup.majorType == property, Lookup.minorType == demonym}
+):demonym
+-->
+	:demonym.Nationality = {rule = "Demonym", context = :demonym.Lookup.context}
+
+
+/* ========== Location ========== */
+Rule: Location
+(
+	{Lookup.majorType == location, Lookup.minorType == location}
+):location
+-->
+	:location.Location = {rule = "Location"}
+
+
+/* ========== Landmark ========== */
+Rule: Landmark
+(
+	{Lookup.majorType == location, Lookup.minorType == landmark}
+):landmark
+-->
+	:landmark.Landmark = {rule = "Landmark", context = :landmark.Lookup.context}

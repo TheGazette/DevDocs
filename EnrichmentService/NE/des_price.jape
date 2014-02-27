@@ -1,0 +1,53 @@
+/*
+* Filename: 	des_price.jape
+* Author:	Paul Appleby
+* Description:	Annotates currency Lookup + number => price
+* Date created:	05/03/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Price
+Input:  Split Token Number Lookup
+Options: control = appelt negationGrouping = false
+
+
+/* e.g. US$300 */
+Rule: PricePre
+(
+  ({Lookup.majorType == location, Lookup.minorType == country})?
+  (
+  	{Token.kind == symbol, Token.symbolkind == currency} |
+  	{Lookup.majorType == symbols, Lookup.minorType == currency} 
+  ):unit
+  (
+  	{Token.kind == number} |
+  	{Number}
+  ):num
+):val
+-->
+	:val.Price = {unit=:unit.Lookup.unit, number=:num.Number.number, number=:num.Token.string, rule="PricePre" }
+	
+	
+/* e.g.	3 million US dollars */
+Rule: PricePost
+(
+  (
+  	{Token.kind == number} |
+  	{Number}
+  ):num
+  ({Lookup.majorType == location, Lookup.minorType == country})?
+  (
+  	{Token.kind == symbol, Token.symbolkind == currency} |
+  	{Lookup.majorType == symbols, Lookup.minorType == currency}
+  ):unit
+):val
+-->
+	:val.Price = {unit=:unit.Lookup.unit, number=:num.Number.number, number=:num.Token.string, rule="Price" }

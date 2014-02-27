@@ -1,0 +1,176 @@
+/*
+* Filename: 	des_company_resolution.jape
+* Author:		Paul Appleby
+* Description:	Removes false positives for companies
+* Date created:	20/10/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version	Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	CompanyResolution
+Input:  Company
+Options: control = once negationGrouping = false
+
+Rule: CompanyResolve
+(
+	({Company}):company
+)
+-->
+{
+
+	AnnotationSet companySet = inputAS.get("Company");
+	Map<String, Boolean> companies = new HashMap<String, Boolean>();
+	boolean isBusinessDocument = false;
+	if (doc.getFeatures().get("category") != null) {
+		if (doc.getFeatures().get("category").toString().equals("business")) {
+			isBusinessDocument = true;
+		}
+	}
+	
+	for (Annotation companyAnn: companySet) {
+		// Now get the tokens
+		AnnotationSet tokenSet = inputAS.get("Token", companyAnn.getStartNode().getOffset(),
+			companyAnn.getEndNode().getOffset());
+
+		String companyName = gate.Utils.stringFor(doc, companyAnn);
+		if (!companies.containsKey(companyName)) {
+
+			if (tokenSet.size() == 1) {
+
+				// Only process companies with single word names
+				//System.out.println("\nTesting name: " + companyName);
+
+				Annotation tokenAnn = tokenSet.iterator().next();
+
+				Boolean isCompany = false;
+				Boolean wordnet = false;
+				Boolean paraCompanies = false;
+				Boolean varOrthCompany = false;
+				
+				if (companyAnn.getFeatures().get("variableOrth") != null) varOrthCompany = true;
+
+				AnnotationSet paraSet = inputAS.get("Paragraph",
+					companyAnn.getStartNode().getOffset(),
+					companyAnn.getEndNode().getOffset());
+
+				// Many companies use acronyms. If so and not allCaps para we'll assume company is correct
+				if (tokenAnn.getFeatures().get("orth") != null) {
+					if (tokenAnn.getFeatures().get("orth").equals("allCaps")) {
+
+						AnnotationSet paraTokenSet = inputAS.get("Token",
+							paraSet.firstNode().getOffset(),
+							paraSet.lastNode().getOffset());
+
+						int capsCount = 0;
+						int nonCapsCount = 0;
+
+						for (Annotation paraTokenAnn: paraTokenSet) {
+							if (paraTokenAnn.getFeatures().get("orth") != null) {
+								String orth = paraTokenAnn.getFeatures().get("orth").toString();
+								if (orth.equals("allCaps")) capsCount++;
+								else nonCapsCount++;
+							}
+						}
+
+						//System.out.println("Caps: " + capsCount);
+						//System.out.println("Lowercase: " + nonCapsCount);
+						if (nonCapsCount > capsCount) isCompany = true;
+						// Word on its own?
+						if (nonCapsCount == 0 && capsCount == 1 && isBusinessDocument) isCompany = true;
+					}
+				}
+
+				if (!isCompany) {
+					// For companies that are NN or NNP
+					String category = tokenAnn.getFeatures().get("category").toString();
+					if (category.equals("NN") || category.equals("NNP")) {		
+						if (tokenAnn.getFeatures().get("wordTypes") != null) {
+							// We will leave companies that have no word type ... indicates some kind of non-word which
+							// many company names are
+							if (tokenAnn.getFeatures().get("wordTypes").toString().isEmpty()) {
+								String wordOrigin = "";
+								if (tokenAnn.getFeatures().get("wordOrigin") != null)
+									wordOrigin = tokenAnn.getFeatures().get("wordOrigin").toString();
+								// But only if not at the start of a sentence or after a linebreak
+								// or if a business document and not an adjective origin!
+								if (!wordOrigin.equals("Adjective") &&
+									(isBusinessDocument ||
+									(tokenAnn.getFeatures().get("lineBreakPosition") == null &&
+										tokenAnn.getFeatures().get("sentencePosition") == null))) {
+									wordnet = true;
+								}
+							}
+						}
+					}
+
+					// Okay so we'll check if there are other companies mentioned in the paragraph
+					// but they need to be longer than one token (or it must be a business document)
+					// otherwise they may also be ambiguous
+
+					AnnotationSet paraCompanySet = inputAS.get("Company",
+						paraSet.firstNode().getOffset(),
+						paraSet.lastNode().getOffset());		
+					if (!wordnet && paraCompanySet.size() > 1 && !varOrthCompany) {
+						for (Annotation companyParaAnn: paraCompanySet) {
+							String companyParaName = gate.Utils.stringFor(doc, companyParaAnn);
+							if (!companyName.equals(companyParaName)) {
+								boolean varOrthParaCompany = false;
+								if (companyParaAnn.getFeatures().get("variableOrth") != null) varOrthParaCompany = true;
+								AnnotationSet tokenParaSet = inputAS.get("Token", companyParaAnn.getStartNode().getOffset(),
+									companyParaAnn.getEndNode().getOffset());
+								// If a multi-word company or it is a business document or another company close by then we'll assume it's a company
+								// But don't consider companies that have variable surrounding orthography ...
+								if (tokenParaSet.size() > 1 || isBusinessDocument ||
+									(Math.abs(companyAnn.getStartNode().getOffset() -
+										companyParaAnn.getEndNode().getOffset()) < 10 && !varOrthParaCompany) ||
+									(Math.abs(companyAnn.getEndNode().getOffset() -
+										companyParaAnn.getStartNode().getOffset()) < 10 && !varOrthParaCompany)) {
+									paraCompanies = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+
+				// If either WordNet indicates a company or other companies mentioned assume company
+				if (wordnet || paraCompanies) isCompany = true;
+
+				if (isCompany) companies.put(companyName, isCompany);
+
+			}
+			else {
+				// Test if it is a company/person conflict
+				AnnotationSet personSet = inputAS.get("Person", companyAnn.getStartNode().getOffset(),
+					companyAnn.getEndNode().getOffset());
+				if (personSet.size() > 0) {
+					// Okay so we'll check if there are other companies mentioned in the paragraph			
+					AnnotationSet paraSet = inputAS.get("Paragraph",
+						companyAnn.getStartNode().getOffset(),
+						companyAnn.getEndNode().getOffset());
+					AnnotationSet paraCompanySet = inputAS.get("Company",
+						paraSet.firstNode().getOffset(),
+						paraSet.lastNode().getOffset());		
+					if (paraCompanySet.size() > 1) 	companies.put(companyName, true);
+				}
+				else companies.put(companyName, true);
+			}
+		}
+	}
+
+	// Now iterate again and mark confirmed companies
+	for (Annotation companyAnn: companySet) {
+		String companyName = gate.Utils.stringFor(doc, companyAnn);
+		if (companies.containsKey(companyName)) {
+			companyAnn.getFeatures().put("confirmed", "yes");
+		}
+	}
+	
+}

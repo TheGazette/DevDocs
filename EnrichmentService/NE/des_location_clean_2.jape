@@ -1,0 +1,95 @@
+/*
+* Filename: 	des_location_clean_2.jape
+* Author:	Paul Appleby
+* Description:	Removes more false positives for locations - in appelt mode
+* Date created:	17/06/2010
+* This version:	0.2
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 14/09/10	0.2		PA		Removed streets in places
+*/
+
+
+Phase:	LocationClean
+Input:  Token County Organisation Place Street Lookup Person
+Options: control = appelt negationGrouping = false
+
+
+/* Counties within an organisation */
+Rule: PlaceRemove1
+(
+	{County within Organisation}
+):county
+-->
+{
+	AnnotationSet countySet = bindings.get("county");
+ 	outputAS.removeAll(countySet);
+}
+
+
+/* Avoid removing streets under certain instances */
+Rule: PlaceRemove2
+(
+	{Street within Person}
+	({Token.string == ","})?
+	{Place}
+)
+-->{}
+
+
+/* Street within ... */
+Rule: PlaceRemove2
+(
+	{Street within Person} |
+	{Street within Place}
+):street
+-->
+{
+	AnnotationSet streetSet = bindings.get("street");
+ 	outputAS.removeAll(streetSet);
+}
+
+
+
+/* Counties within ... */
+Rule: PlaceRemove3
+(
+	{County within Place}
+):county
+-->
+{
+	AnnotationSet countySet = bindings.get("county");
+ 	outputAS.removeAll(countySet);
+}
+
+
+/* Remove places that are first names */
+Rule: PlaceRemove4
+(
+	{Lookup.minorType == relation}
+	({Token.string == ","})?
+	({Place.type == other, Place.rule == OtherAmbiguous}):place
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+ 	String place = gate.Utils.stringFor(doc, placeSet);
+
+	// Remove similarly named places elsewhere
+	AnnotationSet placeToTestSet = inputAS.get("Place");
+
+	// Iterate over all places annotations to see if we have a match
+	for (Annotation placeAnn: placeToTestSet)	{
+		String placeToTest = gate.Utils.stringFor(doc, placeAnn);
+		// A match!
+		if (placeToTest.equals(place)) doc.getAnnotations("DES").remove(placeAnn);
+	}
+ 	
+}
+

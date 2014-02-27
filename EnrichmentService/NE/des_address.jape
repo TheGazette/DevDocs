@@ -1,0 +1,273 @@
+/*
+* Filename: 	des_address.jape
+* Author:	Paul Appleby
+* Description:	Annotates addresses
+* Date created:	15/06/2010
+* This version:	0.13
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 29/11/11	0.13		PA		Removed avoid starting with DT
+* 19/10/11	0.12		PA		Added in Wordnet wordTypes
+* 05/10/11	0.11		PA		Improvements to possesion as part of street name
+* 27/09/10	0.10		PA		Stopped PRP$ as part of street
+* 18/09/10	0.9		PA		Stopped JJ at the start of street
+* 28/08/10	0.8		PA		Introduced not street name
+* 24/08/10	0.7		PA		Removed TO from street names
+* 05/08/10	0.6		PA		Added in disambiugation on StreetAmbiguous.
+						Added in apostrophe to names
+						Added in upper case streets
+						Stopped streets containing courts
+* 02/08/10	0.5		PA		Added in st to start of street name and directions
+* 28/06/10	0.4		PA		Disallowed IN tokens from streets
+* 27/06/10	0.3		PA		Added in ambiguous street matching
+* 15/06/10	0.2		PA		Added DoubleStreet
+*/
+
+
+Phase:	Location
+Input:  Split Lookup Token LineBreak Place PartialPostcode Facility
+Options: control = appelt negationGrouping = false
+
+Macro: POSSESSION
+(
+	(
+		(
+			{Token.string == "\u2019"} |
+			{Token.string == "'"}
+		)
+		{Token.root == "s"}
+	) |
+	{Token.root == "'s"}
+)
+
+/* 1-2, 3A-5B, 45 and 46 Church St, 5/6 Kings Road, etc and with an optional direction appended */
+Macro: BUILDINGNUMBER
+(
+	(
+		{Token.kind == number}
+		{Token.category == "CC"}
+	)?
+	{Token.kind == number}
+	({Token.orth == allCaps, Token.length == 1})?
+	(
+		(
+			{Token.string == "/"}
+			|
+			{Token.string == "-"}
+		)
+		{Token.kind == number}
+		({Token.orth == allCaps, Token.length == 1})?
+	)?
+)
+
+
+Macro: STREETNAME
+(
+	(
+		(
+			(
+				(
+					{Token.root == "st"}
+					({Token.string == "."})?
+					{Token.orth == upperInitial, Token.category != "TO",
+						Token.category != "IN", Token.category != "CC",
+						Token.category != "PRP$", Token.category != "JJ",
+						!Token.wordTypes == time,
+						!Lookup.minorType == court, !Lookup.minorType == not_street_name}
+					(POSSESSION)
+				) |
+				(
+					{Token.orth == upperInitial, Token.category != "TO",
+						Token.category != "IN", Token.category != "CC",
+						Token.category != "PRP$", Token.category != "JJ",						
+						!Token.wordTypes == time, Token.length > 1,
+						!Lookup.minorType == court, !Lookup.minorType == not_street_name,
+						!Lookup.minorType == city, !Lookup.minorType == non_uk_city}
+					(POSSESSION)
+				) |
+				(
+					{Token.root == "st"}
+					({Token.string == "."})?
+					{Token.orth == upperInitial, Token.category != "TO",
+						Token.category != "IN", Token.category != "CC",
+						Token.category != "PRP$", Token.category != "JJ",						
+						!Lookup.minorType == court, !Lookup.minorType == not_street_name}
+				) |
+				(
+					{Token.orth == upperInitial, Token.category != "TO",
+						Token.category != "IN", Token.category != "CC",
+						Token.category != "PRP$", Token.category != "JJ",
+						Token.length > 1,
+						!Lookup.minorType == court, !Lookup.minorType == not_street_name}
+				)
+			)
+			(
+				{Token.orth == upperInitial, Token.category != "IN", Token.category != "CC",
+					Token.category != "PRP$", Token.length > 1,
+					!Lookup.minorType == court, !Lookup.minorType == not_street_name}
+				(POSSESSION)?
+			)*
+			{Lookup.majorType == location, Lookup.minorType == street_name}
+			(
+				{Token.string == "East"} |
+				{Token.string == "West"} |
+				{Token.string == "North"} |
+				{Token.string == "South"}
+			)?
+		) |
+		(
+			(
+				(
+					{Token.root == "st"}
+					({Token.string == "."})?
+					{Token.orth == allCaps, Token.category != "TO",
+						Token.category != "IN", Token.category != "CC",
+						Token.category != "PRP$", Token.category != "JJ",		
+						!Token.wordTypes == time,
+						!Lookup.minorType == court, !Lookup.minorType == not_street_name}
+					(POSSESSION)
+				) |
+				(
+					{Token.orth == allCaps, Token.category != "TO",
+						Token.category != "IN", Token.category != "CC",
+						Token.category != "PRP$", Token.category != "JJ",						
+						!Token.wordTypes == time, Token.length > 1,
+						!Lookup.minorType == court, !Lookup.minorType == not_street_name,
+						!Lookup.minorType == city, !Lookup.minorType == non_uk_city}
+					(POSSESSION)					
+				) |
+				(
+					{Token.root == "st"}
+					({Token.string == "."})?
+					{Token.orth == allCaps, Token.category != "TO",
+						Token.category != "IN", Token.category != "CC",
+						Token.category != "PRP$", Token.category != "JJ",						
+						!Lookup.minorType == court, !Lookup.minorType == not_street_name}
+				) |
+				(
+					{Token.orth == allCaps, Token.category != "TO",
+						Token.category != "IN", Token.category != "CC",
+						Token.category != "PRP$", Token.category != "JJ",
+						Token.length > 1,
+						!Lookup.minorType == court, !Lookup.minorType == not_street_name}
+				)
+			)
+			(
+				{Token.orth == allCaps, Token.category != "IN", Token.category != "TO",
+					Token.category != "PRP$", Token.category != "CC", Token.length > 1,
+					!Lookup.minorType == court, !Lookup.minorType == not_street_name}
+				(POSSESSION)?
+			)*
+			{Lookup.majorType == location, Lookup.minorType == street_name}
+			(
+				{Token.string == "EAST"} |
+				{Token.string == "WEST"} |
+				{Token.string == "NORTH"} |
+				{Token.string == "SOUTH"}
+			)?
+		)
+	)
+)
+
+
+/* If following DT, VBZ or VBN extremely unlikely to be a street
+	Also avoid terms like 'on road' and 'off street parking' */
+Rule: StreetAmbiguousAvoid
+Priority: 10
+(
+	(
+		(
+			{Token.category == VBN}
+		)
+		(STREETNAME)
+	) |
+	(
+		(
+			{Token.root == "on"} |
+			{Token.root == "off"}
+		)
+		{Token.orth == lowercase, Lookup.majorType == location, Lookup.minorType == street_name}
+	)
+)
+-->
+	{}
+
+
+Rule: Street
+(
+	({Facility})?
+	(BUILDINGNUMBER)?:number
+	(STREETNAME):street
+	(
+		(
+			{Token.string == ","}
+		)?
+		(
+			{PartialPostcode}
+		):postcode
+	)?
+)
+-->
+{
+	AnnotationSet street = bindings.get("street");
+	AnnotationSet number = bindings.get("number");
+	AnnotationSet postcode = bindings.get("postcode");	
+	
+	Long streetStart = street.firstNode().getOffset();
+	Long streetEnd = street.lastNode().getOffset();
+	
+	AnnotationSet tokens = inputAS.get("Person", streetStart, streetEnd);
+	Iterator<Annotation> personItr = tokens.iterator();
+	boolean markAsStreet = true;
+	
+	//System.out.println("Street start: " + streetStart + ", end: " + streetEnd);
+	
+	// Now we'll test for crossover street/person combinations
+	while (personItr.hasNext() && markAsStreet == true) {
+		Annotation personAnn = personItr.next();
+		Long personStart = personAnn.getStartNode().getOffset();
+		Long personEnd = personAnn.getEndNode().getOffset();
+		//System.out.println("Person start: " + personStart + ", end: " + personEnd);
+		if (personEnd > streetEnd) markAsStreet = false;
+	}	
+	
+	if (markAsStreet) {
+		try {
+			FeatureMap features = Factory.newFeatureMap();
+			features.put("rule", "Street");
+			// Calculate id for this street instance
+			Iterator<Annotation> streetTestItr = doc.getAnnotations("DES").get("Street").iterator();
+			Integer streetTestCount = 0;
+			while (streetTestItr.hasNext()) {
+				Annotation streetTestAnn = streetTestItr.next();
+				Long streetTestStart = gate.Utils.start(streetTestAnn);
+				if (streetTestStart < streetStart) streetTestCount++;
+			}
+			features.put("id", "street-" + streetTestCount);
+			outputAS.add(streetStart, streetEnd, "Street", features);
+			if (number != null) {
+				Long numberStart = number.firstNode().getOffset();
+				Long numberEnd = number.lastNode().getOffset();
+				FeatureMap numberFeatures = Factory.newFeatureMap();
+				numberFeatures.put("rule", "BuildingNumber");
+				numberFeatures.put("streetRef", "street-" + streetTestCount);
+				outputAS.add(numberStart, numberEnd, "BuildingNumber", numberFeatures);
+			}
+			if (postcode != null) {
+				Long postcodeStart = postcode.firstNode().getOffset();
+				Long postcodeEnd = postcode.lastNode().getOffset();
+				FeatureMap numberFeatures = Factory.newFeatureMap();
+				numberFeatures.put("rule", "PartialPostcode");
+				numberFeatures.put("streetRef", "street-" + streetTestCount);
+				outputAS.add(postcodeStart, postcodeEnd, "Postcode", numberFeatures);
+			}
+		}
+		catch (Exception e) {
+			System.err.println("Could not add street annotation: " + e.getMessage());
+		}
+	}
+}

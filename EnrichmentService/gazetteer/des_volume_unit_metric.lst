@@ -1,0 +1,44 @@
+﻿cubic metres;unit=l;count=1000
+cubic meters;unit=l;count=1000
+cubic metre;unit=l;count=1000
+cubic meter;unit=l;count=1000
+cubic centimetres;unit=ml;count=1
+cubic centimeters;unit=ml;count=1
+cubic centimetre;unit=ml;count=1
+cubic centimeter;unit=ml;count=1
+microlitres;unit=ml;count=0.001
+microliters;unit=ml;count=0.001
+microlitre;unit=ml;count=0.001
+microliter;unit=ml;count=0.001
+millilitres;unit=ml;count=1
+milliliters;unit=ml;count=1
+millilitre;unit=ml;count=1
+milliliter;unit=ml;count=1
+centilitres;unit=l;count=0.01
+centiliters;unit=l;count=0.01
+centilitre;unit=l;count=0.01
+centiliter;unit=l;count=0.01
+decilitres;unit=l;count=0.1
+deciliters;unit=l;count=0.1
+decilitre;unit=l;count=0.1
+decileter;unit=l;count=0.1
+litres;unit=l;count=1
+liters;unit=l;count=1
+litre;unit=l;count=1
+liter;unit=l;count=1
+decalitres;unit=l;count=10
+decaliters;unit=l;count=10
+decalitre;unit=l;count=10
+decaliter;unit=l;count=10
+megalitres;unit=l;count=1000000
+megaliters;unit=l;count=1000000
+megalitre;unit=l;count=1000000
+megaliter;unit=l;count=1000000
+gigalitres;unit=l;count=1000000000
+gigaliters;unit=l;count=1000000000
+gigalitre;unit=l;count=1000000000
+gigaliter;unit=l;count=1000000000
+cm3;unit=ml;count=1
+ml;unit=ml;count=1
+l;unit=l;count=1
+μl;unit=ml;count=0.001

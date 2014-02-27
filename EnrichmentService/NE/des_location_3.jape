@@ -1,0 +1,38 @@
+/*
+* Filename: 	des_location_3.jape
+* Author:	Paul Appleby
+* Description:	More location matches separate out from first pass to avoid rule clashes
+* Date created:	21/11/11
+* This version:	0.1
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Location3
+Input:  Split Lookup Token LineBreak
+Options: control = appelt negationGrouping = false
+
+
+/* ========== Countries ========== */
+Rule: Country
+(
+	{Lookup.majorType == location, Lookup.minorType == country}
+):country
+-->
+	:country.Country = {rule = "Country", context = :country.Lookup.context}
+
+
+/* ========== Emirates ========== */
+Rule: Emirate
+(
+  	{Lookup.majorType == location, Lookup.minorType == emirate}
+):emirate	
+-->
+	:emirate.Emirate = {rule = "Emirate"}
+
+

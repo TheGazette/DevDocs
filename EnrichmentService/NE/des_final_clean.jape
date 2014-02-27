@@ -1,0 +1,53 @@
+/*
+* Filename: 	des_final_clean.jape
+* Author:	Paul Appleby
+* Description:	Any final document clean-up
+* Date created:	02/09/2010
+* This version:	0.5
+* 
+*/
+
+
+Phase:	FinalClean
+Input:  Place Country AdminArea Company
+Options: control = all negationGrouping = false
+
+Rule: RemoveAdminAreaPosition
+(
+	{AdminArea.documentPosition != ""} |
+	{Place.documentPosition != ""} |
+	{Company.documentPosition != ""}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	Annotation annotationAnn = annotationSet.iterator().next();
+ 	annotationAnn.getFeatures().remove("documentPosition");
+}
+
+
+Rule: RemoveCompanyConfirmation
+(
+	{Company}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	Annotation annotationAnn = annotationSet.iterator().next();
+	if (annotationAnn.getFeatures().get("confirmed") != null) {
+ 		annotationAnn.getFeatures().remove("confirmed");
+ 	}
+	if (annotationAnn.getFeatures().get("variableOrth") != null) {
+ 		annotationAnn.getFeatures().remove("variableOrth");
+ 	}
+}
+
+Rule: RemoveCompanyInPosition
+(
+	{Company within TempPosition}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	outputAS.removeAll(annotationSet);
+}

@@ -1,0 +1,72 @@
+/*
+* Filename: 	des_postcode.jape
+* Author:	Paul Appleby
+* Description:	Annotates UK postcodes. Regular expression from http://en.wikipedia.org/wiki/UK_postcodes
+* Date created:	06/12/2010
+* This version:	0.5
+* 
+* * Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 06/12/10	0.5		PA		Added in Postcode rule feature
+* 01/11/10	0.4		PA		Added in URIs for postcodes
+* 08/09/10	0.3		PA		Adjusted spacing/linebreak logic
+* 03/09/10	0.2		PA		Added in easting/northing
+*/
+
+
+Phase:	Postcode
+Input:  Split Token SpaceToken LineBreak Lookup
+Options: control = appelt negationGrouping = false
+
+
+/* Annotates partial postcodes, e.g. N8, EC1AA */
+Rule: PartialPostcode
+(
+	{SpaceToken} |
+	{LineBreak}
+)
+(
+	{Lookup.majorType == postcode}
+	({Token.string ==~ "[A-Z]{1,2}"})?
+):postcode
+(
+	{Token.kind == punctuation} |
+	{SpaceToken} |
+	{LineBreak}
+)
+-->
+	:postcode.PartialPostcode = {rule = "PartialPostcode", easting = :postcode.Lookup.easting, northing = :postcode.Lookup.northing}
+
+
+/* Annotates full postcodes */
+Rule: Postcode
+(
+	{SpaceToken} |
+	{LineBreak}
+)?
+(
+	({Lookup.majorType == postcode}):postcodePart
+	({Token.string ==~ "[A-Z]{1,2}"})?
+	({SpaceToken})*
+	{Token.string ==~ "[0-9]"}
+	{Token.string ==~ "[ABD-HJLNP-UW-Z]{2}"}
+):postcode
+-->
+{
+	AnnotationSet postcodeSet = bindings.get("postcode");
+	Annotation lookupAnn = bindings.get("postcodePart").iterator().next();
+
+	String postcodeUnit = gate.Utils.stringFor(doc, postcodeSet);
+	// Postcode unit needs spaces stripping
+	postcodeUnit = postcodeUnit.replace(" ", "");
+
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("context", "http://data.ordnancesurvey.co.uk/id/postcodeunit/" + postcodeUnit);
+	features.put("easting", lookupAnn.getFeatures().get("easting").toString());
+	features.put("rule", "Postcode");
+	features.put("northing", lookupAnn.getFeatures().get("northing").toString());
+	outputAS.add(postcodeSet.firstNode(), postcodeSet.lastNode(), "Postcode", features);
+}	

@@ -1,0 +1,144 @@
+/*
+* Filename: 	des_II_person.jape
+* Author:	Paul Appleby
+* Description:	Annotates people's names using existing annotations
+* Date created:	17/08/2010
+* This version:	0.5
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 11/10/11	0.5		PA		Added organisations and nationalities into position
+* 02/11/10	0.4		PA		Add cities to PositionNameOf and LookupNameOf
+* 08/09/10	0.3		PA		Added position to 'Rule of' type rule
+* 22/08/10	0.2		PA		Added in counties
+*/
+
+
+Phase:	PersonII
+Input:  Token Lookup LineBreak Person Country Position Emirate County Place Organisation Company Nationality
+Options: control = appelt negationGrouping = false
+
+
+/* Extend names to 'BP Chief Executive Tony Hayward' */
+Rule: OrganisationPositionPerson
+(
+	(
+		{Company} |
+		{Organisation} |
+		{Nationality} |
+		{Country}
+	):organisation
+	({Person, Position}):person
+):extendedPerson
+-->
+{
+
+	AnnotationSet personPositionSet = bindings.get("person");
+	AnnotationSet positionSet = personPositionSet.get("Position");
+	AnnotationSet extendedPersonSet = bindings.get("extendedPerson");
+	Annotation positionAnn = positionSet.iterator().next();
+	AnnotationSet personSet = personPositionSet.get("Person");
+	Annotation personAnn = personSet.iterator().next();
+	outputAS.add(extendedPersonSet.firstNode(), extendedPersonSet.lastNode(), "Person", personAnn.getFeatures()); 	
+	outputAS.add(extendedPersonSet.firstNode(), positionAnn.getEndNode(), "Position", positionAnn.getFeatures()); 	
+	outputAS.remove(personAnn);
+	outputAS.remove(positionAnn);
+}
+
+
+/* Extend names to 'President Obama of America' */
+Rule: PersonNameOf
+(
+	({Person}):person
+	{Token.string == "of"}
+	({Country}):country
+):extendedPerson
+-->
+{
+	AnnotationSet personSet = bindings.get("person");
+	Annotation personAnn = personSet.iterator().next();
+	AnnotationSet extendedPersonSet = bindings.get("extendedPerson");
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "PositionNameOf");
+	outputAS.add(extendedPersonSet.firstNode(), extendedPersonSet.lastNode(), "Person", features); 	
+	outputAS.remove(personAnn);
+}
+
+/* Extend names to 'King John of Scotland', 'The Duchess of Cornwall' */
+Rule: PositionNameOf
+(
+	({Position}):position
+	{Token.string == "of"}
+	(
+		{Country} |
+		{Place.type == city} |
+		{County} |
+		{Emirate}
+	):country
+):extendedPerson
+-->
+{
+	AnnotationSet extendedPersonSet = bindings.get("extendedPerson");
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "PositionNameOf");
+	outputAS.add(extendedPersonSet.firstNode(), extendedPersonSet.lastNode(), "Person", features); 	
+}
+
+/* Avoid Extended name lookups, e.g. 'King of Scotland ' */
+Rule: AvoidLookupNameOf
+(
+	(
+		(
+			{Lookup.majorType == position, Lookup.minorType == position} |
+			{Lookup.majorType == name, Lookup.format == nobility}
+		):person
+		{Token.string == "of"}
+		(
+			{Country} |
+			{Place.type == city} |
+			{County} |
+			{Emirate}
+		):country
+	):extendedPerson
+	(
+		{Token.orth == apostrophe} |
+		{Token.string == "\u2019"}
+	)
+)
+-->
+{}
+
+
+/* Extended name lookups, e.g. 'King of Scotland ' */
+Rule: LookupNameOf
+(
+	(
+		(
+			{Lookup.majorType == position, Lookup.minorType == position} |
+			{Lookup.majorType == name, Lookup.format == nobility}
+		):person
+		{Token.string == "of"}
+		(
+			{Country} |
+			{Place.type == city} |
+			{County} |
+			{Emirate}
+		):country
+	):extendedPerson
+)
+-->
+{
+	AnnotationSet extendedPersonSet = bindings.get("extendedPerson");
+	AnnotationSet personSet = bindings.get("person");
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "LookupNameOf");
+	FeatureMap features2 = Factory.newFeatureMap();
+	features2.put("rule", "LookupNameOf");
+	outputAS.add(personSet.firstNode(), personSet.lastNode(), "Position", features); 	
+	outputAS.add(extendedPersonSet.firstNode(), extendedPersonSet.lastNode(), "Person", features2); 	
+}
+

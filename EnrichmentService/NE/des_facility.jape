@@ -1,0 +1,227 @@
+/*
+* Filename: 	des_facility.jape
+* Author:	Paul Appleby
+* Description:	Annotates facilities. A facility is defined as a man-made structure
+* Date created:	02/08/2010
+* This version:	0.12
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 21/02/11	0.12		PA		Tweaked for performance
+* 09/02/11	0.11		PA		Added context
+* 15/01/11	0.10		PA		Added in compound facilities
+* 13/12/10	0.9		PA		Allowed organisation as first part of facility
+* 27/09/10	0.8		PA		Extended BuildingPart
+* 21/09/10	0.7		PA		Tweak to avoid rules to stop places getting sucked in
+* 14/09/10	0.6		PA		Added in 'St.' to facility term and name_non_matches and BuildingPart
+* 09/09/10	0.5		PA		Tweaked FacilityWithKey match
+* 01/09/10	0.4		PA		Allowed apostrophes in term match
+* 27/08/10	0.3		PA		Added length check to facility term and avoids
+* 15/08/10	0.2		PA		Allowed years in facility names - mainly for sports based stadia
+*/
+
+
+Phase:	Facility
+Input:  Split Token Lookup LineBreak Place
+Options: control = appelt negationGrouping = false
+
+Macro: POSSESSION
+(
+	(
+		(
+			{Token.string == "\u2019"} |
+			{Token.string == "'"}
+		)
+		{Token.string == "s"}
+	) |
+	{Token.string == "'s"}
+)
+
+
+Macro: BUILDINGPART
+(
+	(
+		{Token.root ==~ "[0-9]+st"} |
+		{Token.root ==~ "[0-9]+nd"} |
+		{Token.root ==~ "[0-9]+rd"} |
+		{Token.root ==~ "[0-9]+th"}
+	)
+	(
+		{Token.root == "floor"}
+	)
+	(
+		{Token.string == "("}
+		(
+			{Token.root == "east"} |
+			{Token.root == "west"} |
+			{Token.root == "north"} |
+			{Token.root == "south"}
+		)
+		{Token.string == ")"}
+	)?
+)
+
+
+Macro: FACILITYTERM
+(
+	(
+		{Token.root == "st"}
+		({Token.string == "."})?
+		(
+			{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation", Token.length > 1,
+					!Lookup.minorType == name_non_matches, !Lookup.minorType == award}
+			(POSSESSION)
+		)?
+	) |
+	(
+		{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation", Token.length > 1,
+				!Lookup.minorType == name_non_matches, !Lookup.minorType == award, !Lookup.majorType == location}
+		(POSSESSION)
+	) |
+	(
+		{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation", Token.length > 1,
+				!Lookup.minorType == name_non_matches, !Lookup.minorType == award}
+	) |
+	{Token.orth == upperInitial, Token.category == JJ, Token.length > 1} |
+	{Token.category == CD, Token.length == 4, Token.kind == number} |
+	(
+		{Token.string == "("}
+		({Token.string != ")"})+
+		{Token.string == ")"}
+	) |
+	(
+		{Token.orth == allCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", Token.length > 1,
+				!Lookup.minorType == name_non_matches, !Lookup.minorType == award, !Lookup.majorType == location}	
+		(POSSESSION)
+	) |
+	(
+		{Token.orth == allCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", Token.length > 1,
+				!Lookup.minorType == name_non_matches, !Lookup.minorType == award}	
+	)
+)
+
+/* Part of a building, e.g. '2nd Floor (East)' */
+Rule: BuildingPart
+Priority: 10
+(BUILDINGPART):part
+-->
+	:part.BuildingPart = {rule = "BuildingPart"}
+
+
+/* Will pick up basic facilities sequences */
+Macro: FACILITYTERMSEQ
+(
+	(FACILITYTERM)+
+)
+
+
+/* Facility such as Chequers */
+Rule: Facility
+(
+	{Lookup.majorType == facility, Lookup.minorType == facility}
+):facility
+-->
+	:facility.Facility = {rule = "Facility", context =:facility.Lookup.context}
+
+
+/* Avoid certain patterns that might otherwise get sucked in */
+Rule: FacilityAvoid
+(
+	(
+		{Token.category == CD}
+		{Lookup.majorType == units}
+	)
+)
+--> {}
+
+
+/* Facilities such as Buckingham Palace - we'll only allow upper initial to avoid ambiguity */
+Rule: FacilityWithKeyWithAvoid
+Priority: 5
+(
+	(
+		{Lookup.minorType == city}
+		{Token.category == POS}
+	)
+	(
+		(FACILITYTERMSEQ)
+		{Lookup.majorType == facility, Lookup.minorType == facility_type, !Lookup contains {Token.orth == lowercase}}
+	):facility
+)
+-->
+	:facility.Facility = {rule = "FacilityWithKeyWithAvoid"}
+
+
+Rule: FacilityWithKey
+(
+	(
+		(FACILITYTERMSEQ) |
+		{Lookup.majorType == organisation, Lookup.minorType != organisation_type}
+	)
+	{Lookup.majorType == facility, Lookup.minorType == facility_type, !Lookup contains {Token.orth == lowercase}, Lookup within Token, Token within Lookup}
+):facility
+-->
+	:facility.Facility = {rule = "FacilityWithKey"}
+
+
+/* Organisations such as the 'Royal College of Nursing', or 'Central Saint Martins College of Art and Design' */
+Rule: CompoundFacility
+(
+	{!Token.category == TO}
+	(
+		(FACILITYTERMSEQ)
+		{Lookup.majorType == facility, Lookup.minorType == facility_type, !Lookup contains {Token.orth == lowercase}}
+		{Token.root == "for"}
+		(
+			(
+				(
+					({Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation})+
+					{Token.orth == upperInitial, Token.category == NNPS, !Lookup.minorType == organisation}
+				)+
+			) |
+			(
+				(
+					({Token.orth == allCaps, Token.category == NNP, !Lookup.minorType == organisation})+
+					{Token.orth == allCaps, Token.category == NNPS, !Lookup.minorType == organisation}
+				)+
+			) |
+			(
+				(
+					{Token.orth == upperInitial, Token.category == NNPS, !Lookup.minorType == organisation} |
+					{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation} |		
+					{Token.orth == allCaps, Token.category == NNPS, !Lookup.minorType == organisation}
+				)+
+			) |
+			(
+				(
+					{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation} |
+					{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation} |
+					{Token.orth == allCaps, Token.category == NNP, !Lookup.minorType == organisation}
+				)+
+			) |		
+			(
+				(
+					{Token.orth == upperInitial, Token.category == NNPS, !Lookup.minorType == organisation} |
+					{Token.orth == allCaps, Token.category == NNPS, !Lookup.minorType == organisation}
+				)
+				{Token.category == CC}
+				{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation}
+			) |
+			(
+				(
+					{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation} |
+					{Token.orth == allCaps, Token.category == NNP, !Lookup.minorType == organisation}
+				)
+				{Token.category == CC}
+				{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation}
+			)
+		)
+	):facility
+)
+-->
+	:facility.Facility = {rule = "CompoundFacility"}
+

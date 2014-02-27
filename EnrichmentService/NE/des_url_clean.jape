@@ -1,0 +1,33 @@
+/*
+* Filename: 	des_url_clean.jape
+* Author:	Paul Appleby
+* Description:	Remove any annnotations in Links
+* Date created:	29/06/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	UrlClean
+Input:  SpaceToken Token Company Organisation Person Link
+Options: control = all negationGrouping = false
+
+
+Rule: UrlRemove
+(
+	{Person within Link} |
+	{Company within Link} |
+	{Organisation within Link}
+):link
+-->
+{
+	AnnotationSet linkSet = bindings.get("link");
+ 	outputAS.removeAll(linkSet);
+}
+

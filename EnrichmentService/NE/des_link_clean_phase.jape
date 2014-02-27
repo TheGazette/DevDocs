@@ -1,0 +1,42 @@
+/*  
+* Filename: 	des_link_clean_phase.jape
+* Author:	Paul Appleby
+* Description:	Linking of annotations and final cleaning of data
+* Date created:	26/10/2011
+* This version:	0.1
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+MultiPhase:	LinkCleanPhase
+Phases:
+
+/* Fix stuff after identifying */
+des_identifier_fix
+
+/* These tasks take place after going to be moved to after entity resolution */
+/* They are simply linking stuff and cleaning up. All majore annotating has already taken place */
+
+des_person_attributes
+des_person_attach_honours
+des_person_attach_occupation
+des_person_honours
+
+des_attach_position
+/* Needs to be after attach_postion because it alters Position (not sure if that's really okay) */
+des_person_attach_position
+
+/* Clean up any HTML issues */
+des_crossover_html
+
+/* Final clean-up */
+des_final_clean
+
+/* Now link things together */
+des_link
+/* Ensure all times are in a standard format */
+des_time_normalisation

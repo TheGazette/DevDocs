@@ -1,0 +1,95 @@
+/*
+* Filename: 	des_nounphrase_compound.jape
+* Author:	Paul Appleby
+* Description:	Links two adjacent NounChunk annotations together linked by 'of'
+*		to create a compound NounChunk, e.g. the spread of nuclear power
+*		this pool of talent
+* Date created:	05/03/2010
+* This version:	0.1
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	CompoundNounChunk
+Input:  Split Token NounChunk Value VG
+Options: control = appelt negationGrouping = false
+
+
+Rule: MatchPossessive
+(
+	({NounChunk}):subj
+	({Token.category == POS, NounChunk}):obj
+):ps
+-->
+	:ps.CompoundNounChunk = {type="Possessive", rule="MatchPossessive"},
+	:obj.NCPropertyOf = {rule="MatchPossessive"},
+	:subj.NCHasProperty = {rule="MatchPossessive"}
+
+
+
+Rule: MatchCompoundNounChunk
+(
+  (
+  	{NounChunk} |
+  	{Value}
+  ):nc
+  (
+	{Token.string =="of"} | 
+	{Token.string =="for"}
+  )
+  (
+  	{NounChunk}
+  ):ncs
+):cn
+-->
+	:cn.CompoundNounChunk = {type="NounChunk", rule="MatchCompoundNounChunk" },
+	:nc.NCPropertyOf = {rule="MatchCompoundNounChunk"},
+	:ncs.NCHasProperty = {rule="MatchCompoundNounChunk"}
+
+
+
+Rule: MatchCompoundNounChunk2
+(
+  (
+	  (
+		{NounChunk} |
+		{Value}
+	  )
+  	{Token.string =="of"}
+  	{NounChunk}
+  ):nc
+  (
+	{Token.string =="of"} | 
+	{Token.string =="for"}
+  )
+  (
+  	{NounChunk}
+  ):ncs
+):cn
+-->
+	:cn.CompoundNounChunk = {type="NounChunk", rule="MatchCompoundNounChunk2" },
+	:nc.NCPropertyOf = {rule="MatchCompoundNounChunk2"},
+	:ncs.NCHasProperty = {rule="MatchCompoundNounChunk2"}	
+
+
+
+Rule: MatchCompoundNounChunk3
+(
+  (
+  	{NounChunk}
+  ):nc
+  ({VG})+
+  ({Token.category == IN})?
+  (
+  	{NounChunk}
+  ):ncs
+):cn
+-->
+	:cn.CompoundNounChunk = {type="NounVerbNounChunk", rule="MatchCompoundNounChunk3" },
+	:nc.NCPropertyOf = {rule="MatchCompoundNounChunk3"},
+	:ncs.NCHasProperty = {rule="MatchCompoundNounChunk3"}

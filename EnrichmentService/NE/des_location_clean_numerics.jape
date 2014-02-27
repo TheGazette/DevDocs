@@ -1,0 +1,65 @@
+/*
+* Filename: 	des_location_clean_numerics.jape
+* Author:		Paul Appleby
+* Description:	Removes more false positives for locations where space tokens and digits are important
+* Date created:	29/07/2010
+* This version:	0.5
+* 
+*/
+
+
+Phase:	LocationCleanNumerics
+Input:  Token SpaceToken Country Place LineBreak
+Options: control = all negationGrouping = false
+
+
+/* Remove references to countries that are part of codes, e.g. UK12354 */
+Rule: PlaceRemove1
+(
+	({Country}):country
+	{Token.category == CD}
+)
+-->
+{
+	AnnotationSet countrySet = bindings.get("country");
+ 	outputAS.removeAll(countrySet);
+}
+
+/* Remove references to other places following number - probably odd street names, e.g. 100 Piccadily */
+Rule: PlaceRemove2
+(
+	{Token.category == CD}
+	({SpaceToken, !LineBreak})?
+	({Place.type == other}):place
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+/* Remove references to other places followed by number, e.g. Junction 30 */
+Rule: PlaceRemove3
+(
+	({Place.type == other}):place
+	({SpaceToken, !LineBreak})?
+	{Token.category == CD}
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}
+
+/* Remove O'Hare, where otherwise Hare would be marked up */
+Rule: PlaceRemove3
+(
+	{Token}
+	{Token.string == "'"}	
+	({Place}):place
+)
+-->
+{
+	AnnotationSet placeSet = bindings.get("place");
+ 	outputAS.removeAll(placeSet);
+}

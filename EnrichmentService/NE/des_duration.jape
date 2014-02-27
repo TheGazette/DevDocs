@@ -1,0 +1,64 @@
+/*
+* Filename: 	des_duration.jape
+* Author:	Paul Appleby
+* Description:	Annotates time durations
+*		In cleanup we need to mung this to ISO 8601 extended format PnYn MnDTnH nMnS, 
+*		where nY represents the number of years, 
+*		nM the number of months, nD the number of days, 
+*		'T' is the date/time separator, nH the number of hours, 
+*		nM the number of minutes and nS the number of seconds.
+* Date created:	24/10/2009
+* This version:	0.1
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+Phase:	Time
+Input:  Split Token Number Lookup
+Options: control = appelt negationGrouping = false
+
+/* E.g. six weeks */
+Rule: MatchDurationWords
+(
+  (
+  	({Number.type == written})+
+  ):number
+  {Lookup.majorType == time, Lookup.minorType == duration}
+):duration
+-->
+	:duration.Duration = {duration=:number.Number.number, type=:duration.Lookup.type, count=:duration.Lookup.count, prefix=:duration.Lookup.prefix, rule="MatchDurationWords"}
+	
+	
+/* E.g. 21 days */
+Rule: MatchDurationNumbers
+(
+  (
+  	(
+  		{Token.kind == number} 
+  		{Token.subkind == dashpunct} 
+  	)?
+  	{Token.kind == number} 
+  ):number
+  {Lookup.majorType == time, Lookup.minorType == duration}
+):duration
+-->
+	:duration.Duration = {duration=:number.Token.string, type=:duration.Lookup.type, count=:duration.Lookup.count, prefix=:duration.Lookup.prefix, rule="MatchDurationNumbers"}
+
+
+/* E.g. 9,000 years */
+Rule: MatchDurationNumbers2
+(
+  (
+  	{Number}
+  ):number
+  {Lookup.majorType == time, Lookup.minorType == duration}
+):duration
+-->
+	:duration.Duration = {duration=:number.Number.number, type=:duration.Lookup.type, count=:duration.Lookup.count, prefix=:duration.Lookup.prefix, rule="MatchDurationNumbers2"}
+	
+	
+	

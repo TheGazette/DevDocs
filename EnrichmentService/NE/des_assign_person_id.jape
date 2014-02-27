@@ -1,0 +1,36 @@
+/*
+* Filename: 	des_assign_person_id.jape
+* Author:	Paul Appleby
+* Description:	Assign ids to every person that makes sense
+* Date created:	22/11/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	AssignPersonIdentifiers
+Input:  Person
+Options: control = once negationGrouping = false
+
+
+Rule: AssignPersonID
+(
+	{Person}
+):person
+-->
+{
+	AnnotationSet personSet = inputAS.get("Person");
+	List<Annotation> orderedPerson = gate.Utils.inDocumentOrder(personSet);
+	Integer count = 0;
+	for (Annotation person: orderedPerson) {
+		person.getFeatures().put("id", "name-" + count);
+		count++;
+	}
+}
+

@@ -1,0 +1,101 @@
+/*
+* Filename: 	des_token_adjust.jape
+* Author:		Paul Appleby
+* Description:	Sorts out tokens and makes some adjustments
+* Date created:	19/12/2010
+* This version:	0.5
+*  
+* Change history
+* ==========================================================================
+* Date		Version	Author	Description
+* ==========================================================================
+* 
+*/
+
+Phase:	TokenAdjust
+Input:  Split SpaceToken Token Lookup
+Options: control = appelt negationGrouping = false
+
+/* We need to split tokens that have merged word parts */
+Rule: TokenAdjust1
+(
+	(
+		{Token.string =~ "-based"} |
+		{Token.string =~ "-listed"}
+	):item
+)
+-->
+{
+	try {
+		AnnotationSet itemSet = bindings.get("item");
+		String token = gate.Utils.stringFor(doc, itemSet);
+		int offset = token.indexOf("-");
+
+		Annotation itemAnn = itemSet.iterator().next();
+
+		FeatureMap features = Factory.newFeatureMap();
+		features.put("length", offset);		
+		features.put("orth", itemAnn.getFeatures().get("orth").toString());		
+		features.put("string", itemAnn.getFeatures().get("string").toString().substring(0, offset));		
+		// Bit of an assumption here that the sub-token will have the same category as the whole!
+		features.put("category", itemAnn.getFeatures().get("category").toString());		
+		outputAS.add(itemSet.firstNode().getOffset(), itemSet.firstNode().getOffset() + offset, "Token", features);
+		
+		FeatureMap features2 = Factory.newFeatureMap();
+		outputAS.add(itemSet.firstNode().getOffset() + offset, itemSet.lastNode().getOffset(), "Token", features2);
+		
+		// Now remove existing token
+		outputAS.removeAll(itemSet);
+	}
+	catch (Exception e) {
+	}
+}
+
+
+/* POS tagger doesn't handle diacritics on nouns well and tags as NN. Switch to NNP */
+Rule: TokenAdjust2
+(
+	({Token.string =~ "\\A[\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9]", Token.category == "NN"}):item
+)
+-->
+{
+	try {
+		AnnotationSet itemSet = bindings.get("item");
+		Annotation itemAnn = itemSet.iterator().next();
+		itemAnn.getFeatures().put("category", "NNP");
+	}
+	catch (Exception e) {
+	}
+}
+
+
+/* Em dashes at the end of words causes problems with being in a single token ... so remove */
+Rule: DashRemoval
+(
+	{Token.string ==~ "[A-Za-\u02A8]+\u2013"} |
+	{Token.string ==~ "[A-Za-\u02A8]+\u2014"} |
+	{Token.string ==~ "[A-Za-\u02A8]+\u2015"} |
+	{Token.string ==~ "[A-Za-\u02A8]+--"} |
+	{Token.string ==~ "[A-Za-\u02A8]+-"}
+):item
+-->
+{
+	try {
+		AnnotationSet itemSet = bindings.get("item");
+		String token = gate.Utils.stringFor(doc, itemSet);
+		Annotation itemAnn = itemSet.iterator().next();
+		itemAnn.getFeatures().put("root", token.substring(0, token.length() - 1));
+		itemAnn.getFeatures().put("string", token.substring(0, token.length() - 1));
+		itemAnn.getFeatures().put("length",
+			Integer.toString(Integer.parseInt(itemAnn.getFeatures().get("length").toString()) - 1));
+		FeatureMap features = Factory.newFeatureMap();
+		features.put("root", token.substring(token.length() - 1));				
+		features.put("string", token.substring(token.length() - 1));
+		outputAS.add(itemSet.firstNode().getOffset(), itemSet.lastNode().getOffset() -1, "Token", itemAnn.getFeatures());		
+		outputAS.add(itemSet.lastNode().getOffset() - 1, itemSet.lastNode().getOffset(), "Token", features);		
+		// Now remove existing token
+		outputAS.removeAll(itemSet);
+	}
+	catch (Exception e) {
+	}
+}

@@ -1,0 +1,141 @@
+/*
+* Filename: 	des_disambiguate_4.jape
+* Author:	Paul Appleby
+* Description:	If there is a clash beween a non UK city and a world region attempt to work out which one it is
+* Date created:	08/11/11
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Disambiguation4
+Input:  Token Place Location
+Options: control = appelt negationGrouping = false
+
+
+Rule: PlaceLocation
+(
+	{Place.type == globalCity, Location.type == world}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	Annotation placeAnn = annotationSet.get("Place").iterator().next();
+	Annotation locationAnn = annotationSet.get("Location").iterator().next();
+	String locationType = "";
+	if (locationAnn.getFeatures().get("type") != null) locationType = locationAnn.getFeatures().get("category").toString().toLowerCase();
+	Long locStart = placeAnn.getStartNode().getOffset();
+	Long locEnd = placeAnn.getEndNode().getOffset();
+	String conflictName = gate.Utils.stringFor(doc, placeAnn);
+	String locName = "";
+
+	// Get the surrounding paragraph
+	AnnotationSet paragraphSet = inputAS.get("Paragraph", locStart, locEnd);	
+	Long paragraphStart = paragraphSet.firstNode().getOffset();
+	Long paragraphEnd = paragraphSet.lastNode().getOffset();
+	//System.out.println("Paragraph is: " + gate.Utils.stringFor(doc, paragraphSet));
+	AnnotationSet paragraphTokenSet = inputAS.get("Token", paragraphStart, paragraphEnd);
+
+	Integer localPlaceParagraphCount = 0;
+	Integer globalPlaceParagraphCount = 0;
+
+	// Get local/global counts for entire document
+	// And for local paragraph
+	for (Annotation locAnn : inputAS.get("Place")) {
+		locStart = locAnn.getStartNode().getOffset();
+		locEnd = locAnn.getEndNode().getOffset();
+		String locType = locAnn.getFeatures().get("type").toString();
+		try {
+			locName = gate.Utils.stringFor(doc, locAnn);
+			//System.out.println("Place: " + locName + ", Type: " + locType);
+		}
+		catch (Exception e) {
+		}
+		if (locType.equals("globalCity") && !locName.equals(conflictName))  {
+			if (locStart >= paragraphStart && locEnd <= paragraphEnd) localPlaceParagraphCount++;
+			else globalPlaceParagraphCount++;
+		}
+	}
+
+	// Okay, so we've done a basic count on whether the paragraph/document is local or global
+	// Now disambiguate based on that
+
+	//System.out.println("Global place: " + globalPlaceParagraphCount + ", Local place: " + localPlaceParagraphCount);
+
+	Integer localLocationParagraphCount = 0;
+	Integer globalLocationParagraphCount = 0;
+
+	// Get local/global counts for entire document
+	// And for local paragraph
+	for (Annotation locAnn : inputAS.get("Location")) {
+		locStart = locAnn.getStartNode().getOffset();
+		locEnd = locAnn.getEndNode().getOffset();
+		String locType = locAnn.getFeatures().get("type").toString();
+		try {
+			locName = gate.Utils.stringFor(doc, locAnn);
+			//System.out.println("Location: " + locName + ", Type: " + locType);
+		}
+		catch (Exception e) {
+		}
+		if (locType.equals("world") && !locName.equals(conflictName))  {
+			if (locStart >= paragraphStart && locEnd <= paragraphEnd) localLocationParagraphCount++;
+			else globalLocationParagraphCount++;
+		}
+	}
+
+	//System.out.println("Global location: " + globalLocationParagraphCount + ", Local location: " + localLocationParagraphCount);
+
+	// We'll count the number of mentions of city and the type of the location (using the type feature) in the paragraph
+	Integer localLocationTypeTokenCount = 0;
+	Integer localLocationCityTokenCount = 0;
+
+	// This is very crude. We ideally want to take account of the distance from the mention and possibly POS type
+	for (Annotation tokenAnn : paragraphTokenSet) {
+		if (tokenAnn.getFeatures().get("string") != null) {
+			String tokenText = tokenAnn.getFeatures().get("string").toString().toLowerCase();
+			if (tokenText.equals(locationType)) {
+				localLocationTypeTokenCount++;
+				System.out.println("Counted: " + tokenText + " as type");
+			}
+			else if (tokenText.equals("city")) {
+				localLocationCityTokenCount++;
+				System.out.println("Counted: " + tokenText + " as city");
+			}
+		}
+	}
+	
+	//System.out.println("Type mentions: " + localLocationTypeTokenCount);
+	//System.out.println("City mentions: " + localLocationCityTokenCount);
+	
+	// This is rough and ready but it's a start!
+	if (localLocationCityTokenCount > localLocationTypeTokenCount) {
+		outputAS.remove(locationAnn);
+	}
+	else if (localLocationTypeTokenCount > localLocationCityTokenCount) {
+		outputAS.remove(placeAnn);
+	}
+	else if (localLocationParagraphCount > localPlaceParagraphCount) {
+		outputAS.remove(placeAnn);
+	}
+	else if (localPlaceParagraphCount > localLocationParagraphCount) {
+		outputAS.remove(locationAnn);
+	}
+	// For now we're ignoring global references ... they don't seem to help with disambiguation
+	//else if (globalLocationParagraphCount > globalPlaceParagraphCount) {
+	//	outputAS.remove(placeAnn);
+	//}
+	//else if (globalPlaceParagraphCount > globalLocationParagraphCount) {
+	//	outputAS.remove(locationAnn);
+	//}
+	else {
+		// If all else fails assume the city
+		outputAS.remove(locationAnn);
+	}
+}
+

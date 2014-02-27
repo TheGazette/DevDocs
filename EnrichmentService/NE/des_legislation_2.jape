@@ -1,0 +1,68 @@
+/*  
+* Filename: 	des_legislation_2.jape
+* Author:	Paul Appleby
+* Description:	Extract other legislation references from text
+* Date created:	28/06/2010
+* This version:	0.5
+*
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 23/02/11	0.4		PA		Changes to case tests
+* 21/02/11	0.3		PA		Performance tweaks
+* 15/09/10	0.2		PA		Allowed for years on Acts
+* 02/09/10	0.2		PA		Added in references to primary legislation
+*/
+
+Phase:	Legislation
+Input:  Lookup Token LineBreak Legislation
+Options: control = appelt negationGrouping = false
+
+Macro: LEGISLATIONTERMFIRST
+(
+	{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == facility, Token.length > 1} |
+	{Token.orth == allCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == facility, Token.length > 1}
+)
+
+Macro: LEGISLATIONTERM
+(
+	{Token.orth != lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == facility, Token.length > 1} |
+	{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == facility, Token.length > 1} |
+	{Token.category == CD, Token.length == 4, Token.kind == number} |
+	{Token.category == CC} |
+	{Token.root == "of"} |	
+	{Token.orth == allCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == facility, Token.length > 1}
+)
+
+
+Rule: OtherLegislation
+(
+	(
+		{Token.orth != lowercase, Token.category != DT}
+	)
+	(
+		{Token.orth != lowercase}
+	)*
+	{Lookup.minorType == legislation_type, !Lookup within Legislation}
+	(
+		{Token.category == CD}
+	)?:legisyear	
+):legis
+-->
+	:legis.Legislation = {rule = "OtherLegislation", type = "otherLegislation"}
+	
+
+/* Other references to primary legislation */
+Rule: LegislationReference
+(
+	(LEGISLATIONTERMFIRST)
+	(LEGISLATIONTERM)*
+	{Token.string == "Act", !Token within Legislation}
+	({Token.category == CD, Token.length == 4, Token.kind == number})?
+):legislation
+-->
+	:legislation.Legislation = {rule = "LegislationReference", type="primary"}	
+	
+	

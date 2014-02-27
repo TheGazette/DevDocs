@@ -1,0 +1,516 @@
+/*
+* Filename: 	des_organisation.jape
+* Author:	Paul Appleby
+* Description:	Annotates organisations
+* Date created:	05/05/2010
+* This version:	0.25
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 21/12/11	0.25		PA		Tweaked former
+* 10/11/11	0.24		PA		Allowed a prefix to XXX for YYY
+* 23/10/11	0.23		PA		Fixed to stop second part of conjunction being an organisation lookup
+* 27/06/11	0.22		PA		Ensure that conjuncted organisations are not two organisations
+* 10/05/11	0.21		PA		Added JJR
+* 03/05/11	0.20		PA		Stopped ministerial titles at start
+* 21/02/11	0.19		PA		Rewritten many patterns for much improved performance
+* 08/02/11	0.18		PA		Added straight apostrophe to org term and stopped orgs in companies
+* 04/02/11	0.17		PA		Tweaked PrefixOrganisation with 'for'
+* 02/02/11	0.16		PA		Further work on conjuncted organisations and locations as part of name
+* 01/02/11	0.15		PA		Added PossessedOrganisation
+*/
+
+/* A lookup of prefix=yes indicates type should only occur at start of name */
+
+Phase:	Organisation
+Input:  Split Token Lookup Date LineBreak
+Options: control = appelt negationGrouping = false
+
+Macro: POSSESSION
+(
+	(
+		(
+			{Token.string == "\u2019"} |
+			{Token.string == "'"}
+		)
+		{Token.root == "s"}
+	) |
+	{Token.root == "'s"}
+)
+
+
+Macro: ORGANISATIONTERMFIRST
+(
+	(
+		(
+			{!Token.orth == lowercase, Token.category == CD, Token.kind == word} |
+			{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Token within {Lookup.minorType == company}, !Lookup.minorType == organisation, !Lookup.minorType == ministerial, !Lookup.majorType == emotion, !Lookup.majorType == location, !Lookup.minorType == public_body, !Lookup.minorType == former}
+		)
+		(POSSESSION)
+	) |
+	(
+		{!Token.orth == lowercase, Token.category == CD, Token.kind == word} |
+		{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Token within {Lookup.minorType == company}, !Lookup.minorType == organisation, !Lookup.minorType == ministerial, !Lookup.majorType == emotion, !Lookup.minorType == public_body, !Lookup.minorType == former} |
+		{!Token.orth == lowercase, Token.category == JJ, !Lookup.minorType == organisation} |
+		{!Token.orth == lowercase, Token.category == JJR, !Lookup.minorType == organisation}	)
+)
+
+Macro: SHORTORGANISATIONTERMFIRST
+(
+	(
+		(
+			{!Token.orth == lowercase, Token.category == CD, Token.kind == word} |
+			{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.minorType == ministerial, !Lookup.majorType == emotion, !Lookup.majorType == location, !Lookup.minorType == public_body, !Lookup.minorType == former}
+		)
+		(POSSESSION)
+	) |
+	(
+		{!Token.orth == lowercase, Token.category == CD, Token.kind == word} |
+		{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.minorType == ministerial, !Lookup.majorType == emotion, !Lookup.minorType == public_body, !Lookup.minorType == former} |
+		{!Token.orth == lowercase, Token.category == JJ, !Lookup.minorType == organisation} |
+		{!Token.orth == lowercase, Token.category == JJR, !Lookup.minorType == organisation}	)
+)
+
+
+Macro: ORGANISATIONTERM
+(
+	(
+		(
+			{!Token.orth == lowercase, Token.category == CD, Token.kind == word} |
+			{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.majorType == emotion}
+		)
+		(POSSESSION)?
+	) |
+	{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation}
+)
+
+/* Will pick up basic terms and sequences */
+Macro: ORGANISATIONTERMSEQ
+(
+	(ORGANISATIONTERMFIRST)
+	(ORGANISATIONTERM)[0,7]
+)
+
+Macro: CONJUNCTEDORGANISATION
+(
+	(ORGANISATIONTERMFIRST)
+	(
+		(
+			(
+				{!Token.orth == lowercase, Token.category == CD, Token.kind == word} |
+				{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == organisation, !Lookup.majorType == emotion, !Lookup.minorType == organisation_type}
+			)
+			(POSSESSION)?
+		) |
+		{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation}
+	)[0,7]
+	{Token.category == CC}
+	(
+		{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == authority, !Lookup.minorType == organisation} |
+		{!Token.orth == lowercase, Token.category == JJ, !Lookup.minorType == authority, !Lookup.minorType == organisation} |		
+		{!Token.orth == lowercase, Token.category == JJR, !Lookup.minorType == authority, !Lookup.minorType == organisation} |		
+		{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", Lookup.minorType == authority, Lookup.format == "short", !Lookup.minorType == organisation} |
+		{!Token.orth == lowercase, Token.category == JJ, Lookup.minorType == authority, Lookup.format == "short"} |
+		{!Token.orth == lowercase, Token.category == JJR, Lookup.minorType == authority, Lookup.format == "short"}
+	)[1,10]
+	(
+		{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == authority} |
+		{!Token.orth == lowercase, Token.category == JJ, !Lookup.minorType == authority} |		
+		{!Token.orth == lowercase, Token.category == JJR, !Lookup.minorType == authority} |		
+		{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation", Lookup.minorType == authority, Lookup.format == "short"} |
+		{!Token.orth == lowercase, Token.category == JJ, Lookup.minorType == authority, Lookup.format == "short"} |
+		{!Token.orth == lowercase, Token.category == JJR, Lookup.minorType == authority, Lookup.format == "short"}
+	)[0,9]
+	{Lookup.majorType == organisation, Lookup.minorType == organisation_type, !Lookup.prefix == yes, Token.orth != lowercase,
+		!Lookup contains {Token.category == CC}}
+)
+
+
+
+Rule:NotOrganisation1
+Priority: 20
+(
+	{Lookup.majorType == name, Lookup.minorType == title}
+	{Lookup.majorType == name, Lookup.minorType == first}
+)
+-->
+{}
+
+
+/* Organisations that are verbs and sentence initial, e.g. 'Imagine if' (Imagine is the name of a school!) */
+Rule:NotOrganisation2
+Priority: 20
+(
+	(
+		{LineBreak} |
+		{Token.string == "."}
+	)
+	{Lookup.majorType == organisation, Token.category == VB}
+)
+-->
+{}
+
+
+/* Organisations such as Nato, UN */
+Rule: Organisation
+(
+	{Lookup.majorType == organisation, Lookup.minorType == organisation}
+):org
+-->
+	:org.Organisation = {rule = "Organisation", context =:org.Lookup.context}
+	
+
+Rule: AuthorityOrganisation
+(
+	{Lookup.majorType == organisation, Lookup.minorType == authority, Lookup.format == long}
+):org
+-->
+	:org.Organisation = {type = "localAuthority", rule = "AuthorityOrganisation", context =:org.Lookup.context}
+
+
+/* Councils such as 'Greenwich Borough Council */
+Rule: AuthorityOrganisationTruncated
+(
+	{Lookup.majorType == organisation, Lookup.minorType == authority, Lookup.format == truncated}
+):org
+-->
+	:org.Organisation = {type = "localAuthority", rule = "AuthorityOrganisationTruncated", context =:org.Lookup.context}
+
+
+/* Councils such as 'North Lincolnshire Council or 'Council of East Riding of Yorkshire' */
+Rule: AuthorityOrganisationShort
+(
+	(
+		{Token.root == "council"}
+		{Token.root == "of"}
+		{Lookup.majorType == organisation, Lookup.minorType == authority, Lookup.format == short}
+	) |
+	(
+		{Lookup.majorType == organisation, Lookup.minorType == authority, Lookup.format == short}
+		{Token.root == "council"}
+	)
+):org
+-->
+	:org.Organisation = {type = "localAuthority", rule = "AuthorityOrganisationShort", context =:org.Lookup.context}
+
+
+Rule: PublicBodyOrganisation
+(
+	{Lookup.majorType == organisation, Lookup.minorType == public_body}
+):org
+-->
+	:org.Organisation = {type = "publicBody", rule = "PublicBodyOrganisation", context =:org.Lookup.context}
+
+
+Rule: GovernmentDepartment
+(
+	{Lookup.majorType == organisation, Lookup.minorType == government_dept}
+):org
+-->
+	:org.Organisation = {type = "governmentDepartment", rule = "GovernmentDepartment", context =:org.Lookup.context}
+
+/* Try to avoid references to 'The Green,', 'Slade Green,', etc (okay, it's a bit specific but will do for now) */
+Rule: PoliticalPartyAvoid
+(
+	(
+		{Token.category == DT} |
+		{Token.string == NNP}
+	)
+	{Lookup.majorType == organisation, Lookup.minorType == political_party, Token.string == "Green"}
+	{Token.string == ","}
+)
+-->{}
+
+
+Rule: PoliticalParty
+(
+	{Lookup.majorType == organisation, Lookup.minorType == political_party}
+	({Token.string == "Party"})?
+):org
+-->
+	:org.Organisation = {type = "politicalParty", rule = "PoliticalParty", context =:org.Lookup.context}
+
+
+Rule: Court
+(
+	{Lookup.majorType == organisation, Lookup.minorType == court}
+):org
+-->
+	:org.Organisation = {type = "court", rule = "Court"}
+
+
+/* Groups such as Tabilan, Scouts */
+Rule: OrganisationGroup
+(
+	{Lookup.majorType == organisation, Lookup.minorType == group}
+):org
+-->
+	:org.Organisation = {type =:org.Lookup.minorType, rule = "OrganisationGroup"}
+
+
+Rule: OrganisationEducational
+(
+	{Lookup.majorType == organisation, Lookup.minorType == school}
+):org
+-->
+{
+	gate.AnnotationSet org = (gate.AnnotationSet)bindings.get("org");
+	gate.Annotation orgAnn = (gate.Annotation)org.iterator().next();
+	gate.FeatureMap features = Factory.newFeatureMap();
+	String context = "http://education.data.gov.uk/id/school/";
+	if (orgAnn.getFeatures().get("pc").toString().indexOf(",") < 0) {
+		context += orgAnn.getFeatures().get("pc");
+	}
+	else {
+		features.put("contextOptions", orgAnn.getFeatures().get("pc"));	
+	}
+	features.put("context", context);
+	features.put("rule", "OrganisationEducational");
+	features.put("easting", orgAnn.getFeatures().get("easting"));
+	features.put("northing", orgAnn.getFeatures().get("northing"));
+	outputAS.add(org.firstNode(), org.lastNode(), "Organisation", features);
+}
+
+/* Organisations such as the 'Royal College of Nursing', or 'Central Saint Martins College of Art and Design' */
+Rule: CompoundOrganisation
+(
+	(
+		{Token.category != TO} |
+		{Split} |
+		{LineBreak}
+	)
+	(
+		(ORGANISATIONTERMSEQ)
+		{Lookup.majorType == organisation, Lookup.minorType == organisation_type}
+		{Token.root == "of"}
+		(
+			(
+				(
+					({Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation})+
+					{Token.orth == upperInitial, Token.category == NNPS, !Lookup.minorType == organisation}
+				)+
+			) |
+			(
+				(
+					({Token.orth == allCaps, Token.category == NNP, !Lookup.minorType == organisation})+
+					{Token.orth == allCaps, Token.category == NNPS, !Lookup.minorType == organisation}
+				)+
+			) |
+			(
+				(
+					{Token.orth == upperInitial, Token.category == NNPS, !Lookup.minorType == organisation} |
+					{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation} |		
+					{Token.orth == allCaps, Token.category == NNPS, !Lookup.minorType == organisation}
+				)+
+			) |
+			(
+				(
+					{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation} |
+					{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation} |
+					{Token.orth == allCaps, Token.category == NNP, !Lookup.minorType == organisation}
+				)+
+			) |		
+			(
+				(
+					{Token.orth == upperInitial, Token.category == NNPS, !Lookup.minorType == organisation} |
+					{Token.orth == allCaps, Token.category == NNPS, !Lookup.minorType == organisation}
+				)
+				{Token.category == CC}
+				{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation}
+			) |
+			(
+				(
+					{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation} |
+					{Token.orth == allCaps, Token.category == NNP, !Lookup.minorType == organisation}
+				)
+				{Token.category == CC}
+				{Token.orth == upperInitial, Token.category == NNP, !Lookup.minorType == organisation}
+			)
+		)
+	):org
+)
+-->
+	:org.Organisation = {rule = "CompoundOrganisation"}
+
+
+/* Organisations such as the Institute of Food Research */
+Rule: PrefixOrganisation
+(
+	({Token.orth != lowercase, Token.category =~ "\\ANN[PS]+", Token.kind != "punctuation", !Lookup.minorType == organisation, !Lookup.minorType == organisation_type, !Lookup.minorType == government_dept})?
+	{Lookup.majorType == organisation, Lookup.minorType == organisation_type, Token.orth != lowercase, !Lookup.minorType == government_dept}
+	(
+		{Token.root == "of"} |
+		{Token.root == "for"}
+	)
+	(
+		(
+			(
+				{!Token.orth == lowercase, Token.category =~ "\\ANN[PS]+", !Token.kind == "punctuation", !Lookup.minorType == organisation} |
+				{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == organisation} |
+				{Token.orth == upperInitial, Token.category == JJR, !Lookup.minorType == organisation}
+			)[1,6]
+			(
+				{Token.category == CC}
+				(
+					{!Token.orth == lowercase, Token.category =~ "\\ANN[PS]+", !Token.kind == "punctuation", !Lookup.minorType == organisation}
+				)[1,6]
+			)?
+		) |
+		{Lookup.minorType == ceremonial_county}
+	)
+):org
+-->
+	:org.Organisation = {rule = "PrefixOrganisation"}
+
+
+/* Location-based Conjuncted organisations */
+Rule: LocationConjuctedOrganisation
+(
+	{Lookup.majorType == location, Lookup.minorType == location, !Token.orth == lowercase}
+	(CONJUNCTEDORGANISATION)
+):org
+-->
+	:org.Organisation = {rule = "LocationConjuctedOrganisation"}
+
+
+/* Conjuncted organisations e.g. 'Public and Commercial Service Union', etc */
+Rule: ConjuctedOrganisation
+(
+	(CONJUNCTEDORGANISATION)
+):org
+-->
+	:org.Organisation = {rule = "ConjuctedOrganisation"}
+
+/* Non-governmental organisations such as European Union possessed by somebody */
+Rule: PossessedOrganisation
+Priority: 10
+(
+	(
+		{Lookup.minorType == position}
+		{Token.string == "\u2019"}
+		{Token.root == "s"}
+	)
+	(
+		(ORGANISATIONTERM)+
+		{Lookup.majorType == organisation, Lookup.minorType == organisation_type, !Lookup.prefix == yes, Token.orth != lowercase}
+	):org
+)
+-->
+	:org.Organisation = {rule = "PossessedOrganisation"}
+
+
+/* Non-governmental organisations such as European Union */
+Rule: Organisation
+(
+	(
+		(
+			(ORGANISATIONTERMSEQ) |
+			(SHORTORGANISATIONTERMFIRST)
+		)
+		{Lookup.majorType == organisation, Lookup.minorType == organisation_type, !Lookup.prefix == yes, Token.orth != lowercase}
+	):org
+)
+-->
+	:org.Organisation = {rule = "Organisation"}
+
+
+/* Will pick up sequence like 'Business, Skills and Innovation Committee */
+Rule: OrganisationPunctuation
+(
+	{Token.root == "the"}
+	(
+		(ORGANISATIONTERM)	
+		{Token.category == ","}
+		(ORGANISATIONTERMSEQ)
+		{Token.category == CC}
+		(
+			{!Token.orth == lowercase, Token.category =~ "\\ANN", !Token.kind == "punctuation"} |
+			{Token.orth == upperInitial, Token.category == JJ} |
+			{Token.orth == upperInitial, Token.category == JJR}
+		)[1,8]
+		{Lookup.majorType == organisation, Lookup.minorType == organisation_type, !Lookup.prefix == yes, Token.orth != lowercase}
+	):org
+)
+-->
+	:org.Organisation = {rule = "OrganisationPunctuation"}
+
+
+/* Pick up location based organisation such as 'East of England Development Agency' */
+Rule: LocationOrganisation
+(
+	{Lookup.majorType == location, Lookup.minorType == location, !Token.orth == lowercase}
+	(ORGANISATIONTERMSEQ)
+	{Lookup.majorType == organisation, Lookup.minorType == organisation_type, Token.orth != lowercase}
+):org
+-->
+	:org.Organisation = {rule = "LocationOrganisation"}
+
+/* Military organisation such as '11 Light Brigade' */
+Rule: MilitaryOrganisation
+Priority: 10
+(
+	(
+		(
+			(
+				{Token.category == CD} |
+				{Token.root ==~ "[0-9]+st"} |
+				{Token.root ==~ "[0-9]+nd"} |
+				{Token.root ==~ "[0-9]+rd"} |
+				{Token.root ==~ "[0-9]+th"}
+			)?
+			(ORGANISATIONTERMSEQ)
+			{Lookup.majorType == organisation, Lookup.minorType == organisation_type, !Lookup.prefix == yes,
+				Lookup.type == military, Token.orth != lowercase}
+		) |
+		(
+			(
+				{Token.category == CD} |
+				{Token.root ==~ "[0-9]+st"} |
+				{Token.root ==~ "[0-9]+nd"} |
+				{Token.root ==~ "[0-9]+rd"} |
+				{Token.root ==~ "[0-9]+th"}
+			)
+			{Lookup.majorType == organisation, Lookup.minorType == organisation_type, !Lookup.prefix == yes,
+				Lookup.type == military, Token.orth != lowercase}
+			({Token.root == "the"})?
+			{Lookup.minorType == organisation, Lookup.type == military}
+			(
+				{Token.root == "of"}
+				{Lookup.minorType == country}
+			)?
+		)
+	):org
+)
+-->
+	:org.Organisation = {rule = "MilitaryOrganisation"}
+
+/* Pick up political organisation references such as 'Conservative Hampshire County Council; */
+Rule: PoliticalOrganisation
+Priority: 10
+(
+	(
+		{Lookup.majorType == organisation, Lookup.minorType == political_party}
+		({Token.string == "Party"})?
+	):politic
+	(
+		(ORGANISATIONTERMSEQ)
+		{Lookup.majorType == organisation, Lookup.minorType == organisation_type, !Lookup.prefix == yes, Token.orth != lowercase}
+	):org
+)
+-->
+	:politic.Organisation = {type = "politicalParty", rule = "PoliticalOrganisation", context =:politic.Lookup.context},
+	:org.Organisation = {rule = "PoliticalOrganisation"}
+
+
+/* Nationality based organisation such as 'British army' (note the lowercase flexibility) */
+Rule: NationalityOrganisation
+(
+	{Lookup.majorType == property, Lookup.minorType == nationality}
+	{Lookup.majorType == organisation, Lookup.minorType == organisation_type, !Lookup.prefix == yes}
+):org
+-->
+	:org.Organisation = {rule = "NationalityOrganisation"}

@@ -1,0 +1,62 @@
+/*
+* Filename: 	des_position_clean.jape
+* Author:	Paul Appleby
+* Description:	Remove position ambiguities
+* Date created:	04/10/2010
+* This version:	0.4
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 18/11/11	0.4		PA		Tweaked logic of NestedPositionRemove
+* 15/12/10	0.3		PA		Removed nested positions
+* 13/12/10	0.2		PA		Removed position in Time
+*/
+
+
+Phase:	PositionClean
+Input:  Person Position Organisation Time
+Options: control = appelt negationGrouping = false
+
+
+/* Remove nested positions with people */
+Rule: NestedPositionRemove
+Priority: 10
+(
+	{Position within Person}
+):position
+-->
+{
+	// If there is more than one there will be at least one with a rule
+	// Keep that and remove others
+	AnnotationSet annotSet = bindings.get("position");
+	AnnotationSet positionSet = inputAS.get("Position", annotSet.firstNode().getOffset(), annotSet.lastNode().getOffset());
+	Annotation toRemove = null;
+	Long lowestOffset = new Long(0);
+	if (positionSet.size() > 1) {
+		for (Annotation positionAnn : positionSet) {
+			if (positionAnn.getStartNode().getOffset() > lowestOffset) 
+			{
+				toRemove = positionAnn;
+				lowestOffset = positionAnn.getStartNode().getOffset();
+			}
+		}
+		if (toRemove != null) outputAS.remove(toRemove);					
+	} 	
+}
+
+
+/* Position within ... */
+Rule: PositionRemove
+(
+	{Position within Organisation} |
+	{Position within Time}
+):position
+-->
+{
+	AnnotationSet positionSet = bindings.get("position");
+ 	outputAS.removeAll(positionSet);
+}

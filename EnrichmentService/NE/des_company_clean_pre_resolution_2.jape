@@ -1,0 +1,26 @@
+/*
+* Filename: 	des_company_clean_pre_resolution_2.jape
+* Author:		Paul Appleby
+* Description:	Removes false positives for companies. We do some initial clean up before resolving companies
+* Date created:	26/04/2012
+* This version:	0.1
+* 
+* 
+*/
+
+
+Phase:	CompanyCleanPreResolution2
+Input:  Company Token SpaceToken
+Options: control = appelt negationGrouping = false
+
+Rule: CompanyRemove1
+(
+	({Company}):company
+	{Token.string == "."}
+	{Token}
+)
+-->
+{
+	AnnotationSet companySet = bindings.get("company");
+ 	outputAS.removeAll(companySet);
+}

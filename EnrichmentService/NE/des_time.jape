@@ -1,0 +1,221 @@
+/*
+* Filename: 	des_time.jape
+* Author:	Paul Appleby
+* Description:	Annotates time in 12-hour or 24-hour formats
+* Date created:	05/03/2010
+* This version:	0.5
+*  
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 02/02/11	0.5		PA		Added GMT to Time24HourNoPunctuation
+* 28/09/10	0.4		PA		Major overhaul
+* 14/09/10	0.3		PA		Added Match24HoursNoPunctuation
+* 28/08/10	0.2		PA		Removed time matches on xx.yy - too ambiguous
+*/
+
+
+Phase:	Time
+Input:  Split Token Lookup Day LineBreak
+Options: control = appelt negationGrouping = false
+
+
+/* E.g. Avoid dates, e.g. 16.09.10 */
+Rule: TimeAvoid
+(
+	(
+		{Token.category == IN } |
+		{Token.category == CC }
+	)?
+	{Token.kind == number, Token.length == 2}
+	{Token.kind == punctuation, Token.string == "."}
+	{Token.kind == number, Token.length == 2}
+	{Token.kind == punctuation, Token.string == "."}
+	{Token.kind == number, Token.length == 2}
+)
+-->{}
+
+
+/* E.g. 12 noon */
+Rule: TimeNoon
+(
+	{Token.string == "12"}
+	{Token.root == "noon"}
+):time
+-->
+	:time.Time = {hour = "12", type = "noon", rule = "TimeNoon"}
+
+
+/* E.g. 09.45 p.m. or 10:34 a.m. */
+Rule: Time12Hour
+(
+	{Token.category == IN } |
+	{Token.category == CC }
+)?
+(
+	({Token.kind == number, Token.length <=2}):hour
+	(
+		(
+			{Token.kind == punctuation, Token.string == ":"} | 
+			{Token.kind == punctuation, Token.string == "."}
+		)
+		({Token.kind == number, Token.length <= 2}):minute
+	)?
+	({Lookup.majorType == time, Lookup.minorType == ampm}):type
+):time
+-->
+	:time.Time = {hour =: hour.Token.string, minute =: minute.Token.string, rule = "Time12Hour", type =: type.Lookup.type}
+	
+
+Rule: Time24HourAvoid
+(
+	{Token.category == IN } |
+	{Token.category == CC }
+)
+(
+	{Token.kind == number, Token.length == 2}
+	(
+		{Token.kind == punctuation, Token.string == ":"} |
+		{Token.kind == punctuation, Token.string == "."}
+	)
+	{Token.kind == number, Token.length == 2}
+	{Lookup.majorType == symbols}
+)
+-->{}
+
+/* E.g. 13:30 or 15:30 hours */
+Rule: Time24Hour
+(
+	{Token.category == IN } |
+	{Token.category == CC }
+)
+(
+	({Token.kind == number, Token.length == 2}):hour
+	(
+		{Token.kind == punctuation, Token.string == ":"} |
+		{Token.kind == punctuation, Token.string == "."}
+	)
+	({Token.kind == number, Token.length == 2}):minute
+	(
+		{Token.string == "hours"} |
+		{Token.string == "HOURS"}
+	)?
+):time
+-->
+	:time.Time = {hour =: hour.Token.string, minute =: minute.Token.string, rule = "Time24Hour"}
+
+
+/* E.g. 1330 hours */
+Rule: Time24HourNoPunctuation
+(
+	({Token.kind == number, Token.length == 4}):timestamp
+	(
+		{Token.string == "hours"} |
+		{Token.string == "GMT"} |
+		{Token.string == "HOURS"}
+	)
+):time
+-->
+{
+	AnnotationSet timeSet = bindings.get("time");
+	AnnotationSet timestampSet = bindings.get("timestamp");
+	Annotation timeAnn = timestampSet.iterator().next();
+	String timeText = gate.Utils.stringFor(doc, timeAnn);
+	
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("hour", timeText.substring(0, 2));
+	features.put("minute", timeText.substring(2, 4));
+	features.put("rule", "Time24HourNoPunctuation");
+	outputAS.add(timeSet.firstNode(), timeSet.lastNode(), "Time", features);
+}
+
+	
+/* E.g. 11:30am-2:30pm */
+Rule: TimeRange
+(
+	(
+		({Token.kind == number, Token.length <=2}):hour1
+		(
+			({Token.kind == punctuation, Token.string == ":"} | {Token.kind == punctuation, Token.string == "."})
+			({Token.kind == number, Token.length ==2}):minute1
+		)?
+		({Lookup.majorType == time, Lookup.minorType == ampm}):type1
+	):time1
+	(
+		{Token.kind == punctuation, Token.subkind == dashpunct} |
+		{Token.string == "-"}
+	)?
+	(
+		({Token.kind == number, Token.length <=2}):hour2
+		(
+			({Token.kind == punctuation, Token.string == ":"} | {Token.kind == punctuation, Token.string == "."})
+			({Token.kind == number, Token.length ==2}):minute2
+		)?
+		({Lookup.majorType == time, Lookup.minorType == ampm}):type2
+	):time2
+):timeRange
+-->
+	:time1.Time = {hour =: hour1.Token.string, minute =: minute1.Token.string, rule = "TimeRange", type =: type1.Lookup.type}, 
+	:time2.Time = {hour =: hour2.Token.string, minute =: minute2.Token.string, rule = "TimeRange", type =: type2.Lookup.type},
+	:timeRange.TempTimeRange = {}
+	
+/* E.g. 11:30am-2:30pm */
+Rule: TimeRange
+(
+	(
+		({Token.kind == number, Token.length <=2}):hour1
+		(
+			({Token.kind == punctuation, Token.string == ":"} | {Token.kind == punctuation, Token.string == "."})
+			({Token.kind == number, Token.length ==2}):minute1
+		)?
+		({Lookup.majorType == time, Lookup.minorType == ampm}):type1
+	):time1
+	(
+		{Token.kind == punctuation, Token.subkind == dashpunct} |
+		{Token.string == "-"}
+	)?
+	(
+		({Token.kind == number, Token.length <=2}):hour2
+		(
+			({Token.kind == punctuation, Token.string == ":"} | {Token.kind == punctuation, Token.string == "."})
+			({Token.kind == number, Token.length ==2}):minute2
+		)?
+		({Lookup.majorType == time, Lookup.minorType == ampm}):type2
+	):time2
+):timeRange
+-->
+	:time1.Time = {hour =: hour1.Token.string, minute =: minute1.Token.string, rule = "TimeRange"}, 
+	:time2.Time = {hour =: hour2.Token.string, minute =: minute2.Token.string, rule = "TimeRange"},
+	:timeRange.TempTimeRange = {}	
+
+	
+/* E.g. 11:30-2:30 */
+Rule: TimeRangeNoAmPm
+(
+	(
+		({Token.kind == number, Token.length <=2}):hour1
+		(
+			{Token.kind == punctuation, Token.string == ":"} |
+			{Token.kind == punctuation, Token.string == "."}
+		)
+		({Token.kind == number, Token.length ==2}):minute1
+	):time1
+	(
+		{Token.kind == punctuation, Token.subkind == dashpunct} |
+		{Token.string == "-"}
+	)?
+	(
+		({Token.kind == number, Token.length <=2}):hour2
+		(
+			{Token.kind == punctuation, Token.string == ":"} |
+			{Token.kind == punctuation, Token.string == "."}
+		)
+		({Token.kind == number, Token.length ==2}):minute2
+	):time2
+):timeRange
+-->
+	:time1.Time = {hour =: hour1.Token.string, minute =: minute1.Token.string, rule = "TimeRangeNoAmPm"}, 
+	:time2.Time = {hour =: hour2.Token.string, minute =: minute2.Token.string, rule = "TimeRangeNoAmPm"},
+	:timeRange.TempTimeRange = {}		

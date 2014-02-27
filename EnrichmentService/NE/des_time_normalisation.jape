@@ -1,0 +1,47 @@
+/*
+* Filename: 	des_time_normalisation.jape
+* Author:	Paul Appleby
+* Description:	Ensure all times are in a suitable format
+* Date created:	28/09/2010
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	TimeNormalisation
+Input:  Time
+Options: control = appelt negationGrouping = false
+
+// Add a standard time format to all Time annotations
+Rule: TimeNormalise
+(
+	{Time}
+):time
+-->
+{
+	AnnotationSet timeSet = bindings.get("time");
+	Annotation timeAnn = timeSet.iterator().next();
+	FeatureMap features = timeAnn.getFeatures();
+	String hourText = "";
+	String minuteText = "00";
+	String type = "";
+	if (features.get("hour") != null) hourText = features.get("hour").toString();
+	if (features.get("minute") != null) minuteText = features.get("minute").toString();
+	if (features.get("type") != null) type = features.get("type").toString();
+	Integer hour = 0;
+	Integer minute = 0;
+	if (!hourText.isEmpty()) hour = Integer.parseInt(hourText);
+	if (!minuteText.isEmpty()) minute = Integer.parseInt(minuteText);
+	// Change 12 hour into 24 hour
+	if (type.equals("pm") && hour < 12) hour += 12;
+	java.text.DecimalFormat numberFormat = new java.text.DecimalFormat("00");
+	String time = numberFormat.format(hour) + ":" + numberFormat.format(minute);
+	features.put("time", time);
+}
+

@@ -1,0 +1,80 @@
+/*
+* Filename: 	des_publication_clean.jape
+* Author:		Paul Appleby
+* Description:	Removes false positives related to publications
+* Date created:	27/09/2010
+* This version:	0.2
+* 
+*/
+
+
+Phase:	PublicationClean
+Input:  Publication Token LineBreak Publication Facility
+Options: control = appelt negationGrouping = false
+
+
+/* Remove publications that start 'the' and have certain preceding token patterns - indicates not publication
+We will remove all similar publications which will then cover where the same name is used in the same document */
+Rule: PubliationRemove1
+(
+	(
+		{Token.string == "\u201C"} |
+		{Token.string == "\""}
+	)
+	({Publication, Token.string == "the"}):publication
+)
+-->
+{
+	// First get the text of the publication to remove
+	AnnotationSet publicationSet = bindings.get("publication");
+	Annotation publicationAnn = publicationSet.iterator().next();
+	String publicationTextToRemove = gate.Utils.stringFor(doc, publicationAnn);
+
+	// Now iterate through all publications and remove similar 	
+	for (Annotation testAnn: inputAS.get("Publication")) {
+		String publicationText = gate.Utils.stringFor(doc, testAnn);
+		// Mark any matches as removable
+		if (publicationText.equals(publicationTextToRemove)) {		
+			doc.getAnnotations("DES").remove(testAnn);
+		}
+	}
+
+}
+
+
+/* Handle situations like '<Facility> of <Publication>'  */
+Rule: PublicationRemove2
+(
+	(
+		{Facility}
+		{Token.root == "of"}
+		{Publication}
+	)
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+	AnnotationSet publicationSet = annotationSet.get("Publication");
+	outputAS.removeAll(publicationSet);
+}
+
+
+/* Remove nested Publications */
+Rule: NestedPublicationRemove
+(
+	{Publication}
+):publication
+-->
+{
+	AnnotationSet annotationSet = bindings.get("publication");
+	AnnotationSet containedSet = inputAS.getContained(annotationSet.firstNode().getOffset() + 1,
+		annotationSet.lastNode().getOffset());
+	AnnotationSet publicationSet = containedSet.get("Publication");
+
+	AnnotationSet containedSet2 = inputAS.getContained(annotationSet.firstNode().getOffset(),
+		annotationSet.lastNode().getOffset() - 1);
+	AnnotationSet publicationSet2 = containedSet2.get("Publication");
+	
+	outputAS.removeAll(publicationSet);
+	outputAS.removeAll(publicationSet2);
+}

@@ -1,0 +1,1634 @@
+/*
+* Filename: 	des_person.jape
+* Author:	Paul Appleby
+* Description:	Annotates people's names
+* Date created:	01/06/2010
+* This version:	0.50
+* 
+*/
+
+Phase:	Person
+Input:  Token Lookup LineBreak TempDash
+Options: control = appelt negationGrouping = false
+
+
+/* E.g. CBE, OBE */
+Macro: HONOUR
+(
+	{Lookup.minorType == honour} |
+	{Lookup.minorType == qualification}
+)
+
+
+/* E.g. Pope Benedict XVI */
+Macro: PEDIGREENUMERIC
+(
+	{Token.string ==~ "[XVI]+"}
+)
+
+
+/* Initial in the form A.B. and A. B. and AB and A-B, but make sure we avoid location lookups like UK and U.N. (highly unlikely to be initials) */
+Macro: INITIALS
+(
+ 	{Token.orth == allCaps, Token.length < 2, !Lookup.majorType == location, !Lookup.minorType == titleMale, !Lookup.minorType == titleFemale, !Lookup.minorType == position, !Lookup.orthography == lowercase, Token.string != "HM", !Lookup.majorType == organisation, !Lookup.minorType == country, !Token.category == POS, !Token.category == PRP, !Token.category == IN} |
+  	(
+  		{Token.string ==~ "[A-Z]", Token.length == "3", !Lookup.majorType == location, Lookup.minorType != titleMale, Lookup.minorType != titleFemale, Lookup.minorType != position}
+		{Token.string == "-"}			
+		{Token.string ==~ "[A-Z]", Token.length == "3", !Lookup.majorType == location, Lookup.minorType != titleMale, Lookup.minorType != titleFemale, Lookup.minorType != position}
+  	) |
+	(
+	  	{Token.orth == upperInitial, Token.length =="1", !Token within {Lookup.minorType == country}, !Token.category == POS, !Token within {Lookup.minorType == organisation}}
+	  	{Token.string == "."}
+	)[2,3] |
+	(
+	  	{Token.orth == upperInitial, Token.length =="1", !Token within {Lookup.minorType == country}, !Token.category == POS, !Token.category == PRP, !Token within {Lookup.minorType == organisation}}
+	  	({Token.string == "."})?
+		(
+			{Token.orth == upperInitial, Token.length =="1", !Token within {Lookup.minorType == country}, !Token.category == POS, !Token within {Lookup.minorType == organisation}}
+			({Token.string == "."})?
+		)?
+	)
+)
+
+
+/* We repeat double first names here so that we can force a priority instance where there is ambiguity with surname */
+Macro: DOUBLEFIRSTNAME
+(
+	(
+		{Lookup.majorType == name, Lookup.minorType == firstMale, Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9][A-Za-\u02A8]+",
+			!Lookup.majorType == organisation, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.majorType == number}
+		{Token.string == "-"}
+		{Token.orth == upperInitial, !Lookup.majorType == organisation, !Lookup.majorType == number}
+	) |
+	(
+		{Lookup.majorType == name, Lookup.minorType == firstMale, Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9][A-Za-\u02A8]+",
+			!Lookup.majorType == organisation, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.majorType == number}
+		{Token.string == "-"}
+		{Token.orth == upperInitial, !Lookup.majorType == organisation, !Lookup.majorType == number}
+	) |
+	(
+		{Lookup.majorType == name, Lookup.minorType == firstFemale, Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9][A-Za-\u02A8]+",
+			!Lookup.majorType == organisation, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.majorType == number}
+		{Token.string == "-"}			
+		{Token.orth == upperInitial, !Lookup.majorType == organisation, !Lookup.majorType == number}
+	) |
+	(
+		{Lookup.majorType == name, Lookup.minorType == firstFemale, Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9][A-Za-\u02A8]+",
+			!Lookup.majorType == organisation, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.majorType == number}
+		{Token.string == "-"}
+		{Token.orth == upperInitial, !Lookup.majorType == organisation, !Lookup.majorType == number}
+	)
+)
+
+/* We capture single first names and double-barelled names also */
+Macro: FIRSTNAME
+(
+	(DOUBLEFIRSTNAME) |
+	{Lookup.majorType == name, Lookup.minorType == firstMale, Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9][A-Za-\u02A8]+", !Token.category == MD} |
+	{Lookup.majorType == name, Lookup.minorType == firstFemale, Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9][A-Za-\u02A8]+", !Token.category == MD}
+)
+
+/* Nickname in quotes */
+Macro: NICKNAME
+(
+	{Token.string == "\""}
+	(
+		{Lookup.majorType == name, Lookup.minorType == firstMale, Token.string ==~ "[A-Z][A-Za-\u02A8]+", !Token.category == MD} |
+		{Lookup.majorType == name, Lookup.minorType == firstFemale, Token.string ==~ "[A-Z][A-Za-\u02A8]+", !Token.category == MD}
+	)
+	{Token.string == "\""}
+)
+
+
+Macro: FIRSTSURNAMEUPPER
+(
+	(
+		{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9\u0102][a-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9\u0102][a-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+		{Token.string == "-"}
+		{Token.string ==~ "[A-Za-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname,  !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9\u0102][a-\u02A8]+[-][A-Za-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "(Fitz|fitz)[A-Z][a-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", 			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number}
+	) |
+	(
+		{Token.string ==~ "Mc[A-Z][a-\u02A8]+[-][A-Za-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", 			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number}
+	) |
+	(
+		{Token.string ==~ "Mc[A-Z][a-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "Mc[A-Z][a-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+		{Token.string == "-"}
+		{Token.string ==~ "[A-Za-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "Mac[A-Z][a-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "Mac[A-Z][a-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+		{Token.string == "-"}			
+		{Token.string ==~ "[A-Za-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "El[A-Z][a-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		(
+			{Token.string == "de"} |
+			{Token.string == "De"}
+		)	
+		(
+			{Token.string == "la"} |
+			{Token.string == "La"}
+		)
+		{Token.string ==~ "[A-Z][a-\u02A8]+", Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "(van|Van)"}
+		{Token.string == "der"}
+		{Token.string ==~ "[A-Z][a-\u02A8]+", Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "(Le|de|De|da|di|Di|von|Von|van|Van|i)"}
+		{Token.string ==~ "[A-Z][a-\u02A8]+", Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "(bin|bint|Bin|Bint)"}
+		{Token.string ==~ "[A-Z][a-\u02A8]+", Token.length > 1}
+	)+ |
+	(
+		{Token.string == "St"}
+		({Token.string == "."})?
+		{Token.string ==~ "[A-Z][a-\u02A8]+", !Lookup.minorType == not_surname, Token.length > 1}
+	) |
+	(
+		({Token.string == "d"} | {Token.string == "D"} | {Token.string == "O"})
+		(
+			{Token.string == "'"} |
+			{Token.string == "\u2019"}
+		)
+		{Token.string ==~ "[A-Z][a-\u02A8]+", Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9\u0102][a-\u02A8]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)"}
+		{Token.string == "-"}
+		{Token.orth == upperInitial, Token.length > 1}
+	)
+)
+
+
+Macro: FIRSTSURNAMECAPS
+(
+	(
+		{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+		{Token.string == "-"}
+		{Token.string ==~ "[A-Z]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number,  Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9]+[-][A-Z]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number,  Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "Mc[A-Z]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number,  Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "Mc[A-Z]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+		{Token.string == "-"}
+		{Token.string ==~ "[A-Z]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number,  Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "Mac[A-Z]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number,  Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "Mac[A-Z]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number,  Token.length > 1}
+		{Token.string == "-"}
+		{Token.string ==~ "[A-Z]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)",
+			!Lookup.minorType == not_surname, !Lookup.minorType == ministerial, !Lookup.minorType == organisation, !Lookup.minorType == titleFemale, !Lookup.minorType == company_type, !Lookup.majorType == number, Token.length > 1}
+	) |
+	(
+		{Token.string == "DE"}
+		{Token.string == "LA"}
+		{Token.string ==~ "[A-Z]+", Token.length > 1}
+	) |
+	(
+		{Token.string == "VAN"}
+		{Token.string == "DER"}
+		{Token.string ==~ "[A-Z]+", Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "(LE|DE|DI|VON|VAN)"}
+		{Token.string ==~ "[A-Z]+", Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "(BIN|BINT)"}
+		{Token.string ==~ "[A-Z]+", Token.length > 1}
+	)+ |
+	(
+		{Token.string == "ST"}
+		({Token.string == "."})?
+		{Token.string ==~ "[A-Z]+", !Lookup.minorType == not_surname, Token.length > 1}
+	) |
+	(
+		({Token.string == "D"} | {Token.string == "O"})
+		(
+			{Token.string == "'"} |
+			{Token.string == "\u2019"}
+		)
+		{Token.string ==~ "[A-Z]+", Token.length > 1}
+	) |
+	(
+		{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9]+", Token.category ==~ "(NNP[S]?|NNS|VB[G]?)"}
+		{Token.string == "-"}
+		{Token.orth == allCaps, Token.length > 1}
+	)
+)
+
+
+/* For people with two surnames such as Sarah McCarthy Fry */
+Macro: SECONDSURNAME
+(
+	(
+		(
+			{Token.string == "Al"}
+			({Token.string == "-"})?
+		)|
+		(
+			{Token.string == "al"}
+			({Token.string == "-"})?
+		)|
+		{Token.string == "e"} |
+		{Token.string == "i"} |	
+		{Token.string == "de"} |	
+		{Token.string == "El"} |
+		(
+			({Token.string == "d"} | {Token.string == "D"} | {Token.string == "O"})
+			(
+				{Token.string == "'"} |
+				{Token.string == "\u2019"}
+			)
+		) |
+		{Token.string == "Ben"}
+	)?
+	(
+		{Token.orth == upperInitial, !Lookup.minorType == ministerial, !Lookup.minorType == not_second_surname,
+		!Lookup.minorType == titleMale, !Lookup.minorType == titleFemale, !Lookup.majorType == organisation,
+		!Lookup.minorType == not_surname, !Lookup.minorType == nationality, !Lookup.majorType == number,
+		Token.length > 1} |
+		(
+					{Token.string ==~ "(bin|bint|Bin|Bint)"}
+					{Token.string ==~ "[A-Z][a-\u02A8]+", Token.length > 1}
+		)+
+	)
+)
+
+
+/* Will capture initial capital Surnames, double barrel surnames and names of the form 'Sarah McCarthy Fry' */
+/* And di Maggio and D'Souza and O'Grady */
+Macro: SURNAME
+(
+	(
+		(
+			(
+				{Token.string == "Al"}
+				({Token.string == "-"})?
+			)|
+			(
+				{Token.string == "al"}
+				({Token.string == "-"})?
+			)|
+			{Token.string == "El"}|
+			(
+				{Token.string == "el"}
+				({Token.string == "-"})?
+			)
+		)?
+		(FIRSTSURNAMEUPPER)
+		(SECONDSURNAME)?
+	) |
+	(FIRSTSURNAMECAPS)
+)
+
+
+/* A surname after a middlename is a little more restricted because of the ambiguity that the middle name might allow */
+/* Therefore the non_surname lookup are used to avoid picking up instances like 'Andrew Marr Show' */
+Macro: SURNAMERESTRICTED
+(
+	(
+		(
+			(
+				{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9][A-Za-\u02A8]+", !Lookup.minorType == not_surname, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.minorType == ministerial, !Lookup.majorType == number, !Lookup.minorType == not_second_surname, !Lookup.majorType == organisation}
+			) |
+			(
+				{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9][A-Za-\u02A8]+[-][A-Za-\u02A8]+", !Lookup.minorType == not_surname, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.minorType == ministerial, !Lookup.majorType == number, !Lookup.minorType == not_second_surname, !Lookup.majorType == organisation}
+			) |
+			(
+				{Token.string ==~ "Mc[A-Z][A-Za-\u02A8]+", !Lookup.minorType == not_surname, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.minorType == ministerial, !Lookup.majorType == number, !Lookup.minorType == not_second_surname, !Lookup.majorType == organisation}
+			) |
+			(
+				{Token.string ==~ "Mc[A-Z][A-Za-\u02A8]+[-][A-Za-\u02A8]+", !Lookup.minorType == not_surname, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.minorType == ministerial, !Lookup.majorType == number, !Lookup.minorType == not_second_surname, !Lookup.majorType == organisation}
+			) |
+			(
+				{Token.string ==~ "Mac[A-Z][A-Za-\u02A8]+", !Lookup.minorType == not_surname, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.minorType == ministerial, !Lookup.majorType == number, !Lookup.minorType == not_second_surname, !Lookup.majorType == organisation}
+			) |
+			(
+				{Token.string ==~ "Mac[A-Z][A-Za-\u02A8]+[-][A-Za-\u02A8]+", !Lookup.minorType == not_surname, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.minorType == ministerial, !Lookup.majorType == number, !Lookup.minorType == not_second_surname, !Lookup.majorType == organisation}
+			) |
+			(
+				(
+					{Token.string == "de"} |
+					{Token.string == "De"}
+				)	
+				(
+					{Token.string == "la"} |
+					{Token.string == "La"}
+				)
+				{Token.string ==~ "[A-Z][a-\u02A8]+", Token.length > 1}
+			) |
+			(
+				{Token.string ==~ "(van|Van)"}
+				{Token.string == "der"}
+				{Token.string ==~ "[A-Z][A-Za-\u02A8]+", !Lookup.minorType == not_surname}
+			) |
+			(
+				{Token.string ==~ "(Le|de|De|da|di|Di|von|Von|van|Van)"}
+				{Token.string ==~ "[A-Z][A-Za-\u02A8]+", !Lookup.minorType == not_surname}
+			) |
+			(
+				{Token.string ==~ "(bin|bint|Bin|Bint)"}
+				{Token.string ==~ "[A-Z][A-Za-\u02A8]+", !Lookup.minorType == not_surname}
+			)+ |
+			(
+				{Token.string == "St"}
+				({Token.string == "."})?
+				{Token.string ==~ "[A-Z][A-Za-\u02A8]+", !Lookup.minorType == not_surname}
+			) |
+			(
+				({Token.string == "D"} | {Token.string == "O"})
+				(
+					{Token.string == "'"} |
+					{Token.string == "\u2019"}
+				)
+				{Token.string ==~ "[A-Z][A-Za-\u02A8]+", !Lookup.minorType == not_surname}
+			) |
+			(
+				{Token.string ==~ "[A-Z\u017D\u00C7\u00CC\u015E\u00D6\u00DC\u00C5\u00C9][A-Za-\u02A8]+", !Lookup.minorType == ministerial, !Lookup.minorType == not_surname, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)", !Lookup.majorType == number}
+				{Token.string == "-"}
+				{Token.orth == upperInitial, !Lookup.minorType == not_surname, !Lookup.majorType == number}
+			) |
+			(
+				(
+					(
+						{Token.string == "Al"}
+						({Token.string == "-"})?
+					) |
+					(
+						{Token.string == "al"}
+						({Token.string == "-"})?
+					)
+				)
+				{Token.string ==~ "[A-Z][A-Za-\u02A8]+", !Lookup.minorType == not_surname}
+			)
+		)
+	)  |
+	(
+		(
+			(
+				{Token.string == "Al"}
+				({Token.string == "-"})?
+			) |
+			(
+				{Token.string == "al"}
+				({Token.string == "-"})?
+			)
+		)?
+		(FIRSTSURNAMEUPPER)
+		(SECONDSURNAME)
+	)  |
+	(FIRSTSURNAMECAPS)
+)
+
+/* We'll only allow lookups longer than 2 characters to be lower case to stop, e.g. pm as in 2.15 pm */
+MACRO: MINISTER
+(
+	({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+	(
+		{Lookup.majorType == position, Lookup.minorType == position, !Lookup.orthography == lowercase, Lookup.format == political} |
+		{Lookup.majorType == position, Lookup.minorType == position, Token.length > 2, Lookup.format == political} |
+		{Lookup.majorType == position, Lookup.minorType == ministerial} |
+		{Lookup.majorType == position, Lookup.minorType == ministerial} |
+		(
+			(
+				{Token.orth == upperInitial, !Lookup.majorType == organisation, Token.category != CC, Token.category != DT} |
+				{Token.orth == allCaps, !Lookup.majorType == organisation, Token.category != CC, Token.category != DT}
+			)
+			{Token.root == "minister"}
+		)
+	)	
+)
+
+
+MACRO: HONORIFIC
+(
+	{Lookup.majorType == name, Lookup.minorType == titleMale} |
+	{Lookup.majorType == name, Lookup.minorType == titleFemale}
+)
+
+
+/* Avoid certain patterns that might otherwise get sucked in */
+/* Including e.g. S. E. Uruguay*/
+Rule: PersonAvoid
+Priority: 100
+(
+	(
+		(
+			{Token.category == CD}
+			{Lookup.majorType == units}
+		) |
+		{Lookup.majorType == position, Lookup.minorType == misc}
+	) |
+	(
+		{Lookup.minorType == compass_point}
+		{Lookup.minorType == country}
+	) |
+	(
+		(
+			{Token.category ==~ "PRP.*"} |
+			{Token.category ==~ "WP.*"} |
+			{Token.category == "POS"} |
+			(
+				{Token.category == "DT", Token.root != "the"}
+				({Token.category ==~ "JJ"})?
+			)
+		)
+		{Lookup.majorType == position, Lookup.minorType == position}
+	)
+)
+-->
+{}
+
+/* Avoid people like The Queen when part of a bigger phrase */
+Rule: PersonFamousAvoid
+(
+	{Token.root == "the"}
+	{Lookup.majorType == organisation, Lookup.minorType == organisation}
+):person
+-->
+{}
+
+
+/* People who can be identified by a tag other than their full name, e.g. The Queen or Bach */
+Rule: PersonFamous
+(
+	{Lookup.majorType == name, Lookup.minorType == famous}
+):person
+-->
+	:person.TempName = {rule = "PersonNameFamous", context =:person.Lookup.context}
+
+
+Rule: PersonNameHonorificWithMiddle
+(
+	(
+	  	{Lookup.majorType == name, Lookup.minorType == titleMale, Lookup.format == standard} |
+	  	{Lookup.majorType == name, Lookup.minorType == titleFemale, Lookup.format == standard}
+	):honorific
+	(FIRSTNAME):firstName
+	(FIRSTNAME):middleName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonorificWithMiddle"}
+
+
+Rule: PersonNameHonorificWithMiddleInitials
+(
+	(
+	  	{Lookup.majorType == name, Lookup.minorType == titleMale, Lookup.format == standard} |
+	  	{Lookup.majorType == name, Lookup.minorType == titleFemale, Lookup.format == standard}
+	):honorific
+	(FIRSTNAME):firstName
+	(INITIALS):middleInitials
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleInitials.MiddleInitials = {}, 
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonorificWithMiddleInitials"}
+
+
+Rule: PersonNameHonorific
+(
+	(HONORIFIC):honorific
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonorific"}
+
+
+Rule: PersonNamePositionHonorificWithMiddle
+Priority: 30
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):position
+	(HONORIFIC):honorific
+	(FIRSTNAME):firstName
+	(FIRSTNAME):middleName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePositionHonorificWithMiddle"}
+
+
+Rule: PersonNamePositionHonorificWithMiddleInitials
+Priority: 30
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):position
+	(HONORIFIC):honorific
+	(FIRSTNAME):firstName
+	(INITIALS):middleInitials
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleInitials.MiddleInitials = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePositionHonorificWithMiddleInitials"}
+
+
+Rule: PersonNamePositionHonorific
+Priority: 30
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):position
+	(HONORIFIC):honorific
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePositionHonorific"}
+
+
+Rule: PersonNamePositionMultipleHonorific
+Priority: 30
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):position
+	(HONORIFIC):honorific
+	(HONORIFIC):honorific2
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honorific2.Honorific = {format = :honorific2.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePositionMultipleHonorific"}
+
+
+Rule: PersonNameDoubleHonorificPosition
+Priority: 30
+(
+	(HONORIFIC):honorific
+	({Lookup.majorType == position, Lookup.minorType == position, !Lookup.orthography == lowercase}):position
+	(HONORIFIC):honorific2
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honorific2.Honorific = {format = :honorific2.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameDoubleHonorificPosition"}
+
+
+Rule: PersonNameHonorificPosition
+Priority: 30
+(
+	(HONORIFIC):honorific
+	({Lookup.majorType == position, Lookup.minorType == position, !Lookup.orthography == lowercase}):position
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonorificPosition"}
+
+
+Rule: PersonNameHonorificPositionAlias
+Priority: 30
+(
+	(HONORIFIC):honorific
+	({Lookup.majorType == position, Lookup.minorType == position, !Lookup.orthography == lowercase}):position
+):person
+-->
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:person.TempName = {rule = "PersonNameHonorificPositionAlias"}
+
+
+Rule: PersonNameMultipleHonorific
+(
+	(HONORIFIC):honorific
+	(HONORIFIC):honorific2
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honorific2.Honorific = {format = :honorific2.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMultipleHonorific"}
+
+
+
+Rule: PersonNameMultipleHonorificMiddle
+(
+	(HONORIFIC):honorific
+	(HONORIFIC):honorific2
+	(INITIALS):middleInitials
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:middleInitials.MiddleInitials = {}, 	
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honorific2.Honorific = {format = :honorific2.Lookup.format},	
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonorificMiddle"}
+
+
+Rule: PersonNameMultipleHonorificWithMiddle
+(
+	(HONORIFIC):honorific
+	(HONORIFIC):honorific2
+	(FIRSTNAME):firstName
+	(FIRSTNAME):middleName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honorific2.Honorific = {format = :honorific2.Lookup.format},	
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonorificWithMiddle"}
+
+
+Rule: PersonNameHonorificMiddle
+(
+	(HONORIFIC):honorific
+	(INITIALS):middleInitials
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:middleInitials.MiddleInitials = {}, 	
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonorificMiddle"}
+
+	
+Rule: PersonNameHonorificSurname
+(
+	(HONORIFIC):honorific
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonorificSurname"}
+
+
+Rule: PersonNamePositionHonorificSurname
+Priority: 30
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):position
+	(HONORIFIC):honorific
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePositionHonorificSurname"}
+
+
+Rule: PersonNamePositionMultipleHonorificSurname
+Priority: 30
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):position
+	(HONORIFIC):honorific
+	(HONORIFIC):honorific2
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honorific2.Honorific = {format = :honorific2.Lookup.format},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePositionMultipleHonorificSurname"}
+
+/*
+Rule: PersonNamePositionMultiplePositionSurname
+Priority: 35
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):position1
+	(HONORIFIC)?:honorific
+	({Lookup.majorType == position, Lookup.minorType == position, !Lookup.orthography == lowercase}):position2
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {},
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:position1.Position = {format = :position1.Lookup.format, full = :position.Lookup.full},
+	:position2.Position = {format = :position2.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePositionMultiplePositionSurname"}
+*/
+
+/*
+Rule: PersonNamePositionMultiplePositionSurname
+Priority: 30
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):position1
+	(HONORIFIC)?:honorific
+	({Lookup.majorType == position, Lookup.minorType == position, !Lookup.orthography == lowercase}):position2
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:position1.Position = {format = :position1.Lookup.format, full = :position.Lookup.full},
+	:position2.Position = {format = :position2.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePositionMultiplePositionSurname"}
+*/
+
+Rule: PersonNameHonorificPositionSurname
+Priority: 30
+(
+	(HONORIFIC):honorific
+	({Lookup.majorType == position, Lookup.minorType == position, !Lookup.orthography == lowercase}):position
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonorificPositionSurname"}
+
+
+Rule: PersonNameMultipleHonorificSurname
+(
+	(HONORIFIC):honorific
+	(HONORIFIC):honorific2
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honorific2.Honorific = {format = :honorific2.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMultipleHonorificSurname"}
+
+
+/* With no honorific the level of uncertainty on these names is much greater so mark as possibly ambiguous */
+Rule: PersonNameBasicWithInitials
+(
+	(FIRSTNAME):firstName
+ 	(INITIALS):middleInitials
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleInitials.MiddleInitials = {}, 
+	:surname.Surname = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameBasicWithInitials"}
+
+Rule: PersonNamePedigree
+Priority: 10
+(
+	(FIRSTNAME):firstName
+	(PEDIGREENUMERIC):pedigree
+):person
+-->
+	:firstName.FirstName = {},
+	:pedigree.Pedigree = {},
+	:person.TempName = {rule = "PersonNamePedigree"}
+	
+
+Rule: PersonNameBasicHonour
+Priority: 10
+(
+	(FIRSTNAME):firstName
+	(SURNAMERESTRICTED):surname
+	(HONOUR):honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameBasicHonour"}
+
+	
+/* This is the most basic name match. Unfortunately using restricted surnames may lose a few but they are far less likely to be names than other entity types */
+Rule: PersonNameBasic
+(
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:person.TempName = {rule = "PersonNameBasic"}
+
+
+Rule: PersonNameBasicDoubleBarreled
+Priority: 10
+(
+	(FIRSTNAME):firstName
+	(
+		{Lookup.majorType == name, Lookup.minorType == first, Token.string ==~ "[A-Z][A-Za-\u02A8]+[-]", !Lookup.majorType == organisation, Token.category ==~ "(NNP[S]?|NNS|VB[G]?)"}
+		(SURNAME)
+	):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameBasicDoubleBarreled"}
+
+
+/* We give double first names priority */
+Rule: PersonNameBasicDoubleFirstName
+Priority: 10
+(
+	(DOUBLEFIRSTNAME):firstName
+	(NICKNAME)?
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameBasicDoubleFirstName"}
+
+
+/* Pick up a firstname, middlenames, surname sequence */
+/* We have to be careful with priorities here to stop non-deterministic behaviour so double middle name gets priority over single middle name which gets priority over surname */
+Rule: PersonNameBasicWithMiddle
+Priority: 5
+(
+	(FIRSTNAME):firstName
+	(NICKNAME)?
+	(FIRSTNAME):middleName
+	(NICKNAME)?
+	(SURNAMERESTRICTED):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameBasicWithMiddle"}
+
+Rule: PersonNameBasicWithDoubleMiddle
+Priority: 10
+(
+	(FIRSTNAME):firstName
+	(FIRSTNAME)[2]:middleName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameBasicWithDoubleMiddle"}
+
+
+/* Also not if followed by an allCaps word. If in an uppercase sentence would be very ambiguous */
+/* Also if following closing punctuation */
+Rule: PersonNameInitialsAvoid
+(
+	(
+		{Token.orth == allCaps} |
+		{Token.string == "\u2019"}
+	)
+	(INITIALS)
+	(SURNAME)
+)
+-->{}
+
+
+
+Rule: PersonNamePositionInitials
+Priority: 30
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):position
+	(INITIALS):middleInitials
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:middleInitials.MiddleInitials = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePositionInitials"}
+
+
+Rule: PersonNameInitials
+(
+	(
+		(INITIALS):middleInitials
+		(SURNAME):surname
+		(HONOUR)*:honour
+	):person
+)
+-->
+	:middleInitials.MiddleInitials = {}, 
+	:surname.Surname = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameInitials"}
+
+
+/* Matches forms such as Lord Lucan, Earl Spencer */
+/* We need to apply priority in case a first name also gets annotated as one of the other possibilites */
+Rule: PersonNameNobility
+Priority: 10
+(
+	(
+		{Lookup.majorType == name, Lookup.minorType == titleMale, Lookup.format == nobility} |
+		{Lookup.majorType == name, Lookup.minorType == titleFemale, Lookup.format == nobility}
+	):honorific
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameNobility"}
+
+
+/* Matches Queen Mary, etc. but not Lord XXX */
+Rule: PersonNameNobilityFirstName
+Priority: 20
+(
+	(
+		{Lookup.majorType == name, Lookup.minorType == titleMale, Lookup.format == nobility,
+			Token.string != "Lord"} |
+		{Lookup.majorType == name, Lookup.minorType == titleFemale, Lookup.format == nobility,
+			Token.string != "Lady"}
+	):honorific
+	(FIRSTNAME):firstName
+	(PEDIGREENUMERIC)?:pedigree	
+):person
+-->
+	:firstName.FirstName = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:person.TempName = {rule = "PersonNameNobilityFirstName"},
+	:pedigree.Pedigree = {}
+
+Rule: PersonNameNobilitySurname
+Priority: 10
+(
+	(
+		{Lookup.majorType == name, Lookup.minorType == titleMale, Lookup.format == nobility} |
+		{Lookup.majorType == name, Lookup.minorType == titleFemale, Lookup.format == nobility}
+	):honorific
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameNobilitySurname"}
+
+
+/* Matches Mother Teresa, etc. */
+Rule: PersonNameReligiousFirstName
+Priority: 10
+(
+	(
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == religious}
+	):position
+	(FIRSTNAME):firstName
+	(PEDIGREENUMERIC)?:pedigree
+):person
+-->
+	:firstName.FirstName = {},
+	:position.Position = {format = :position.Lookup.format},
+	:pedigree.Pedigree = {},
+	:person.TempName = {rule = "PersonNameReligiousFirstName"}
+
+
+Rule: PersonNameReligious
+Priority: 10
+(
+	({Lookup.majorType == position, Lookup.minorType == position, Lookup.format == religious}):position
+  	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(PEDIGREENUMERIC)?:pedigree
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:pedigree.Pedigree = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameReligious"}
+	
+
+Rule: PersonNameReligiousWithMiddle
+Priority: 15
+(
+	({Lookup.majorType == position, Lookup.minorType == position, Lookup.format == religious}):position
+  	(FIRSTNAME):firstName
+	(FIRSTNAME):middleName
+	(SURNAMERESTRICTED):surname
+	(PEDIGREENUMERIC)?:pedigree
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:pedigree.Pedigree = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameReligious"}
+	
+
+Rule: PersonNameReligiousSurname
+Priority: 10
+(
+	({Lookup.majorType == position, Lookup.minorType == position, Lookup.format == religious, !Lookup.subFormat == firstName}):position
+	(SURNAME):surname
+	(PEDIGREENUMERIC)?:pedigree
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:pedigree.Pedigree = {},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameReligiousSurname"}
+
+
+
+/* Match names such as General John Arthur Peter Smith */
+Rule: PersonNameMilitaryWithDoubleMiddle
+Priority: 20
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == military}
+	):position
+  	(FIRSTNAME):firstName
+	(FIRSTNAME)[2]:middleName
+	(SURNAMERESTRICTED):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMilitaryWithDoubleMiddle"}
+
+
+/* Match names such as General John Arthur Smith */
+Rule: PersonNameMilitaryWithMiddle
+Priority: 15
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == military}
+	):position
+  	(FIRSTNAME):firstName
+	(FIRSTNAME):middleName
+	(SURNAMERESTRICTED):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMilitaryWithMiddle"}
+
+/* Match names such as Second Lieutenant Henry P.M. Smith */
+Rule: PersonNameMilitaryWithMiddleInitials
+Priority: 30
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == military}
+	):position
+	(FIRSTNAME):firstName
+	(INITIALS):middleInitials
+	(SURNAMERESTRICTED):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleInitials.MiddleInitials = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMilitaryWithMiddleInitials"}
+
+/* Match names such as General John Smith */
+Rule: PersonNameMilitary
+Priority: 10
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == military}
+	):position
+  	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMilitary"}
+
+
+/* We have to use a restricted surname here because of 'General Election' or 'General Motors', etc! */
+Rule: PersonNameMilitarySurname
+Priority: 10
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == military, Token.orth != lowercase}
+	):position
+	(SURNAMERESTRICTED):surname	
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMilitarySurname"}	
+
+
+/* Match names such as Sir Richard Branson */
+Rule: PersonNameHonour
+Priority: 10
+(
+	(
+		{Lookup.majorType == name, Lookup.minorType == titleMale, Lookup.format == honour} |
+		{Lookup.majorType == name, Lookup.minorType == titleFemale, Lookup.format == honour}  	
+	):honorific
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonour"}
+
+
+Rule: PersonNameHonourSurname
+Priority: 10
+(
+	(
+	  	{Lookup.majorType == name, Lookup.minorType == titleMale, Lookup.format == honour} |
+	  	{Lookup.majorType == name, Lookup.minorType == titleFemale, Lookup.format == honour}
+	):honorific
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:honorific.Honorific = {format = :honorific.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameHonourSurname"}
+
+
+/* Match names such as Dr Arroway */
+Rule: PersonNameMedical
+Priority: 10
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == medical}
+	):position
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMedical"}
+
+
+Rule: PersonNameMedicalSurname
+Priority: 10
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == medical}
+	):position
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMedicalSurname"}
+
+
+/* Match names such as Professor Arroway */
+Rule: PersonNameEducation
+Priority: 20
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == education}
+	):position
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameEducation"}
+
+
+Rule: PersonNameEducationSurname
+Priority: 10
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == education}
+	):position
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameEducationSurname"}
+
+
+/* Match names such as Councillor Arroway */
+Rule: PersonNamePolitical
+Priority: 20
+(
+	(MINISTER):position
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePolitical"}
+
+
+Rule: PersonNamePoliticalWithMiddle
+Priority: 20
+(
+	(MINISTER):position
+	(FIRSTNAME):firstName
+	(FIRSTNAME):middleName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePoliticalWithMiddle"}
+
+Rule: PersonNamePoliticalSurname
+Priority: 10
+(
+	(MINISTER):position
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePoliticalSurname"}
+
+Rule: PersonNamePoliticalHonorificFirstName
+Priority: 18
+(
+	(MINISTER):position
+	(HONORIFIC):honorific
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},	
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePoliticalHonorificFirstName"}
+
+
+Rule: PersonNamePoliticalMultipleHonorificFirstName
+Priority: 15
+(
+	(MINISTER):position
+	(HONORIFIC):honorific
+	(HONORIFIC):honorific2
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},	
+	:honorific2.Honorific = {format = :honorific2.Lookup.format},	
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePoliticalMultipleHonorificFirstName"}
+
+
+Rule: PersonNamePoliticalMultipleHonorificSurname
+Priority: 15
+(
+	(MINISTER):position
+	(HONORIFIC):honorific
+	(HONORIFIC):honorific2
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},	
+	:honorific2.Honorific = {format = :honorific2.Lookup.format},	
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePoliticalMultipleHonorificSurname"}
+
+
+Rule: PersonNamePoliticalHonorificSurname
+Priority: 15
+(
+	(MINISTER):position
+	(HONORIFIC):honorific
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honorific.Honorific = {format = :honorific.Lookup.format},	
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePoliticalHonorificSurname"}
+
+
+/* Match names such as 'Defence Secretary Dr Liam Fox' */
+Rule: PersonNamePoliticalPosition
+Priority: 20
+(
+	(MINISTER):position
+	({Lookup.majorType == position, Lookup.minorType == position, !Lookup.orthography == lowercase})+:position2
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:position2.Position = {format = :position2.Lookup.format},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNamePoliticalPosition"}
+
+
+/* Catch-alls for multi-purpose positions */
+Rule: PersonNameMultiWithMiddleInitials
+Priority: 20
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == standard}
+	):position
+	(FIRSTNAME):firstName
+	(INITIALS):middleInitials
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleInitials.MiddleInitials = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMultiWithMiddleInitials"}
+
+
+Rule: PersonNameMulti
+Priority: 18
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == standard}
+	):position
+	(FIRSTNAME):firstName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMulti"}
+
+
+Rule: PersonNameMultiWithMiddle
+Priority: 20
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == standard}
+	):position
+	(FIRSTNAME):firstName
+	(FIRSTNAME):middleName
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:firstName.FirstName = {}, 
+	:middleName.MiddleNames = {}, 
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMultiWithMiddle"}
+
+Rule: PersonNameMultiSurname
+Priority: 10
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position, Lookup.format == standard}
+	):position
+	(SURNAME):surname
+	(HONOUR)*:honour
+):person
+-->
+	:surname.Surname = {},
+	:position.Position = {format = :position.Lookup.format, full = :position.Lookup.full},
+	:honour.Honours = {},
+	:person.TempName = {rule = "PersonNameMultiSurname"}

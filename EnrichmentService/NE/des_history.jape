@@ -1,0 +1,30 @@
+/*
+* Filename: 	des_history.jape
+* Author:	Paul Appleby
+* Description:	Annotates historical things
+* Date created:	03/02/2011
+* This version:	0.1
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	History
+Input:  Split Token Lookup LineBreak
+Options: control = appelt negationGrouping = false
+
+
+/* Historical period */
+Rule: Period
+(
+	{Lookup.majorType == history, Lookup.minorType == period}
+):period
+-->
+	:period.Period = {rule = "Period", context =:period.Lookup.context}
+
+

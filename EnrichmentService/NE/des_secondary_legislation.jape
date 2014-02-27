@@ -1,0 +1,112 @@
+/*  
+* Filename: 	des_secondary_legislation.jape
+* Author:	Paul Appleby
+* Description:	Extract secondary legislation references from text and normalize ready for flexible matching
+* Date created:	04/05/2010
+* This version:	0.4
+*
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 30/09/10	0.4		PA		Changed normaltext to normalText
+* 05/08/10	0.3		PA		Removed embedded legislation
+* 29/07/10	0.2		PA		Added in test for already annotated legislation	
+*/
+
+Phase:	SecondaryLegislation
+Input:  Lookup Token LineBreak Legislation
+Options: control = appelt negationGrouping = false
+
+Rule: SecondaryLegislation
+(
+	(
+		{Token.string == "The", !Legislation}	|
+		{Token.string == "THE", !Legislation}
+	)
+	(
+		(
+			{Token.string == ",", !Legislation} |
+			{Token.category == CC, !Legislation} |
+			{Token.category == CD, !Legislation} |
+			{Token.category == DT, !Legislation} |
+			{Token.category == NN, !Legislation} |
+			{Token.category == NNS, !Legislation} |
+			{Token.category == NNP, !Legislation} |
+			{Token.category == NNPS, !Legislation} |
+			{Token.category == VB, !Legislation} |
+			{Token.category == TO, !Legislation} |
+			{Token.category == IN, !Legislation}
+		) |
+		(
+			{Token.string == "("}
+			(
+				{Token.string != ")"}
+			)+
+			{Token.string == ")"}
+		)		
+	)+
+	(
+		{Token.root == "order"} |
+		{Token.string == "regulations"} |
+		{Token.string == "Regulations"} |
+		{Token.string == "REGULATIONS"} |
+		{Token.string == "rules"} |
+		{Token.string == "Rules"} |
+		{Token.string == "RULES"}
+	)
+	(
+		{Token.string == "("}
+		(
+			{Token.root == "no"}
+			({Token.string == "."})?
+			{Token.kind == number}
+		)+
+		{Token.string == ")"}
+	)?
+	(
+		{Token.root == "order"}
+		{Token.root == "of"}
+		{Token.root == "council"}
+	)?
+	(
+		{Token.string == "("}
+		(
+			{Token.root == "northern"}
+			{Token.root == "ireland"}
+		)+
+		{Token.string == ")"}
+	)?
+	{Token.category == CD, Token.length == 4}
+):secondlegis
+-->
+{
+	
+	AnnotationSet legisSet = bindings.get("secondlegis");
+
+	// Get text covering entire annotation
+	Long startOffset = legisSet.firstNode().getOffset();
+	Long endOffset = legisSet.lastNode().getOffset();
+
+	// Remove any legislation embedded in the new legislation	
+	AnnotationSet legisExistSet = inputAS.get("Legislation", startOffset, endOffset);
+	outputAS.removeAll(legisExistSet);
+	
+	String annText = "";
+	try {
+		annText = doc.getContent().getContent(startOffset, endOffset).toString();
+	}
+	catch (Exception e) {
+	}
+
+	// Now normalize text
+	annText = annText.replaceAll("[(),.'-]", "");
+	
+	gate.FeatureMap features = Factory.newFeatureMap();
+	features.put("normalText", annText);
+	features.put("type", "secondary");
+	features.put("rule", "SecondaryLegislation");
+	outputAS.add(legisSet.firstNode(), legisSet.lastNode(), "Legislation", features);	
+
+}

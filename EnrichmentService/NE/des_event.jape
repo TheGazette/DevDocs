@@ -1,0 +1,102 @@
+/*
+* Filename: 	des_event.jape
+* Author:	Paul Appleby
+* Description:	Annotates events.
+* Date created:	13/08/2010
+* This version:	0.7
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 04/11/11	0.7		PA		Output context on event
+* 21/02/11	0.6		PA		Tweaked for performance
+* 06/12/10	0.5		PA		Stopped organisation in event term
+* 02/11/10	0.4		PA		Added NN to EVENTTERM and organisation events
+* 01/09/10	0.3		PA		Allowed apostrophes in term match
+* 15/08/10	0.2		PA		Added year to event term and event suffixes
+*/
+
+
+Phase:	Event
+Input:  Split Token Lookup LineBreak
+Options: control = appelt negationGrouping = false
+
+
+Macro: POSSESSION
+(
+	(
+		(
+			{Token.string == "\u2019"} |
+			{Token.string == "'"}
+		)
+		{Token.string == "s"}
+	) |
+	{Token.string == "'s"}
+)
+
+
+/* A term within an event title, including a year. We'll allow famous people in the event */
+Macro: EVENTTERM
+(
+	(
+		(
+			{Lookup.minorType == famous} |
+			{Token.orth == upperInitial, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == facility, !Lookup.minorType == organisation}
+		)
+		(POSSESSION)?
+	) |
+	{Token.orth == upperInitial, Token.category == JJ, !Lookup.minorType == facility, !Lookup.minorType == organisation} |
+	{Token.category == CD, Token.length == 4, Token.kind == number} |
+	(
+		(
+			{Lookup.minorType == famous} |
+			{Token.orth == allCaps, Token.category =~ "\\ANN", !Token.kind == "punctuation", !Lookup.minorType == facility, !Lookup.minorType == organisation}
+		)
+		(POSSESSION)?
+	)
+)
+
+/* Will pick up basic event sequences and organisation events */
+Macro: EVENTTERMSEQ
+(
+	(
+		{Lookup.minorType == organisation}
+		(POSSESSION)?
+		(EVENTTERM)*
+	) |
+	(EVENTTERM)+
+)
+
+
+/* Event such as Olympics */
+Rule: Event
+(
+	{Lookup.majorType == event, Lookup.minorType == event}
+):event
+-->
+	:event.Event = {rule = "Event", context = :event.Lookup.context}
+
+
+/* Events such as Ryder Cup, Fife Festival of Music */
+Rule: EventWithKey
+(
+	(
+		(EVENTTERMSEQ)
+		(
+			(
+				{Lookup.majorType == event, Lookup.minorType == event_type}
+			) |
+			(
+				{Lookup.majorType == event, Lookup.minorType == event_type, Lookup.suffix == "of"}
+				{Token.root == "of"}
+				(EVENTTERM)
+			)
+		)
+	):event
+)
+-->
+	:event.Event = {rule = "EventWithKey"}
+

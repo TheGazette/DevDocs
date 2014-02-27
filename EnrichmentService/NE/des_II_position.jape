@@ -1,0 +1,123 @@
+/*
+* Filename: 	des_II_position.jape
+* Author:		Paul Appleby
+* Description:	Annotates positions using existing annotations
+* Date created:	28/08/2010
+* This version:	0.8
+* 
+*/
+
+
+Phase:	PositionII
+Input:  Token Lookup LineBreak Position Company Organisation Publication Facility Person Country
+Options: control = appelt negationGrouping = false
+
+Macro: POSSESSION
+(
+	(
+		(
+			{Token.string == "\u2019"} |
+			{Token.string == "'"}
+		)
+		{Token.root == "s"}
+	) |
+	{Token.root == "'s"}
+)
+
+Macro: POSITION
+(
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix, !Position})?
+		(
+			{Lookup.majorType == position, Lookup.minorType == occupation, !Position} |
+			{Lookup.majorType == position, Lookup.minorType == position, !Position}
+		)
+		(
+			{Token.string == "of"}
+			(
+				(
+					{Token.category == "NNP", !Country, !Person}
+					(POSSESSION)?
+				) |
+				{Token.category == "NNS", Token.orth != "lowercase", !Country, !Person} |
+				{Token.category == "CC"} |
+				{Token.string == ","} |
+				{Token.category == "NNPS", !Country, !Person}
+			)[0,5]
+			(
+				{Token.category == "NNS", Token.orth != "lowercase", !Country, !Person} |
+				{Token.category == "NNP", !Country, !Person} |
+				{Token.category == "NNPS", !Country, !Person}
+			)
+		)?
+	)
+)
+
+
+Rule: OrganisationPosition
+(
+	{Organisation, !Position}
+	({Lookup.majorType == position, Lookup.minorType == position_prefix, !Lookup within Organisation})?
+	{Lookup.majorType == position, Lookup.minorType == position, !Lookup within Organisation}
+):position
+-->
+	:position.Position = {type = "general", rule = "OrganisationPosition", format = "generic"}
+
+
+Rule: CompanyPosition
+(
+	{Company, !Position}
+	(
+		{Token.string == "'"} |
+		(POSSESSION)
+	)
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix})?
+		{Lookup.majorType == position, Lookup.minorType == position}
+	):temp
+):position
+-->
+	:temp.TempPosition = {},
+	:position.Position = {type = "general", rule = "CompanyPosition", format = "generic"}
+
+
+/* If a person is followed directly by an occupation or position it is a very strong indicator */
+Rule: PersonOccupation
+(
+	{Person}
+	({Token.string == ","})?
+	({Token.category == DT})?
+	(
+		(POSITION)
+		(
+			{Token.category == CC}
+			(POSITION)
+		)?
+	):position
+)
+-->
+	:position.Position = {type = "general", rule = "PersonOccupation", format = "generic"}
+
+/* If a person is followed directly by an occupation or position it is a very strong indicator */
+Rule: PersonOccupation2
+(
+	{Person}
+	({Token.string == ","})?
+	(
+		({Lookup.majorType == position, Lookup.minorType == position_prefix, !Position})?
+		(
+			{Lookup.majorType == position, Lookup.minorType == occupation, !Position} |
+			{Lookup.majorType == position, Lookup.minorType == position, !Position}
+		)
+		(
+			{Token.string == "of"}
+			(
+				{Token.category == "NN", !Country, !Person} |
+				{Token.category == "NNP", !Country, !Person}
+			)
+		)
+	):position
+	{Token.string == "at"}
+)
+-->
+	:position.Position = {type = "general", rule = "PersonOccupationAt", format = "generic"}

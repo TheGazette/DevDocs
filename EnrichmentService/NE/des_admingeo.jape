@@ -1,0 +1,60 @@
+/*
+* Filename: 	des_admingeo.jape
+* Author:	Paul Appleby
+* Description:	Annotates admin geo locations, etc
+* Date created:	11/04/2010
+* This version:	0.4
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 27/09/10	0.4		PA		Added wards
+* 17/09/10	0.3		PA		Added in boroughs other than London and removed AdminCounty
+* 02/09/10	0.2		PA		Added in boroughs
+*/
+
+
+Phase:	Location
+Input:  Split Lookup Token LineBreak
+Options: control = appelt negationGrouping = false
+
+
+/* ========== Wards ========== */
+Rule: AdminWard
+(
+	{Lookup.majorType == admingeo, Lookup.minorType == ward}
+	{Token.root == "ward"}
+):ward
+-->
+	:ward.AdminArea = {rule = "AdminWard", type = "ward", context = :ward.Lookup.context}
+
+
+/* ========== London boroughs ========== */
+Rule: AdminBoroughLondon
+(
+	{Token.root == "london"}
+	{Token.root == "borough"}
+	{Token.root == "of"}
+	{Lookup.majorType == admingeo, Lookup.minorType == london_borough}
+):borough
+-->
+	:borough.AdminArea = {rule = "AdminBoroughLondon", type = "london", context = :borough.Lookup.context}
+
+
+/* ========== Other boroughs ========== */
+Rule: AdminBorough
+(
+	{Lookup.majorType == admingeo, Lookup.minorType == london_borough, Lookup.format == long}
+):borough
+-->
+	:borough.AdminArea = {rule = "AdminBorough", type="other", context = :borough.Lookup.context}
+
+
+Rule: AdminAreaShort
+(
+	{Lookup.majorType == admingeo, Lookup.minorType == admin_area, Lookup.format == short}
+):borough
+-->
+	:borough.AdminArea = {rule = "AdminAreaShort", type="other", context = :borough.Lookup.context}

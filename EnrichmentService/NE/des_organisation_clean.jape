@@ -1,0 +1,154 @@
+/*
+* Filename: 	des_organisation_clean.jape
+* Author:	Paul Appleby
+* Description:	Removes false positives for organisations
+* Date created:	18/06/2010
+* This version:	0.14
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 02/02/11	0.14		PA		Added OrganisationRemove7
+* 04/01/11	0.13		PA		Added in OrganisationRemove 5 and 6
+* 06/12/10	0.12		PA		Removed misc stuff
+* 22/09/10	0.11		PA		Added in OrganisationRemove4
+* 21/09/10	0.10		PA		Added in removal of Organisation in Position
+* 31/08/10	0.9		PA		Added AnnotationRemove1
+* 13/08/10	0.8		PA		Added in removal of organisation in Event
+* 05/06/10	0.7		PA		Added in removal of organisation after CD
+* 02/08/10	0.6		PA		Added in removal of organisation in facility
+* 30/07/10	0.5		PA		Updated OrganisationRemove3 to allow consecutive organisations
+* 18/06/10	0.4		PA		Added in removal of nested organisations
+* 15/06/10	0.3		PA		Added in removal of organisation within name
+* 24/05/10	0.2		PA		Added in removal of organisation within street and within a county
+*/
+
+
+Phase:	OrganisationClean
+Input:  Organisation Company Token LineBreak County Street Person Legislation Event Person County Street Facility Position Postcode Place
+Options: control = appelt negationGrouping = false
+
+
+/* Organisations within ... */
+Rule: OrganisationRemove1
+Priority: 10
+(
+	{Organisation within Company} |
+	{Organisation within Person} |
+	{Organisation within County} |
+	{Organisation within Street} |
+	{Organisation within Facility} |
+	{Organisation within Place} |	
+	{Organisation within Position} |	
+	{Organisation within Postcode} |
+	{Organisation within Legislation}
+):organisation
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	outputAS.removeAll(organisationSet);
+}
+
+
+Rule: AnnotationRemove1
+Priority: 20
+(
+	{Person within Organisation}
+):annotation
+-->
+{
+	AnnotationSet annotationSet = bindings.get("annotation");
+ 	outputAS.removeAll(annotationSet);
+}
+
+
+/* Look out for Executive Board */
+Rule: OrganisationRemove2
+Priority: 10
+(
+	{Organisation, Token.string == "Executive"}
+):organisation
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	AnnotationSet organisation = organisationSet.get("Organisation");
+ 	outputAS.removeAll(organisation);
+}
+
+
+/* Organisations CD (CD indicates an address probably) */
+Rule: OrganisationRemove3
+Priority: 10
+(
+	{Token.category == CD}
+	({Organisation}):organisation
+	{Token.string == ","}
+)
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	outputAS.removeAll(organisationSet);
+}
+
+
+/* Handle some edge cases for nationality organisations */
+Rule: OrganisationRemove4
+Priority: 10
+(
+	{Token.category == RB}
+	({Organisation.rule == "NationalityOrganisation"}):organisation
+)
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	outputAS.removeAll(organisationSet);
+}
+
+
+/* Unlikely POS combinations */
+Rule: OrganisationRemove5
+Priority: 10
+(
+	{Token.category == VBG}
+	({Organisation}):organisation
+	{Token.category == NNP}
+)
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	outputAS.removeAll(organisationSet);
+}
+
+
+/* Unlikely POS combinations */
+Rule: OrganisationRemove6
+Priority: 10
+(
+	({Organisation}):organisation
+	{Token.category == NNP}
+	{Token.category == VBZ}
+)
+-->
+{
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	outputAS.removeAll(organisationSet);
+}
+
+
+/* Remove single word places that are related to facility keys, e.g. 'Chapel' */
+Rule: OrganisationRemove7
+(
+	({Organisation.rule == "OrganisationEducational"}):organisation
+)
+-->
+{
+	// For now simply remove one word schools. Rubbish but better than not doing it
+	AnnotationSet organisationSet = bindings.get("organisation");
+ 	String orgName = gate.Utils.stringFor(doc, organisationSet);
+	if (orgName.indexOf(" ") == -1) {
+		outputAS.removeAll(organisationSet);
+	} 	
+}

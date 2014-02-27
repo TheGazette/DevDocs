@@ -1,0 +1,36 @@
+/*
+* Filename: 	des_location_2.jape
+* Author:	Paul Appleby
+* Description:	More location matches separate out from first pass to avoid rule clashes
+* Date created:	21/11/11
+* This version:	0.1
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+*/
+
+
+Phase:	Location2
+Input:  Split Lookup Token LineBreak
+Options: control = all negationGrouping = false
+
+
+/* ========== Continent ========== */
+Rule: Continent
+(
+	{Lookup.majorType == location, Lookup.minorType == continent}
+):continent
+-->
+	:continent.Continent = {rule = "Continent", context = :continent.Lookup.context}
+
+
+/* ========== Other regions of the world ========== */
+Rule: Region
+(
+  	{Lookup.majorType == location, Lookup.minorType == world_region}
+):region
+-->
+	:region.Location = {rule = "Region", type ="world", category = :region.Lookup.type, country = :region.Lookup.country, context = :region.Lookup.context}

@@ -1,0 +1,34 @@
+/*  
+* Filename: 	des_inline_om.jape
+* Author:		Paul Appleby
+* Description:	Used to detect inline markup in known namespaces
+* Date created:	16/06/2011
+* This version:	0.1
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+ */
+
+Phase: InlineDetection
+Input: a strong emphasis
+Options: control = appelt negationGrouping = false
+
+Rule: HTML
+( 
+	{a} |
+	{strong} |
+	{emphasis}
+):tag
+-->
+{
+	AnnotationSet tagSet = bindings.get("tag");
+	FeatureMap features = Factory.newFeatureMap();
+	features.put("rule", "HTML");
+	features.put("type", "");
+	outputAS.add(tagSet.firstNode(), tagSet.lastNode(), "Inline", features);
+	//System.out.println("Found inline annotation");
+}
+

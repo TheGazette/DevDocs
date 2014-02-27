@@ -1,0 +1,163 @@
+/*
+*  
+* Filename: 	des_term_abbrev.jape
+* Author:	Paul Appleby
+* Description:	Annotates abbreviations and terms
+* Date created:	05/03/2010
+* This version:	0.4
+* 
+* 
+* Change history
+* ==========================================================================
+* Date		Version		Author		Description
+* ==========================================================================
+* 
+* 13/12/10	0.4		PA		Added in TO category and check to ensure abbrev is completely consumed
+* 25/10/10	0.3		PA		Allowed commas in terms
+* 06/08/10	0.2		PA		Complete rewrite
+*/
+
+
+Phase:	TermAndAbbrev
+Input:  Split Token
+Options: control = appelt negationGrouping = false
+
+MACRO: INITIALTERMPHRASE
+(
+	{Token.category == JJ} |
+	{Token.category == NN, Token.string != "\u2019"} |
+	{Token.category == NNP} |
+	{Token.category == NNPS} |
+	{Token.category == NNS} |
+	{Token.category == VBN} |
+	{Token.category == VB}
+)
+
+
+MACRO: TERMPHRASE
+(
+	(
+		{Token.category == JJ} |
+		{Token.category == NN, Token.string != "\u2019"} |
+		{Token.category == NNP} |
+		{Token.category == IN} |
+		{Token.category == NNPS} |
+		{Token.category == NNS} |
+		{Token.category == VBN} |
+		{Token.category == VB} |
+		{Token.string == ","}
+	)
+	(
+		{Token.orth == apostrophe}  |
+		{Token.string == "'"}  |
+		{Token.string == "\u2019"}
+	)?
+)
+
+/* Look for term/abbreviation pairs. We'll do an overgreedy match on the term and the test */
+Rule: AbbreviationDefinition
+({Token.orth == apostrophe})?
+(
+	(INITIALTERMPHRASE)
+	({Token.category == TO})?
+	(TERMPHRASE)[0,7]
+	({Token.category == CC})?
+	(TERMPHRASE)[0,4]
+):term
+({Token.orth == apostrophe})?
+(
+	{Token.category == "("}
+	({Token.orth == allCaps}):abbrev
+	{Token.category == ")"}
+)
+-->
+{
+	try {
+		AnnotationSet termSet = bindings.get("term");
+		AnnotationSet abbrevSet = bindings.get("abbrev");
+		Annotation abbrevAnn = abbrevSet.iterator().next();
+
+		String abbrevText = gate.Utils.stringFor(doc, abbrevAnn);
+		//System.out.println("Testing ... " + abbrevText);
+		
+		// Now work back through text to test against abbreviation
+		Integer abbrevIndex = abbrevText.length() - 1;
+		Boolean isMatch = true;
+		List<Annotation> orderedText = gate.Utils.inDocumentOrder(termSet);
+		Integer listIndex = orderedText.size() - 1;
+		// We might not want to tag the entire term so keep track of the start of the bit we do
+		Long termStart = gate.Utils.end(termSet);
+		
+		while (abbrevIndex >=0 && listIndex >= 0 && isMatch) {
+			
+			// At the momeent we're assuming a one-to-one match between letter and term
+			// And looking our for terms in allCaps that appear verbatim in the acronym
+			// But some acronyms use several letters from a term ... to do!
+			String abbrevItemChar = abbrevText.substring(abbrevIndex, abbrevIndex + 1);
+			Annotation termItemAnn = orderedText.get(listIndex);
+			termStart = gate.Utils.start(termItemAnn);
+			String termItemText = gate.Utils.stringFor(doc, termItemAnn);		
+			String termItemType = termItemAnn.getFeatures().get("category").toString();
+			String termItemKind = termItemAnn.getFeatures().get("kind").toString();
+			String termItemOrth = "";
+			if (termItemAnn.getFeatures().get("orth") != null) 
+				termItemOrth = termItemAnn.getFeatures().get("orth").toString();
+			
+			if (!termItemType.equals("IN")
+				&& !termItemType.equals("CC")
+				&& !termItemType.equals("TO")
+				&& !termItemType.equals("POS")
+				&& !termItemKind.equals("punctuation")) {
+
+				//System.out.println("Testing " + abbrevItemChar + " against " + termItemText);
+				if (!termItemText.toLowerCase().startsWith(abbrevItemChar.toLowerCase())) {
+					// Is the term item allCaps? If so then probably all letters will be in acronym
+					if (termItemOrth.equals("allCaps")) {
+						abbrevIndex = abbrevIndex - termItemText.length() + 1;
+						String abbrevPartText = abbrevText.substring(abbrevIndex,
+							abbrevIndex + termItemText.length());
+						//System.out.println("Retesting " + abbrevPartText + " against " + termItemText);
+						if (!termItemText.equals(abbrevPartText)) isMatch = false;
+					}
+					else isMatch = false;
+				}
+				abbrevIndex--;
+			}
+			
+			listIndex--;
+		
+		}
+		
+		// Ran out of words to check against abbreviation
+		if (abbrevIndex >= 0) {
+			isMatch = false;
+			//System.out.println("Abbreviation could not find enough terms to match");
+		}
+
+		// Does the abbreviation match up with the term?	
+		if (isMatch) {
+			FeatureMap termFeatures = Factory.newFeatureMap();
+			termFeatures.put("rule", "AbbreviationDefinition");
+			termFeatures.put("abbrev", abbrevText);
+			outputAS.add(termStart, gate.Utils.end(termSet), "Term", termFeatures);
+
+			FeatureMap abbrevFeatures = Factory.newFeatureMap();
+			abbrevFeatures.put("rule", "AbbreviationDefinition");
+			outputAS.add(abbrevAnn.getStartNode(), abbrevAnn.getEndNode(), "TempAbbrev", abbrevFeatures);
+		}
+	}
+	catch (Exception e) {
+		System.err.println("An error occurred testing abbreviation and term: " + e.getMessage());
+	}
+}
+
+
+Rule: Abbrev
+(
+	{Token.string ==~ "[A-Z]{2,}s?"}
+):abbrev
+-->
+	:abbrev.TempAbbrev = {rule = "Abbrev"}
+
+
+
