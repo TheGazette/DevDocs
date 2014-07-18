@@ -9,6 +9,10 @@ The end point to see the basket details of a user
 
 {format} could be html, json etc
 
+See also
+
+- [Checkout](checkout.md)
+
 <table>
 <tr>
 	<th>Representation URI</th>

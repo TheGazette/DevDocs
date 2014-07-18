@@ -14,6 +14,7 @@ Valid bundle Ids can be found using:
 See also
 
 - [Create Bundle](create-bundle.md)
+- [Add a Bundle to the Basket](../basket/add-to-basket.md)
 
 ###Available methods###
 

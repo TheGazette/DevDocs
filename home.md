@@ -37,7 +37,7 @@ Gazettes have the following resources. Click on a link to read the API documenta
 
 * [Notice taxonomy](notice/notice-taxonomy.md)
 * [Place notice options](mygazette/place-options.md)  
-* [Submission and asynchronous process](notice/notice-submissions.md) 
+* [Create a Notice Bundle](mygazette/create-bundle.md)  
 * [Add to basket](basket/add-to-basket.md) 
 * [Checkout](basket/checkout.md) 
 
