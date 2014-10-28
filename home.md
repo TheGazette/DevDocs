@@ -58,10 +58,10 @@ The helpdesk can be contacted by emailing [cssup@tso.co.uk](mailto:cssup@tso.co.
 
 ## License ##
 
-All content is available under the Open Government Licence v2.0 except where otherwise stated
+All content is available under the Open Government Licence v3.0 except where otherwise stated
 	
 	(c) Crown copyright
 	You may use and re-use the code in this repository free of charge under the terms of the Open Government Licence
-	http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2
+	http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3
 
-For more information on the please visit [the national archives open government licence explanation](http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2) page
+For more information on the please visit [the national archives open government licence explanation](http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3) page
