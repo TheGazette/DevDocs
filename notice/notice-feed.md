@@ -136,7 +136,7 @@ The start and end parameter for each pair may be used independently.</td>
 </tr>
 <tr>
 <td rowspan=2>location-postcode-[n]</td>
-<td>UK postcode or Location (City or Town)</td>
+<td>UK postcode or Location (City or Town), <b>N.B. for each use a matching location-distance-[n] is also required</b></td>
 </tr>
 <tr>
 <td><b>Example Values:</b> NR3 1PD or London</td>
@@ -411,3 +411,54 @@ The JSON structure is derived from the atom xml format and contains an array of 
 	        }
 	    ]
 	}
+
+##Code samples##
+###JAVA###
+	
+	
+
+###PHP###
+
+
+- `$uri` to be a valid feed uri
+- `$bearer` set to be the users OAuth token if required
+- `$xsl_doc` should be a xslt 1.0 stylesheet to transform returned Atom feed to desired html
+
+*Assumes a php install with both cURL and DOM modules enablede* 
+
+	<?php
+	
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL,				$uri);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER,	true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,	false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,	false);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION,	false);
+		
+		$headers = array();
+		if($bearer != '')		$headers []= "Authorization: Bearer" . $bearer;
+		if(sizeof($headers) > 0)	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		
+		$response = curl_exec($ch);
+		
+		curl_close($ch);
+		
+		$html = transformXML($response, "notice-feed.xsl");
+		$xml_doc = new DOMDocument();
+		$xml_doc->loadXML($response);
+		
+		$xslt = new XSLTProcessor();
+		
+		$xsl_doc = new DOMDocument();
+		$xsl_doc->load($xsl);
+		
+		$xslt->importStylesheet($xsl_doc);
+		
+		$html = $xslt->transformToXML($xml_doc);
+		
+		echo $html;
+	?>
+
+###Javascript###
+
+	
