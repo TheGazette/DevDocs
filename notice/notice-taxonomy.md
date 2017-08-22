@@ -1,7 +1,8 @@
-[home](../home.md)
-#The Gazette Notice Taxonomy#
+[Home](../home.md)
+# The Gazette Notice Taxonomy #
 
 Used to retrieve a list of notices which can be placed by the current user.
+
 These end points are only available to authenticated users ([authentication](../authentication/sign-in.md)).
 
 ## Resource URL ##

@@ -23,10 +23,9 @@ Gazettes have the following resources. Click on a link to read the API documenta
 
 **Print Publishing Service**
 
-* [The Gazette Issue](publication/issue.md)
+* [The Gazette Issue](publication/index.md)
 * [The Gazette Supplement](publication/supplement.md)
 * [The Gazette Page](publication/page.md)
-* [The Gazette Index](publication/index.md)
  
 **Registration and user authentication**
 

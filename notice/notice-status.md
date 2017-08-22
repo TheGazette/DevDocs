@@ -1,5 +1,5 @@
-[home](../home.md)
-#The Gazette Notice  - Status#
+[Home](../home.md)
+# The Gazette Notice  - Status #
 
 The users can change the status of their unpublished notices, in order to do this they must be authenticated, [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
@@ -53,7 +53,7 @@ This is only possible when a notice has a status of <i>status</i>
 
 ## Code Samples ##
 
-###	java ###
+###	Java ###
 	// with accept header
 	import com.jayway.restassured.RestAssured;
 	import com.jayway.restassured.response.Response;
@@ -86,6 +86,6 @@ This is only possible when a notice has a status of <i>status</i>
 
 
 
-### php ###
+### PHP ###
 
-### javascript ###
+### Javascript ###

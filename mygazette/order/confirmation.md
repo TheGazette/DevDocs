@@ -1,5 +1,5 @@
-[home](../home.md)
-#Order confirmation#
+[Home](../home.md)
+# Order confirmation #
 Once and order has been placed and a purchase order number assigned the user will need to confirm the order.
 If the order has been confirmed then this page will return information on that confirmation.
 
@@ -7,7 +7,7 @@ These end points are only available to authenticated users with permission to pl
 
 ## Resource URL ##
 
-`my-gazette/order/{orderId}/confirmation`
+`/my-gazette/order/{orderId}/confirmation`
 
 See also
 
@@ -15,7 +15,7 @@ See also
 - [Confirm an Order](confirm.md)
 - [Cancel an Order](cancel.md)
 
-###Available methods###
+### Available methods ###
 
 <table>
 <tr>
@@ -33,4 +33,4 @@ See also
 ## Sample responses ##
 ### JSON ###
 
-##Code Samples##
+## Code Samples ##

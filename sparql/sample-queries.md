@@ -1,5 +1,5 @@
-[home](../home.md)
-# Sample SPARQL queries#
+[Home](../home.md)
+# Sample SPARQL queries #
 
 Useful resources:
 
@@ -8,7 +8,7 @@ Useful resources:
 - [Flint SPARQL editor project on github](https://github.com/TSO-Openup/FlintSparqlEditor)
 
 
-## Main Dataset##
+## Main Dataset ##
 	
 	PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -50,7 +50,7 @@ Useful resources:
 		}
 	}
 
-## Logitudinal Dataset (Archive)##
+## Logitudinal Dataset (Archive) ##
 
 	PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

@@ -1,13 +1,12 @@
-[home](../home.md)
-# My Gazette#
-
+[Home](../home.md)
+# My Gazette #
 
 These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
 **TODO: Need endpoints and description for following use cases.**
 
-##My Notices ##
-###My draft####
+## My Notices ##
+### My draft ###
 <table>
 <tr>
 	<th>Representation URI</th>
@@ -27,7 +26,7 @@ These end points are only available to authenticated Users, user needs  to [regi
 </tr>
 </table>
 
-###My pending draft###
+### My pending draft ###
 
 <table>
 <tr>
@@ -47,7 +46,7 @@ These end points are only available to authenticated Users, user needs  to [regi
 	<td>None</td>
 </tr>
 </table>
-###My withdrawn draft###
+### My withdrawn draft ###
 
 <table>
 <tr>
@@ -68,7 +67,7 @@ These end points are only available to authenticated Users, user needs  to [regi
 </tr>
 </table>
 
-###My rejected draft###
+### My rejected draft ###
 <table>
 <tr>
 	<th>Representation URI</th>
@@ -87,7 +86,7 @@ These end points are only available to authenticated Users, user needs  to [regi
 	<td>None</td>
 </tr>
 </table>
-###My published draft###
+### My published draft ###
 
 <table>
 <tr>
@@ -108,9 +107,9 @@ These end points are only available to authenticated Users, user needs  to [regi
 </tr>
 </table>
 
-##My Account##
+## My Account ##
 
-###My Account settings###
+### My Account settings ###
 User can retrieve account details using the following end points
 
 <table>
@@ -141,7 +140,7 @@ User can retrieve account details using the following end points
 </tr>
 </table>
 
-###My orders###
+### My orders ###
 <table>
 <tr>
 	<th>Representation URI</th>
@@ -163,7 +162,7 @@ User can retrieve account details using the following end points
 </table>
 
 
-##Saved searches##
+## Saved searches ##
 <table>
 <tr>
 	<th>Representation URI</th>
@@ -192,7 +191,7 @@ User can retrieve account details using the following end points
 </tr>
 </table>
 
-##Saved notics##
+## Saved notics ##
 
 <table>
 <tr>

@@ -1,19 +1,17 @@
-[home](../home.md)
-#The Gazette Supplement #
+[Home](../home.md)
+# The Gazette Supplement #
 Print versions of the Gazette can be retrieved in pdf format, data about these print editions can also be retrieved in RDF+XML and JSON formats.
 
 Similar resources
 
+- [Complete issue](index.md)
 - [Single Page](page.md)
-- [Supplements](supplement.md)
-- [Indexes](index.md)
-
 
 ## Resource URL ##
 
 `/{edition}/issue/{issue-number}/supplement`
 
-Suppplements exist for the following editions, the correct parameter follows the title:
+Supplements exist for the following editions, the correct parameter follows the title:
 
 - The London Gazette: `london`
 - The Edinburgh Gazette: `edinburgh`

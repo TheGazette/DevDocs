@@ -1,4 +1,4 @@
-[home](../home.md)
+[Home](../home.md)
 
 
 # REST API: Notice Feed #
@@ -412,12 +412,12 @@ The JSON structure is derived from the atom xml format and contains an array of 
 	    ]
 	}
 
-##Code samples##
-###JAVA###
+## Code samples ##
+### Java ###
 	
 	
 
-###PHP###
+### PHP ###
 
 
 - `$uri` to be a valid feed uri
@@ -459,6 +459,6 @@ The JSON structure is derived from the atom xml format and contains an array of 
 		echo $html;
 	?>
 
-###Javascript###
+### Javascript ###
 
 	

@@ -1,13 +1,11 @@
-[home](../home.md)
-#The Gazette Page #
+[Home](../home.md)
+# The Gazette Page #
 Single pages of the print versions of the Gazette can be retrieved in pdf format, data about these print editions can also be retrieved in issues and supplements RDF+XML and JSON formats.
 
 Similar resources
 
-- [Complete Issue](issue.md)
+- [Complete Issue](index.md)
 - [Supplements](supplement.md)
-- [Indexes](index.md)
-
 
 ## Resource URL ##
 

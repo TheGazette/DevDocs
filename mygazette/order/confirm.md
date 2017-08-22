@@ -1,12 +1,12 @@
-[home](../home.md)
-#Confirm an Order#
+[Home](../home.md)
+# Confirm an Order #
 Once and order has been placed and a purchase order number assigned the user will need to confirm the order, once confirmed the user 
 
 These end points are only available to authenticated users with permission to place notices, user needs  to [register](../authentication/registration.md) as either an individual or an organisation and then [sign-in](../authentication/sign-in.md).
 
 ## Resource URL ##
 
-`my-gazette/order/{orderId}/confirm`
+`/my-gazette/order/{orderId}/confirm`
 
 See also
 
@@ -14,7 +14,7 @@ See also
 - [Confirm an Order](confirm.md)
 - [Cancel an Order](cancel.md)
 
-###Available methods###
+### Available methods ###
 
 <table>
 <tr>
@@ -33,4 +33,4 @@ See also
 ## Sample responses ##
 ### JSON ###
 
-##Code Samples##
+## Code Samples ##

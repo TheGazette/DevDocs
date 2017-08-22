@@ -1,17 +1,11 @@
-[home](../home.md)
-# The Gazette Add To Basket#
-
+[Home](../home.md)
+# The Gazette Add To Basket #
 
 These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
-User must have required access to see the basket details.
-The end point to see the basket details of a user
+User must have the appropriate access to see the basket details. See also [Checkout](checkout.md).
 
-{format} could be html, json etc
-
-See also
-
-- [Checkout](checkout.md)
+## Resource URL ##
 
 <table>
 <tr>
@@ -38,7 +32,7 @@ See also
 </table>
 
 
-single or multiple notices can be posted to basket. To add a single item to the basket , **noticeId** must be part of request, the URI is: 
+Single or multiple notices can be posted to basket. To add a single item to the basket , **noticeId** must be part of request, the URI is: 
 
 <table>
 <tr>
@@ -178,7 +172,7 @@ To increase the quantity of an item, URI is
 
 
 
-  - from individual notice
+- from individual notice
 - Basket contents
   - HTML
   - XML

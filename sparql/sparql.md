@@ -1,5 +1,5 @@
-[home](../home.md)
-#SPARQL Endpoints#
+[Home](../home.md)
+# SPARQL Endpoints #
 
 The data of The Gazette can be queried against by using SPARQL against one of the two endpoints provided.
 The main `/sparql` endpoint is populated with data from the modern notices which have been placed in the Gazette (starting from 1998). The `/longitudinal-dataset/sparql` endpoint contains the information derived from indexes of Archive of the Gazette and span a time period from 1900 to 1999.

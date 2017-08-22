@@ -1,10 +1,10 @@
-[home](../home.md)
-#Existing Bundle#
+[Home](../home.md)
+# Existing Bundle #
 Once a bundle has been created it can be accessed and deleted by the user who created it.
 These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
 ## Resource URL ##
-`my-gazette/bundle/{bundle-id}`
+`/my-gazette/bundle/{bundle-id}`
 
 Valid bundle Ids can be found using:
 
@@ -16,7 +16,7 @@ See also
 - [Create Bundle](create-bundle.md)
 - [Add a Bundle to the Basket](../basket/add-to-basket.md)
 
-###Available methods###
+### Available methods ###
 
 <table>
 <tr>
@@ -36,7 +36,7 @@ See also
 </table>
 
 
-###Alternative Representations###
+### Alternative Representations ###
 <table>
 <tr>
 	<th>Representation URI</th>
@@ -70,13 +70,13 @@ See also
 </table>
 
 ## Sample responses ##
-###XML (Atom)###
-###JSON###
+### XML (Atom) ###
+### JSON ###
 
 
 
-##Code samples##
-###java###
+## Code samples ##
+### Java ###
 
 Retrieving the content of an exisiting bundle
 

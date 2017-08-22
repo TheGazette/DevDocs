@@ -1,5 +1,5 @@
-[home](../home.md)
-#The Gazette Notice - Previous versions#
+[Home](../home.md)
+# The Gazette Notice - Previous versions #
 Previous versions of the Notice content can be retrieved using following URIs, content will be for a particular notice (notice-id). 
 The user can optionally be registered for this endpoint, being authenticated will allow users to retrieve their unpublished notices. [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 

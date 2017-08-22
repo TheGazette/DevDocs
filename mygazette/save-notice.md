@@ -1,5 +1,5 @@
-[home](../home.md)
-#Saved notice #
+[Home](../home.md)
+# Saved notice #
 Authenticated users can save notices to the My Gazette area for future reference, information about  [registration](../authentication/registration.md) and [signing-in](../authentication/sign-in.md).
 
 Related Resources
@@ -27,9 +27,10 @@ Valid notice Ids for published notices can be found using:
 <td>HTML</td>
 </tr>
 </table>
-##Sample Response##
-###XML###
-###JSON###
+
+## Sample Response ##
+### XML ###
+### JSON ###
 Success (200 Status Code)
 
 	{}
@@ -39,7 +40,7 @@ Failure	(400 Status Code)
 	{}
 
 
-##Parameters##
+## Parameters ##
 <table>
 <tr>
 <th>Parameter</th>
@@ -58,7 +59,7 @@ Failure	(400 Status Code)
 
 ## Code Samples ##
 
-###	java ###
+###	Java ###
 	
-### php ###
-###javascript###
+### PHP ###
+### Javascript ###

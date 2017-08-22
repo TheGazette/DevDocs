@@ -1,9 +1,9 @@
-[home](../home.md)
-#Place notice options#
+[Home](../home.md)
+# Place notice options #
 
 These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
-## Options to place notices##
+## Options to place notices ##
 
 This is for html clients only , returns back a list of options to place a notice based on user access level.
 <table>
@@ -42,12 +42,12 @@ This is for html clients only , returns back a list of options to place a notice
 
 ## Sample Responses ##
 
-###XML###
-###JSON###
+### XML ###
+### JSON ###
 
 
 
-##XML submission##
+## XML submission ##
 
 XML as request body or multipart file upload.
 <table>
@@ -69,7 +69,7 @@ XML as request body or multipart file upload.
 
 ## Code samples
 
-### java ###
+### Java ###
 
 	final String uri = "https://www.thegazette.co.uk/my-gazette/place-notice";
 	HttpClient client = new HttpClient();

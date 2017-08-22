@@ -1,11 +1,11 @@
-[home](../home.md)
-# The Gazette Checkout#
-
+[Home](../home.md)
+# The Gazette Checkout #
 
 These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.html) and [sign-in](../authentication/sign-in.html).
 
-##Resource URL##
-`my-gazette/checkout`
+## Resource URL ##
+
+`/my-gazette/checkout`
 
 See also
 

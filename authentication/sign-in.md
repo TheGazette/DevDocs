@@ -1,5 +1,5 @@
-[home](../home.md)
-#REST API: Sign In #
+[Home](../home.md)
+# REST API: Sign In
 
 User Authentication in The Gazette REST API works based on the [OAuth2.0](http://tools.ietf.org/html/rfc6749) principles using '[Resource Owner Password Credentials](http://tools.ietf.org/html/rfc6749#page-38)’ grant type, which allows the client to exchange a user’s username and password for an access token.
 
@@ -32,7 +32,7 @@ HTTP status code should be used an indicator to success, a 200 return code is
 </tr>
 </table>
 
-##Parameters##
+## Parameters
 <table>
 <tr>
 <th>Parameter</th>
@@ -62,8 +62,8 @@ HTTP status code should be used an indicator to success, a 200 return code is
 </tr>
 </table>
 
-##Sample Response##
-###JSON###
+## Sample Response
+### JSON
 Success (200 Status Code)
 	
 	{  
@@ -79,9 +79,9 @@ Failure	(400 Status Code)
 		"error_description":"zzzzzzzzzzzzzzzzzzzzzzzzz"
 	}
 
-##Code Samples##
+## Code Samples
 
-###Java###
+### Java
 To run the sample below you need to have JDK and rest assured jars in class path.
 	
 	CookieHandler.setDefault(new CookieManager());
@@ -113,7 +113,7 @@ To run the sample below you need to have JDK and rest assured jars in class path
 	    httpPost.releaseConnection();
 	}
 	
-###php###
+### PHP
 
 Requires that $username,$password,$headerAuth are defined with appropriate, requires a [php installation with cURL](https://php.net/curl) to be enabled.
 `$headerAuth` should be set to `Basic dHNvOkphdmEkY3IxcHQh`.
@@ -143,7 +143,7 @@ Requires that $username,$password,$headerAuth are defined with appropriate, requ
 		curl_close($ch);
 	?>
 
-###Javascript###
+### Javascript
 Requires that username, password and headerAuth are defined with appropriate values. The `headerAuth` variable should be set to `Basic dHNvOkphdmEkY3IxcHQh`.
 
 *with jQuery*

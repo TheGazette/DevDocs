@@ -1,12 +1,12 @@
-[home](../home.md)
-#Assign Purchase Order Number#
+[Home](../home.md)
+# Assign Purchase Order Number #
 Once and order has been placed and a purchase order number can be assigned.
 
 These end points are only available to authenticated users with permission to place notices, user needs  to [register](../authentication/registration.md) as either an individual or an organisation and then [sign-in](../authentication/sign-in.md).
 
 ## Resource URL ##
 
-`my-gazette/order/{orderId}/assign-po-number`
+`/my-gazette/order/{orderId}/assign-po-number`
 
 See also
 
@@ -15,7 +15,7 @@ See also
 - [Confirm an Order](confirm.md)
 - [Cancel an Order](cancel.md)
 
-###Available methods###
+### Available methods ###
 
 <table width=100%>
 <tr>
@@ -44,4 +44,4 @@ See also
 ## Sample responses ##
 ### JSON ###
 
-##Code Samples##
+## Code Samples ##

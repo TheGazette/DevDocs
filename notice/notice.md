@@ -1,5 +1,5 @@
-[home](../home.md)
-#The Gazette Notice #
+[Home](../home.md)
+# The Gazette Notice #
 Notice content can be retrieved using following URIs, content will be for a particular notice (notice-id).
 The user can optionally be registered for this endpoint, being authenticated will allow users to retrieve their unpublished notices. To be authenticated users must [register](../authentication/registration.md) and then [sign-in](../authentication/sign-in.md).
 
@@ -175,6 +175,7 @@ Due to the large number of alternative representations available there is a note
 </tr>
 </table>
 *\*Only included where the response type is otherwise ambiguous*
+
 ## Parameters ##
 <table>
 <tr>
@@ -188,7 +189,7 @@ Due to the large number of alternative representations available there is a note
 
 ## Code Samples ##
 
-###	java ###
+###	Java ###
 	// with accept header
 	import com.jayway.restassured.RestAssured;
 	import com.jayway.restassured.response.Response;
@@ -221,7 +222,7 @@ Due to the large number of alternative representations available there is a note
 
 
 
-### php ###
+### PHP ###
 	<?php
 		//$noticeId should be set to the notice Id to be retrieved
 		$noticeURI = "https://www.thegazette.co.uk/notice/" + $noticeId;
@@ -240,7 +241,7 @@ Due to the large number of alternative representations available there is a note
 		}
 	?>
 
-### javascript ###
+### Javascript ###
 *without external libraries*
 
 	//noticeId should be set to the notice Id to be retrieved	    

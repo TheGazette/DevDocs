@@ -1,5 +1,5 @@
-[home](../home.md)
-#Bundle Status#
+[Home](../home.md)
+# Bundle Status #
 Once a [bundle has been submitted](create-bundle.md) this starts an Asynchronous process whereby the bundle is transformed into notices and validated as containing the correct information.
 
 This end point is only available to authenticated users with permission to place notices, user needs  to [register](../authentication/registration.md) as either an individual or an organisation and then [sign-in](../authentication/sign-in.md).
@@ -8,7 +8,7 @@ The registered user is only able to check the status of their own bundles
 
 ## Resource URL ##
 
-`my-gazette/bundle/{bundleId}/process-status`
+`/my-gazette/bundle/{bundleId}/process-status`
 
 See also
 
@@ -17,7 +17,7 @@ See also
 
 ## Sample responses ##
 ### JSON ###
-####An in-progress bundle####
+#### An in-progress bundle ####
 
 	{
 	    "process-status": "in-progress",
@@ -55,7 +55,7 @@ See also
 	        ]
 	    }
 	}
-####A completed bundle####
+#### A completed bundle ####
 
 	{
 	    "process-status": "completed",
@@ -94,4 +94,4 @@ See also
 	    }
 	}
 
-##Code Samples##
+## Code Samples ##
