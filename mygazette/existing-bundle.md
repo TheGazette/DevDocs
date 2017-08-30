@@ -276,28 +276,26 @@ See also
 ## Code samples ##
 ### Java ###
 
-Retrieving the content of an exisiting bundle
+To run the sample below you need to have JDK and [Apache HttpClient](https://hc.apache.org/httpcomponents-client-ga/index.html) on the class path.
+
+	CloseableHttpClient httpClient = HttpClients.createDefault();
 
 	final String uri = "https://www.thegazette.co.uk/my-gazette/bundle/76838";
-	HttpClient client = new HttpClient();
-	HttpMethod httpGet = new GetMethod(uri);
-	
+	HttpGet httpGet = new HttpGet(uri);
+	httpGet.addHeader("Accept", "application/json");
+	httpGet.addHeader("Authorization", "Bearer xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+
 	try {
-	    int httpStatus = client.executeMethod(httpGet);
-	    System.out.println("Http response code: " + httpStatus);
-	    
-	    InputStream is = httpGet.getResponseBodyAsStream();
-		
-		// process content in the InputStream
-		BufferedInputStream is = new BufferedInputStream(is);
-	    int r=0;
-	    byte[] buf = new byte[10];
-	    while((r = is.read(buf)) > 0) {
-	        System.out.write(buf,0,r);
-	    }
-	    
+		HttpResponse response = httpClient.execute(httpGet);
+		System.out.println("Http response code: " + response.getStatusLine().getStatusCode());
+		System.out.println("Response body: \n" + EntityUtils.toString(response.getEntity()));
 	} catch (IOException e) {
-	    e.printStackTrace();
+		e.printStackTrace();
 	} finally {
-	    httpGet.releaseConnection();
+		try {
+			httpGet.releaseConnection();
+			httpClient.close();
+		} catch (IOException e) { 
+			System.out.println("unable to close HttpClient at this time"); 
+		}
 	}

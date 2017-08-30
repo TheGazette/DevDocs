@@ -109,36 +109,31 @@ Once a successful [response](sign-in.md#sample-response) has been received from 
 ## Code Samples
 
 ### Java
-To run the sample below you need to have JDK and rest assured jars in class path.
+To run the sample below you need to have JDK and [Apache HttpClient](https://hc.apache.org/httpcomponents-client-ga/index.html) on the class path.
 	
-	CookieHandler.setDefault(new CookieManager());
-	
-	final String uri = "https://www.thegazette.co.uk/oauth/token";
-	HttpClient client = new HttpClient();
+	CloseableHttpClient httpClient = HttpClients.createDefault();
 
-	HttpMethod httpPost = new PostMethod(uri);
-	httpPost.addRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	httpPost.addRequestHeader("Authorization", "Basic tttttttttttttttttttttttt");
-
-	final String body = "email=person@email.com&password=passWord&grant_type=password&scope=trust";
-	RequestEntity requestEntity = new StringRequestEntity(body); 
-	((PostMethod) httpPost).setRequestEntity(requestEntity);
+	HttpPost httpPost = new HttpPost("https://www.thegazette.co.uk/oauth/token");
+	httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
+	httpPost.addHeader("Authorization", "Basic tttttttttttttttttttt");
 
 	try {
-	    int httpStatus = client.executeMethod(httpPost);
-	    System.out.println("Http response code: " + httpStatus);
+		final String body = "username=person@email.com&password=passWord&grant_type=password&scope=trust";
+		StringEntity entity = new StringEntity(body);
+		httpPost.setEntity(entity);
 
-	    BufferedInputStream inputStream = new BufferedInputStream(httpPost.getResponseBodyAsStream());
-	    int r = 0;
-	    byte[] buf = new byte[10];
-	
-	    while ((r = inputStream.read(buf)) > 0) {
-	        System.out.write(buf, 0, r);
-	    }
+		HttpResponse response = httpClient.execute(httpPost);
+		System.out.println("Http response code: " + response.getStatusLine().getStatusCode());
+		System.out.println("Response body: \n" + EntityUtils.toString(response.getEntity()));
 	} catch (IOException e) {
-	    e.printStackTrace();
+		e.printStackTrace();
 	} finally {
-	    httpPost.releaseConnection();
+		try {
+			httpPost.releaseConnection();
+			httpClient.close();
+		} catch (IOException e) {
+			System.out.println("unable to close HttpClient at this time");
+		}
 	}
 	
 ### PHP

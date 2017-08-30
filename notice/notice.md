@@ -193,38 +193,30 @@ Due to the large number of alternative representations available there is a note
 
 ## Code Samples ##
 
-###	Java ###
-	// with accept header
-	import com.jayway.restassured.RestAssured;
-	import com.jayway.restassured.response.Response;
-	public class RestClient {
-		public static void main(String args[])
-		{
-			// get the access token via POST explained in Sign-in document.
-		   	RestAssured.baseURI = "https://www.thegazette.co.uk";
-		   	
-		   	Response response = given().header("Authorization", "Bearer " + accessToken).header("Accept", "application/rdf+xml").expect().statusCode(200).get("/notice/{notice-id}");
-			String asString = response.getBody().asString();
-	    }
-	
+### Java ###
+
+To run the sample below you need to have JDK and [Apache HttpClient](https://hc.apache.org/httpcomponents-client-ga/index.html) on the class path.
+
+	CloseableHttpClient httpClient = HttpClients.createDefault();
+
+	final String uri = "https://www.thegazette.co.uk/notice/2829074";
+	HttpGet httpGet = new HttpGet(uri);
+	httpGet.addHeader("Accept", "application/rdf+xml");
+
+	try {
+		HttpResponse response = httpClient.execute(httpGet);
+		System.out.println("Http response code: " + response.getStatusLine().getStatusCode());
+		System.out.println("Response body: \n" + EntityUtils.toString(response.getEntity()));
+	} catch (IOException e) {
+		e.printStackTrace();
+	} finally {
+		try {
+			httpGet.releaseConnection();
+			httpClient.close();
+		} catch (IOException e) { 
+			System.out.println("unable to close HttpClient at this time"); 
+		}
 	}
-	
-	// without accept header
-	import com.jayway.restassured.RestAssured;
-	import com.jayway.restassured.response.Response;
-	public class RestClient {
-		public static void main(String args[])
-		{
-			// get the access token via POST explained in Sign-in document.
-		   	RestAssured.baseURI = "https://www.thegazette.co.uk";
-	
-	    	Response response = given().expect().statusCode(200).get("/notice/{notice-id}");
-			String asString = response.getBody().asString();
-	    }
-
-	}
-
-
 
 ### PHP ###
 	<?php

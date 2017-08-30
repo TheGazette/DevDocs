@@ -69,52 +69,48 @@ application/vnd.openxmlformats-officedocument.wordprocessingml.document
 </tr>
 </table>
 
-
-
 \**Microsoft Word template upload is only available on request*
-
-
 
 ## XML submission ##
 
 The schema for a valid XML bundle can be found [here](https://github.com/TheGazette/Transformations/tree/master/XMLSubmissionSchema/Schema/Schema), with an example XML bundle [here](example-bundle.xml).
 
-A successful submission will receive an HTTP 201 Created response.
+A successful submission will receive an HTTP 201 Created response. The URI for the newly created bundle is returned in the "Location" header.
 
 ## Code Samples ##
 
 ### Java ###
 	
-	final String uri = "https://test.thegazette.co.uk/my-gazette/bundle";
-	HttpClient client = new HttpClient();
+To run the sample below you need to have JDK and [Apache HttpClient](https://hc.apache.org/httpcomponents-client-ga/index.html) on the class path.
 	
-	HttpMethod httpPost = new PostMethod(uri);
-	httpPost.addRequestHeader("Content-Type", "text/xml; charset=UTF-8");
-	
+	CloseableHttpClient httpClient = HttpClients.createDefault();
+
+	final String uri = "https://www.thegazette.co.uk/my-gazette/bundle";
+	HttpPost httpPost = new HttpPost(uri);
+	httpPost.addHeader("Content-Type", "application/xml");
+	httpPost.addHeader("Authorization", "Bearer xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+
 	try {
-	    InputStream is = new FileInputStream("post-bundle.xml");
-	    RequestEntity requestEntity = new InputStreamRequestEntity(is);
-	    ((PostMethod)httpPost).setRequestEntity(requestEntity);
-	} catch (FileNotFoundException e1) {
-	    e1.printStackTrace();
-	}
-	
-	
-	try {
-	    int httpStatus = client.executeMethod(httpPost);
-	    System.out.println("Http response code: " + httpStatus);
-	    
-	    BufferedInputStream is = new BufferedInputStream(httpPost.getResponseBodyAsStream());
-	    int r=0;
-	    byte[] buf = new byte[10];
-	    while((r = is.read(buf)) > 0) {
-	        System.out.write(buf,0,r);
-	    }
-	    
+		File file = new File("path/to/bundle.xml");
+		InputStreamEntity inputStreamEntity = new InputStreamEntity(new FileInputStream(file));
+		httpPost.setEntity(inputStreamEntity);
+
+		HttpResponse response = httpClient.execute(httpPost);
+		System.out.println("Http response code: " + response.getStatusLine().getStatusCode());
+		System.out.println("Response body: \n" + EntityUtils.toString(response.getEntity()));
+
+		for (Header header : response.getHeaders("Location")) {
+			System.out.println("Bundle URI: " + header.getValue());
+		}
 	} catch (IOException e) {
-	    e.printStackTrace();
+		e.printStackTrace();
 	} finally {
-	    httpPost.releaseConnection();
+		try {
+			httpClient.releaseConnection();
+			client.close();
+		} catch (IOException e) {
+			System.out.println("unable to close HttpClient at this time");
+		}
 	}
 
 ### PHP ###
