@@ -65,22 +65,19 @@ In each instance the base URI can be either `/notice-taxonomy/` or  `/notice-tax
 
 <table>
 <tr>
-<td rowspan=2 style="width:12em">online-form-edition</td>
-<td>limits the returned taxonomy to those notices which can be placed by the user, on a per edition basis</td>
+<th>Parameter name</th>
+<th>Parameter type</th>
+<th>Notes</th>
 </tr>
 <tr>
-<td><b>Example Values:</b> london, edinburgh or belfast</td>
+<td>categoriesOnly</td>
+<td>boolean</td>
+<td>Whether to exclude subcategories from the response</td>
 </tr>
 </table>  
-- (above exists currently but parameter is named different)
-
-</table>
 
 ## Sample Responses ##
 The results from this endpoint are available as either xml or json. Below are samples of responses from both the 3 level portion of the taxonomy and also the 2 level portion of the taxonomy.
-
-	https://www.thegazette.co.uk/notice-taxonomy/24/data.xml?online-edition-form=london
-	https://www.thegazette.co.uk/notice-taxonomy/29/data.xml?online-edition-form=london
 
 ### XML ###
 

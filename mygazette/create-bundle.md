@@ -6,6 +6,8 @@ These end points are only available to authenticated users with permission to pl
 
 The type of user registered will affect the ability of that user to place notices of different types and also the ability to place notice utilising different routes.
 
+Once a bundle has been submitted, you are able to [check on it's status](bundle-status.md).
+
 ## Resource URL ##
 
 `/my-gazette/bundle`
@@ -13,7 +15,7 @@ The type of user registered will affect the ability of that user to place notice
 See also
 
 - [Existing Bundle](existing-bundle.md)
-- [HTML5+RDFa notice creation](notice-submit)
+- [Bundle Status](bundle-status.md)
 
 Content to be process should be included either in the request body or multipart file upload.
 
@@ -75,7 +77,9 @@ application/vnd.openxmlformats-officedocument.wordprocessingml.document
 
 ## XML submission ##
 
-## Sample responses ##
+The schema for a valid XML bundle can be found [here](https://github.com/TheGazette/Transformations/tree/master/XMLSubmissionSchema/Schema/Schema), with an example XML bundle [here](example-bundle.xml).
+
+A successful submission will receive an HTTP 201 Created response.
 
 ## Code Samples ##
 

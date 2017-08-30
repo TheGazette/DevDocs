@@ -3,19 +3,15 @@
 
 User Authentication in The Gazette REST API works based on the [OAuth2.0](http://tools.ietf.org/html/rfc6749) principles using '[Resource Owner Password Credentials](http://tools.ietf.org/html/rfc6749#page-38)’ grant type, which allows the client to exchange a user’s username and password for an access token.
 
-The Gazette REST clients interested in accessing secured resources in The Gazette must obtain OAuth token from the sign-in end point as below.
+In order to access secured resources in The Gazette, REST clients must obtain OAuth token from the sign-in end point as below.
 
-To access the Gazette OAuth token endpoint your API client must use an appropriate client user name and secret. Please contact TSO customer service to get the Client user name and secret code for accessing the token endpoint.
+## Prerequisites
 
-To obtain The Gazette OAuth token you need to do following:
-
-**TO DO:** Add some notes on the Authorization header value i.e. how the client should generate and using the API client credentials. 
+To access the Gazette OAuth token endpoint, your API client must use an appropriate Basic authentication token. Please contact TSO customer service to get the Basic authentication token for accessing the token endpoint.
 
 ## Resource URL ##
 
 `/oauth/token`
-
-HTTP status code should be used an indicator to success, a 200 return code is
 
 <table>
 <tr>
@@ -62,22 +58,53 @@ HTTP status code should be used an indicator to success, a 200 return code is
 </tr>
 </table>
 
+## Headers
+
+To get a basic auth token, please refer to [Prerequisites](sign-in.md#prerequisites).
+
+<table>
+<tr>
+<th>Header</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>Basic {basic-auth-token}</td>
+</tr>
+</table>
+
 ## Sample Response
 ### JSON
 Success (200 Status Code)
 	
 	{  
-		"access_token":"xxxxxxxxxxxxxxxxxxxxxxxxxx",  
-		"token_type":"bearer",  
-		"expires_in":3600,  
-		"refresh_token":"yyyyyyyyyyyyyyyyyyyyyyyyy"
+		"access_token": "xxxxxxxxxxxxxxxxxxxxxxxxxx",  
+		"token_type": "bearer",  
+		"expires_in": 3600,  
+		"scope": "trust"
 	}
+	
 Failure	(400 Status Code)
 
 	{
 		"error":"invalid_request",
-		"error_description":"zzzzzzzzzzzzzzzzzzzzzzzzz"
+		"error_description":"yyyyyyyyyyyyyyyyyyyyyyyyy"
 	}
+	
+## Using the OAuth token to authenticate
+
+Once a successful [response](sign-in.md#sample-response) has been received from the end point, the client will be able to include the provided OAuth token on any API end points which require the client to authenticate:
+
+<table>
+<tr>
+<th>Header</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>Bearer {access_token}</td>
+</tr>
+</table>
 
 ## Code Samples
 
@@ -86,13 +113,14 @@ To run the sample below you need to have JDK and rest assured jars in class path
 	
 	CookieHandler.setDefault(new CookieManager());
 	
-	final String uri = "https://www.thegazette.co.uk/sign-in";
+	final String uri = "https://www.thegazette.co.uk/oauth/token";
 	HttpClient client = new HttpClient();
 
 	HttpMethod httpPost = new PostMethod(uri);
 	httpPost.addRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	httpPost.addRequestHeader("Authorization", "Basic tttttttttttttttttttttttt");
 
-	final String body = "email=person@email.com&password=passWord";
+	final String body = "email=person@email.com&password=passWord&grant_type=password&scope=trust";
 	RequestEntity requestEntity = new StringRequestEntity(body); 
 	((PostMethod) httpPost).setRequestEntity(requestEntity);
 
@@ -100,13 +128,13 @@ To run the sample below you need to have JDK and rest assured jars in class path
 	    int httpStatus = client.executeMethod(httpPost);
 	    System.out.println("Http response code: " + httpStatus);
 
-	    BufferedInputStream is = new BufferedInputStream(httpPost.getResponseBodyAsStream());
+	    BufferedInputStream inputStream = new BufferedInputStream(httpPost.getResponseBodyAsStream());
 	    int r = 0;
 	    byte[] buf = new byte[10];
-	    while ((r = is.read(buf)) > 0) {
-		System.out.write(buf, 0, r);
+	
+	    while ((r = inputStream.read(buf)) > 0) {
+	        System.out.write(buf, 0, r);
 	    }
-
 	} catch (IOException e) {
 	    e.printStackTrace();
 	} finally {

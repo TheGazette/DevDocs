@@ -1,15 +1,14 @@
 [Home](../home.md)
 # The Gazette Notice - Previous versions #
-Previous versions of the Notice content can be retrieved using following URIs, content will be for a particular notice (notice-id). 
-The user can optionally be registered for this endpoint, being authenticated will allow users to retrieve their unpublished notices. [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
-Initial version (1) will contain the submitted version of the notice and are available in the format which was submitted for more information on these formats see the [notice placement](../mygazette/mygazette.md) documentation. Subsequent versions are available as (X)HTML5+RDFa similar to the data.xml available for the current version of a [notice](notice.md).
+Previous versions of the Notice content can be retrieved using following URIs, content will be for a particular notice (notice-id). The user can optionally be registered for this endpoint, being authenticated will allow users to retrieve their unpublished notices. For more info, see [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
+
+Initial version (1) will contain the submitted version of the notice and are available in the format which was originally submitted. For more information on these formats see the [notice placement](../mygazette/mygazette.md) documentation. Subsequent versions are available as (X)HTML5+RDFa, similar to the data.xml available for the current version of a [notice](notice.md).
 
 Other related endpoints which give further information about the notice:
 
 - [Current version of the notice](notice.md)
 - [Provenance of the notice](notice-provenance.md)
-
 
 ## Resource URL ##
 

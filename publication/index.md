@@ -22,10 +22,6 @@ The following editions exist, the correct parameter follows the title:
 
 *\* Please note: For the new editions (The Insolvency Gazette, The Daily Edition,The Wills and Probate Gazette) the issue number is the ISO 8601 date of publication in (YYYY-MM-DD).*
 
-
-### Alternative Representations ###
-Due to the large number of alternative representations available there is a notes column to help guide the user to the appropriate representation.
-
 <table>
 <tr>
 <th>Representation URI</th>
@@ -35,18 +31,8 @@ Due to the large number of alternative representations available there is a note
 </tr>
 <tr>
 <td>/{edition}/issue/{issue-number}<br />/{edition}/issue/{issue-number}/data.pdf</td>
-<td rowspan=3>GET</td>
+<td>GET</td>
 <td>PDF</td>
 <td>Complete PDF of the edition.</td>
-</tr>
-<tr>
-<td>/{edition}/issue/{issue-number}/data.rdf</td>
-<td>RDF+XML</td>
-<td>RDF XML for the issue</td>
-</tr>
-<tr>
-<td>/{edition}/issue/{issue-number}/data.json</td>
-<td>JSON</td>
-<td>JSON for the issue</td>
 </tr>
 </table>

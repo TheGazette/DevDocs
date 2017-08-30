@@ -1,10 +1,11 @@
 [Home](../home.md)
 # Delete a saved notice #
-Authenticated users can delete notices previously save to the My Gazette area, information about  [registration](../authentication/registration.md) and [signing-in](../authentication/sign-in.md).
 
-Related Resources
+Authenticated users can delete notices previously saved to the My Gazette area. For more info, please refer to [registration](../authentication/registration.md) and [signing-in](../authentication/sign-in.md).
 
-- [Saved a notice](save-notice.md)
+## Related Resources ##
+
+- [Save a notice](save-notice.md)
 
 ## Resource URL ##
 
@@ -12,7 +13,7 @@ Related Resources
 
 Valid notice Ids can be obtained from the list of the user's saved notices.
 
-- [Saved notices](../my-gazette/my-gazette.md) (Authentication Required)
+- Saved notices via [My Gazette](../mygazette/mygazette.md) (Authentication Required)
 
 <table>
 <tr>
@@ -23,14 +24,12 @@ Valid notice Ids can be obtained from the list of the user's saved notices.
 <tr>
 <td>/my-gazette/notice/{notice-id}</td>
 <td>DELETE</td>
-<td>status code only</td>
+<td>HTTP status code only</td>
 </tr>
 </table>
 
 ## Code Samples ##
 
-###	Java ###
-	
 ### PHP ###
 Requires that $noticeId and $headerAuth are defined with appropriate values. The `$headerAuth` variable should be set to `Bearer {bearerToken}` where the bearerToken has been previously obtained ([sign-in](../authentication/sign-in.md)).
 

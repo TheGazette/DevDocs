@@ -1,10 +1,11 @@
 [Home](../home.md)
 
-
 # REST API: Notice Feed #
+
 Used to perform searches against the database of published notices.
 The user can optionally be registered for this endpoint, being authenticated will include an extra element in the response which indicates if the notices has been saved by the user. 
 More information on authentication is available, [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
+
 ## Resource URL ##
 
 `/{service}/notice/`
@@ -95,7 +96,7 @@ In each instance the base URI can be either `/{service}/notice` or  `/{service}/
 <table>
 <tr>
 <td rowspan=2 style="width:12em">noticetype</td>
-<td>1 or more 4 digit notice code(s) separated by +. <a href="../local-auth">Complete notice taxonomy</a>
+<td>1 or more 4 digit notice code(s) separated by +. <a href="notice-taxonomy.md">Complete notice taxonomy</a>
 </td>
 </tr>
 <tr>
@@ -103,7 +104,7 @@ In each instance the base URI can be either `/{service}/notice` or  `/{service}/
 </tr>
 <tr>
 <td rowspan=2>categorycode</td>
-<td>1 or more 2 digit notice category code(s) separated by +. <a href="../local-auth">Complete notice taxonomy</a></td>
+<td>1 or more 2 digit notice category code(s) separated by +. <a href="notice-taxonomy.md">Complete notice taxonomy</a></td>
 </tr>
 <tr>
 <td><b>Example Values:</b> 24+25</td>
@@ -130,8 +131,8 @@ The start and end parameter for each pair may be used independently.</td>
 </tr>
 <tr>
 <th>Location Searching</th>
-<td>Any number of location search parameters can be included as part of a search. These are processed as an OR instruction meaning that notices returned will match at least one of the locations specified.
-<br />The <code>[n]</code> specified should be a positive integer, the <code>location-local-authority-[n]</code> takes precedence over that of the location-postcode
+<td>Up to 10 location search parameters can be included as part of a search. These are processed as an OR instruction meaning that notices returned will match at least one of the locations specified.
+<br />The <code>[n]</code> specified should be an integer between 1 and 10 inclusive, the <code>location-local-authority-[n]</code> takes precedence over that of the location-postcode
 </td>
 </tr>
 <tr>
@@ -159,11 +160,8 @@ The start and end parameter for each pair may be used independently.</td>
 <th>Edition Searching</th>
 <td></td>
 <tr>
-<td rowspan=2>edition</td>
-<td>1 or more of  London, Edinburgh and Belfast. Limits the search to </td>
-</tr>
-<tr>
-<td><b>Example Values:</b> 10</td>
+<td>edition</td>
+<td>1 or more of  London, Edinburgh and Belfast</td>
 </tr>
 <tr>
 <td rowspan=2>issue</td>
@@ -193,7 +191,7 @@ The start and end parameter for each pair may be used independently.</td>
 </tr>
 <tr>
 <td rowspan=2>sort-by</td>
-<td>Change the ordering of </td>
+<td>Change the ordering of the returned results.</td>
 </tr>
 <tr>
 <td><b>Example Values:</b> latest-date | oldest-date</td>
@@ -413,18 +411,14 @@ The JSON structure is derived from the atom xml format and contains an array of 
 	}
 
 ## Code samples ##
-### Java ###
-	
-	
 
 ### PHP ###
-
 
 - `$uri` to be a valid feed uri
 - `$bearer` set to be the users OAuth token if required
 - `$xsl_doc` should be a xslt 1.0 stylesheet to transform returned Atom feed to desired html
 
-*Assumes a php install with both cURL and DOM modules enablede* 
+*Assumes a php install with both cURL and DOM modules enabled* 
 
 	<?php
 	
@@ -458,7 +452,4 @@ The JSON structure is derived from the atom xml format and contains an array of 
 		
 		echo $html;
 	?>
-
-### Javascript ###
-
 	

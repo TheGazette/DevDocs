@@ -5,14 +5,13 @@ These end points are only available to authenticated Users, user needs  to [regi
 
 ## Resource URL ##
 
-`/my-gazette/checkout`
+`/my-gazette/basket/checkout`
 
 See also
 
 - [Add to Basket](add-to-basket.md)
 - [Assign Purchase Order](../mygazette/order/assign-po-number.md)
-- [Order Confirmation](../mygazette/order/confirmation.md)
-
+- [Order Confirmation](../mygazette/order/confirm.md)
 
 <table>
 <tr>
@@ -23,7 +22,7 @@ See also
 	<th>Accept header​</th>
 </tr>
 <tr>
-	<td>/my-gazette/basket/data.{format}</td>
+	<td>/my-gazette/basket/checkout</td>
 	<td>POST</td>
 	<td>as per format</td>
 	<td>200</td>

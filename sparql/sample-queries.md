@@ -4,8 +4,8 @@
 Useful resources:
 
 - [SPARQL endpoint documentation](sparql.md)
-- [Flint editor on the gazette website](https://www.thegazette.co.uk/flint)
-- [Flint SPARQL editor project on github](https://github.com/TSO-Openup/FlintSparqlEditor)
+- [Flint editor on The Gazette website](https://www.thegazette.co.uk/flint)
+- [Flint SPARQL editor project on Github](https://github.com/TSO-Openup/FlintSparqlEditor)
 
 
 ## Main Dataset ##

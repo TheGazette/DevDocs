@@ -93,5 +93,83 @@ Resource URL has been shortened to {resourceURL} for clarity.
 ## Sample Responses ##
 
 ### RDF XML ###
+	<doc>
+	   <links xmlns="http://www.w3.org/1999/xhtml">
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B61" rel="self" title="HTML" type="application/xhtml+xml" xmlns=""/>
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B61/data.pdf" rel="alternate" title="PDF" type="application/pdf" xmlns=""/>
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B61" rel="first" title="HTML" type="application/xhtml+xml" xmlns=""/>
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B64" rel="last" title="HTML" type="application/xhtml+xml" xmlns=""/>
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B62" rel="next" title="HTML" type="application/xhtml+xml" xmlns=""/>
+	   </links>
+	   <links xmlns="http://www.w3.org/1999/xhtml">
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B61" rel="self" title="HTML" type="application/xhtml+xml"/>
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B61/data.pdf" rel="alternate" title="PDF" type="application/pdf"/>
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B61" rel="first" title="HTML" type="application/xhtml+xml"/>
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B64" rel="last" title="HTML" type="application/xhtml+xml"/>
+		  <link href="https://www.thegazette.co.uk/london/issue/61968/supplement/B62" rel="next" title="HTML" type="application/xhtml+xml"/>
+	   </links>
+	</doc>
 
 ### JSON ###
+	[
+		  {
+		  "@xmlns": "http://www.w3.org/1999/xhtml",
+		  "link":       [
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B61",
+				"@rel": "self",
+				"@title": "HTML"
+			 },
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B61/data.pdf",
+				"@rel": "alternate",
+				"@title": "PDF"
+			 },
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B61",
+				"@rel": "first",
+				"@title": "HTML"
+			 },
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B64",
+				"@rel": "last",
+				"@title": "HTML"
+			 },
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B62",
+				"@rel": "next",
+				"@title": "HTML"
+			 }
+		  ]
+	   },
+		  {
+		  "@xmlns": "http://www.w3.org/1999/xhtml",
+		  "link":       [
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B61",
+				"@rel": "self",
+				"@title": "HTML"
+			 },
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B61/data.pdf",
+				"@rel": "alternate",
+				"@title": "PDF"
+			 },
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B61",
+				"@rel": "first",
+				"@title": "HTML"
+			 },
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B64",
+				"@rel": "last",
+				"@title": "HTML"
+			 },
+					  {
+				"@href": "https://www.thegazette.co.uk/london/issue/61968/supplement/B62",
+				"@rel": "next",
+				"@title": "HTML"
+			 }
+		  ]
+	   }
+	]

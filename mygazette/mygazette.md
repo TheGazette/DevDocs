@@ -3,114 +3,117 @@
 
 These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
-**TODO: Need endpoints and description for following use cases.**
-
 ## My Notices ##
-### My draft ###
+
+These endpoints allow the client to retrieve the user's notices, based on the notice status.
+
+Various response formats can be requested via content negotiation, using the "Accept" header:
+
 <table>
 <tr>
-	<th>Representation URI</th>
-	<th>Method</th>
+	<th>Accept header</th>
 	<th>Response type</th>
-	<th>Response code</th>
-	<th>Accept header​</th>
 </tr>
 
 <tr>
-	<td>my-gazette/draft/data.{format}
-</td>
-	<td>GET</td>
-	<td></td>
-	<td>200</td>
-	<td>None</td>
+	<td>text/html</td>
+	<td>HTML</td>
+</tr>
+<tr>
+	<td>application/xml</td>
+	<td>XML</td>
+</tr>
+<tr>
+	<td>application/json</td>
+	<td>JSON</td>
 </tr>
 </table>
 
-### My pending draft ###
+### My draft notices ###
 
 <table>
 <tr>
 	<th>Representation URI</th>
 	<th>Method</th>
-	<th>Response type</th>
-	<th>Response code</th>
 	<th>Accept header​</th>
 </tr>
 
 <tr>
-	<td>my-gazette/pending/data.{format}
-</td>
+	<td>my-gazette/draft</td>
 	<td>GET</td>
-	<td></td>
-	<td>200</td>
-	<td>None</td>
-</tr>
-</table>
-### My withdrawn draft ###
-
-<table>
-<tr>
-	<th>Representation URI</th>
-	<th>Method</th>
-	<th>Response type</th>
-	<th>Response code</th>
-	<th>Accept header​</th>
-</tr>
-
-<tr>
-	<td>/my-gazette/withdrawn/data.{format}
-</td>
-	<td>GET</td>
-	<td></td>
-	<td>200</td>
-	<td>None</td>
+	<td>See table above</td>
 </tr>
 </table>
 
-### My rejected draft ###
+### My pending draft notices ###
+
 <table>
 <tr>
 	<th>Representation URI</th>
 	<th>Method</th>
-	<th>Response type</th>
-	<th>Response code</th>
 	<th>Accept header​</th>
 </tr>
 
 <tr>
-	<td>/my-gazette/rejected/data.{format}
-</td>
+	<td>my-gazette/pending</td>
 	<td>GET</td>
-	<td></td>
-	<td>200</td>
-	<td>None</td>
+	<td>See table above</td>
 </tr>
 </table>
-### My published draft ###
+
+### My withdrawn draft notices ###
 
 <table>
 <tr>
 	<th>Representation URI</th>
 	<th>Method</th>
-	<th>Response type</th>
-	<th>Response code</th>
 	<th>Accept header​</th>
 </tr>
 
 <tr>
-	<td>/my-gazette/published/data.{format}
-</td>
+	<td>/my-gazette/withdrawn</td>
 	<td>GET</td>
-	<td></td>
-	<td>200</td>
-	<td>None</td>
+	<td>See table above</td>
+</tr>
+</table>
+
+### My rejected draft notices ###
+
+<table>
+<tr>
+	<th>Representation URI</th>
+	<th>Method</th>
+	<th>Accept header​</th>
+</tr>
+
+<tr>
+	<td>/my-gazette/rejected</td>
+	<td>GET</td>
+	<td>See table above</td>
+</tr>
+</table>
+
+### My published draft notices ###
+
+<table>
+<tr>
+	<th>Representation URI</th>
+	<th>Method</th>
+	<th>Accept header​</th>
+</tr>
+
+<tr>
+	<td>/my-gazette/published</td>
+	<td>GET</td>
+	<td>See table above</td>
 </tr>
 </table>
 
 ## My Account ##
 
+Client can retrieve the user's account details and order details using the following end points.
+
 ### My Account settings ###
-User can retrieve account details using the following end points
 
 <table>
 <tr>
@@ -130,17 +133,10 @@ User can retrieve account details using the following end points
 	<td>None</td>
 </tr>
 
-<tr>
-	<td>/my-gazette/order/{order-id}/data.{format}
-</td>
-	<td>GET</td>
-	<td></td>
-	<td>200</td>
-	<td>None</td>
-</tr>
 </table>
 
 ### My orders ###
+
 <table>
 <tr>
 	<th>Representation URI</th>
@@ -159,10 +155,22 @@ User can retrieve account details using the following end points
 	<td>None</td>
 </tr>
 
+<tr>
+	<td>/my-gazette/order/{order-id}/data.{format}
+</td>
+	<td>GET</td>
+	<td></td>
+	<td>200</td>
+	<td>None</td>
+</tr>
+
 </table>
 
 
 ## Saved searches ##
+
+Client can retrieve details of a user's saved searches. A delete endpoint is also available for removing saved searches from a user's account.
+
 <table>
 <tr>
 	<th>Representation URI</th>
@@ -191,7 +199,9 @@ User can retrieve account details using the following end points
 </tr>
 </table>
 
-## Saved notics ##
+## Saved notices ##
+
+A signed in user is able to save notices to the My Gazette area for future reference. For more info, please refer to [Save a Notice](save-notice.md).
 
 <table>
 <tr>
@@ -211,8 +221,3 @@ User can retrieve account details using the following end points
 	<td>None</td>
 </tr>
 </table>
-
-
-TODO:
-- is there anything on the lineitem level?
-- Bookmarks - saved searches, notices

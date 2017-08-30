@@ -1,15 +1,16 @@
 [Home](../home.md)
 # SPARQL Endpoints #
 
-The data of The Gazette can be queried against by using SPARQL against one of the two endpoints provided.
+The data of The Gazette can be queried by using SPARQL against one of the two endpoints provided.
 The main `/sparql` endpoint is populated with data from the modern notices which have been placed in the Gazette (starting from 1998). The `/longitudinal-dataset/sparql` endpoint contains the information derived from indexes of Archive of the Gazette and span a time period from 1900 to 1999.
 
 Useful resources:
 
 - [Sample queries](sample-queries.md)
-- [Flint editor on the gazette website](https://www.thegazette.co.uk/flint)
-- [Flint SPARQL editor project on github](https://github.com/TSO-Openup/FlintSparqlEditor)
-
+- [Flint editor on The Gazette website](https://www.thegazette.co.uk/flint)
+- [Flint SPARQL editor project on Github](https://github.com/TSO-Openup/FlintSparqlEditor)
+- [Details on SPARQL/XML](http://www.w3.org/TR/2007/CR-rdf-sparql-XMLres-20070925/)
+- [Details on JSON results](http://www.w3.org/TR/rdf-sparql-json-res/)
 
 ## Resource URL ##
 
@@ -30,7 +31,6 @@ and
 <td>GET<br/>or<br/>POST</td>
 <td>Various</td>
 </tr>
-
 </table>	 
 
 
@@ -67,17 +67,11 @@ The available formats are given in the table below:
 </tr>
 </table>	 
 
-- [Details on SPARQL/XML](http://www.w3.org/TR/2007/CR-rdf-sparql-XMLres-20070925/)
-- [Details on JSON results](http://www.w3.org/TR/rdf-sparql-json-res/)
-
 ## Parameters ##
 <table>
 <tr>
-<td rowspan=2 style="width:12em">query</td>
+<td style="width:12em">query</td>
 <td>Contains the text of the SPARQL query<br/>The text needs to be encoded using application/x-www-form-urlencoded format</td>
-</tr>
-<tr>
-<td><b>Example Values:</b> </td>
 </tr>
 <tr>
 <td rowspan=2 style="width:12em">output</td>

@@ -48,6 +48,99 @@ Supplements exist for the following editions, the correct parameter follows the 
 
 ## Sample Responses ##
 
-### RDF XML ###
+### XML ###
+	<?xml version="1.0" encoding="UTF-8"?>
+	<doc>
+	   <links xmlns="http://www.w3.org/1999/xhtml">
+		  <link xmlns="" href="https://www.thegazette.co.uk/London/issue/62035/supplement/16257" rel="self" title="HTML" type="application/xhtml+xml" />
+		  <link xmlns="" href="https://www.thegazette.co.uk/London/issue/62035/supplement/16257/data.pdf" rel="alternate" title="PDF" type="application/pdf" />
+		  <link xmlns="" href="https://www.thegazette.co.uk/London/issue/62035/supplement/16165" rel="first" title="HTML" type="application/xhtml+xml" />
+		  <link xmlns="" href="https://www.thegazette.co.uk/London/issue/62035/supplement/16268" rel="last" title="HTML" type="application/xhtml+xml" />
+		  <link xmlns="" href="https://www.thegazette.co.uk/London/issue/62035/supplement/16176" rel="prev" title="HTML" type="application/xhtml+xml" />
+		  <link xmlns="" href="https://www.thegazette.co.uk/London/issue/62035/supplement/16258" rel="next" title="HTML" type="application/xhtml+xml" />
+	   </links>
+	   <links xmlns="http://www.w3.org/1999/xhtml">
+		  <link href="https://www.thegazette.co.uk/London/issue/62035/supplement/16257" rel="self" title="HTML" type="application/xhtml+xml" />
+		  <link href="https://www.thegazette.co.uk/London/issue/62035/supplement/16257/data.pdf" rel="alternate" title="PDF" type="application/pdf" />
+		  <link href="https://www.thegazette.co.uk/London/issue/62035/supplement/16165" rel="first" title="HTML" type="application/xhtml+xml" />
+		  <link href="https://www.thegazette.co.uk/London/issue/62035/supplement/16268" rel="last" title="HTML" type="application/xhtml+xml" />
+		  <link href="https://www.thegazette.co.uk/London/issue/62035/supplement/16176" rel="prev" title="HTML" type="application/xhtml+xml" />
+		  <link href="https://www.thegazette.co.uk/London/issue/62035/supplement/16258" rel="next" title="HTML" type="application/xhtml+xml" />
+	   </links>
+	</doc>
+
+
 
 ### JSON ###
+	[
+	   {
+		  "@xmlns": "http://www.w3.org/1999/xhtml",
+		  "link": [
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16257",
+				"@rel": "self",
+				"@title": "HTML"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16257/data.pdf",
+				"@rel": "alternate",
+				"@title": "PDF"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16165",
+				"@rel": "first",
+				"@title": "HTML"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16268",
+				"@rel": "last",
+				"@title": "HTML"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16176",
+				"@rel": "prev",
+				"@title": "HTML"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16258",
+				"@rel": "next",
+				"@title": "HTML"
+			 }
+		  ]
+	   },
+	   {
+		  "@xmlns": "http://www.w3.org/1999/xhtml",
+		  "link": [
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16257",
+				"@rel": "self",
+				"@title": "HTML"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16257/data.pdf",
+				"@rel": "alternate",
+				"@title": "PDF"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16165",
+				"@rel": "first",
+				"@title": "HTML"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16268",
+				"@rel": "last",
+				"@title": "HTML"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16176",
+				"@rel": "prev",
+				"@title": "HTML"
+			 },
+			 {
+				"@href": "https://www.thegazette.co.uk/London/issue/62035/supplement/16258",
+				"@rel": "next",
+				"@title": "HTML"
+			 }
+		  ]
+	   }
+	]

@@ -21,6 +21,10 @@ Ids for the user's own unpublished notices can be found using:
 
 - [My Gazette](../mygazette/mygazette.md)
 
+Users are able to update the status of an unpublished notice using:
+
+- [Notice Status](../notice/notice-status.md)
+
 ### Alternative Representations ###
 Due to the large number of alternative representations available there is a notes column to help guide the user to the appropriate representation.
 

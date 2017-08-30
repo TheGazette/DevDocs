@@ -7,12 +7,14 @@ User must have the appropriate access to see the basket details. See also [Check
 
 ## Resource URL ##
 
+### Get basic basket details
+
 <table>
 <tr>
 	<th>Representation URI</th>
 	<th>Method</th>
 	<th>Response type</th>
-	<th>Response code</th>
+	<th>Success response code</th>
 	<th>Accept header​</th>
 </tr>
 <tr>
@@ -22,104 +24,79 @@ User must have the appropriate access to see the basket details. See also [Check
 	<td>200</td>
 	<td>None</td>
 </tr>
-<tr>
-	<td>/my-gazette/basket/data.{format}</td>
-	<td>GET</td>
-	<td>as per format</td>
-	<td>400</td>
-	<td>None</td>
-</tr>
 </table>
 
+### Adding notices to basket
 
-Single or multiple notices can be posted to basket. To add a single item to the basket , **noticeId** must be part of request, the URI is: 
+Single or multiple notices can be posted to basket.
+
+To add a single item to the basket , **{noticeId}** must be part of request, the URI is: 
 
 <table>
 <tr>
 	<th>Representation URI</th>
 	<th>Method</th>
 	<th>Response type</th>
-	<th>Response code</th>
+	<th>Success response code</th>
 	<th>Accept header​</th>
 </tr>
 <tr>
-	<td>/my-gazette/basket/item</td>
+	<td>/my-gazette/basket/item?noticeId={noticeId}</td>
 	<td>POST</td>
 	<td>HTML</td>
 	<td>200</td>
 	<td>None</td>
 </tr>
-<tr>
-	<td>/my-gazette/basket/item</td>
-	<td>POST</td>
-	<td>HTML</td>
-	<td>400</td>
-	<td>None</td>
-</tr>
 </table>
 
-To add multiple items to basket , **bundleId** must be part of request , the URI is :
+To add multiple items to basket , **{bundleId}** must be part of request , the URI is :
 
 <table>
 <tr>
 	<th>Representation URI</th>
 	<th>Method</th>
 	<th>Response type</th>
-	<th>Response code</th>
+	<th>Success response code</th>
 	<th>Accept header​</th>
 </tr>
 <tr>
-	<td>/my-gazette/basket/multiple-items</td>
+	<td>/my-gazette/basket/multiple-items/bundle?bundleId={bundleId}</td>
 	<td>POST</td>
 	<td>HTML</td>
 	<td>201</td>
 	<td>None</td>
 </tr>
-<tr>
-	<td>/my-gazette/basket/multiple-items</td>
-	<td>POST</td>
-	<td>HTML</td>
-	<td>400</td>
-	<td>None</td>
-</tr>
 </table>
 
-To delete an item from basket, URI is 
+### Deleting from the basket
+
+In order to clear the user's basket, URI is:
 
 <table>
 <tr>
 	<th>Representation URI</th>
 	<th>Method</th>
 	<th>Response type</th>
-	<th>Response code</th>
+	<th>Success response code</th>
 	<th>Accept header​</th>
 </tr>
 <tr>
-	<td>/my-gazette/basket/multiple-items</td>
-	<td>POST</td>
-	<td>HTML</td>
+	<td>/my-gazette/basket</td>
+	<td>DELETE</td>
+	<td>XML</td>
 	<td>201</td>
-	<td>None</td>
-</tr>
-<tr>
-	<td>/my-gazette/basket/multiple-items</td>
-	<td>POST</td>
-	<td>HTML</td>
-	<td>400</td>
 	<td>None</td>
 </tr>
 </table>
 
+It is also possible to delete an individual item from the basket:
 
-
-
-To delete an item from basket, URI is 
 <table>
 <tr>
 	<th>Representation URI</th>
 	<th>Method</th>
 	<th>Response type</th>
-	<th>Response code</th>
+	<th>Success response code</th>
 	<th>Accept header​</th>
 </tr>
 <tr>
@@ -129,52 +106,25 @@ To delete an item from basket, URI is
 	<td>201</td>
 	<td>None</td>
 </tr>
-<tr>
-	<td>/my-gazette/basket/item/{itemId}</td>
-	<td>DELETE</td>
-	<td>HTML</td>
-	<td>400</td>
-	<td>None</td>
-</tr>
 </table>
+
+### Increasing the quantity of an item
 
 To increase the quantity of an item, URI is
 
-
 <table>
 <tr>
 	<th>Representation URI</th>
 	<th>Method</th>
 	<th>Response type</th>
-	<th>Response code</th>
+	<th>Success response code</th>
 	<th>Accept header​</th>
 </tr>
 <tr>
-	<td>/my-gazette/basket/multiple-items</td>
-	<td>POST</td>
+	<td>/my-gazette/basket/item/{itemId}/quantity</td>
+	<td>PUT</td>
 	<td>HTML</td>
 	<td>201</td>
 	<td>None</td>
 </tr>
-<tr>
-	<td>/my-gazette/basket/multiple-items</td>
-	<td>POST</td>
-	<td>HTML</td>
-	<td>400</td>
-	<td>None</td>
-</tr>
 </table>
-
-**TODO: Need endpoints and description for following use cases.**
-
-
-
-
-
-
-- from individual notice
-- Basket contents
-  - HTML
-  - XML
-  - JSON
-

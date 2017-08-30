@@ -1,25 +1,11 @@
 [Home](../home.md)
 # Place notice options #
 
-These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
+This end points is only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
 ## Options to place notices ##
 
-This is for html clients only , returns back a list of options to place a notice based on user access level.
-<table>
-<tr>
-	<th>Representation URI</th>
-	<th>Method</th>
-	<th>Response type</th>
-</tr>
-<tr>
-	<td>/my-gazette/place-notice</td>
-	<td>GET</td>
-	<td>HTML</td>
-</tr>
-</table>
-
-{accept-header} is text/html
+Returns a list of options for [placing a notice](create-bundle.md) based on user access level.
 
 <table>
 <tr>
@@ -34,36 +20,7 @@ This is for html clients only , returns back a list of options to place a notice
 	<td>GET</td>
 	<td>HTML</td>
 	<td>200</td>
-	<td>{accept-header}</td>
-</tr>
-</table>
-
-**NOTE:** The following URIs are for submission and once bundle/notice has been posted, user can [check the status of submission](notice-submissions.md)
-
-## Sample Responses ##
-
-### XML ###
-### JSON ###
-
-
-
-## XML submission ##
-
-XML as request body or multipart file upload.
-<table>
-<tr>
-	<th>Representation URI</th>
-	<th>Method</th>
-	<th>Response type</th>
-	<th>Response code</th>
-	<th>Accept header​</th>
-</tr>
-<tr>
-	<td>/my-gazette/bundle</td>
-	<td>POST</td>
-	<td></td>
-	<td>200</td>
-	<td>None</td>
+	<td>text/html</td>
 </tr>
 </table>
 
