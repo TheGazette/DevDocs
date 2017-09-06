@@ -40,3 +40,6 @@ See also
 </tr>
 </table>
 
+## Response
+
+A successful call will receive a `302 Found` response code. The URI for the [confirmation endpoint](../mygazette/order/confirm.md) (including the order number) is returned in the `Location` response header.

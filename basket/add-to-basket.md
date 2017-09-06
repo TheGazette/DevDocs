@@ -30,7 +30,7 @@ User must have the appropriate access to see the basket details. See also [Check
 
 Single or multiple notices can be posted to basket.
 
-To add a single item to the basket , **{noticeId}** must be part of request, the URI is: 
+To add a single item to the basket , `{noticeId}` must be part of request, the URI is: 
 
 <table>
 <tr>
@@ -41,7 +41,7 @@ To add a single item to the basket , **{noticeId}** must be part of request, the
 	<th>Accept header​</th>
 </tr>
 <tr>
-	<td>/my-gazette/basket/item?noticeId={noticeId}</td>
+	<td>/my-gazette/basket/item?itemId={noticeId}&itemType=Notice</td>
 	<td>POST</td>
 	<td>HTML</td>
 	<td>200</td>
@@ -49,7 +49,7 @@ To add a single item to the basket , **{noticeId}** must be part of request, the
 </tr>
 </table>
 
-To add multiple items to basket , **{bundleId}** must be part of request , the URI is :
+To add multiple items to basket , `{bundleId}` must be part of request , the URI is :
 
 <table>
 <tr>

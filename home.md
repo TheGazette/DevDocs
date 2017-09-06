@@ -34,8 +34,7 @@ Gazettes have the following resources. Click on a link to read the API documenta
 
 **Place notice in The Gazette**
 
-* [Notice taxonomy](notice/notice-taxonomy.md)
-* [Place notice options](mygazette/place-options.md)  
+* [Process overview](basket/overview.md)  
 * [Create a Notice Bundle](mygazette/create-bundle.md)  
 * [Add to basket](basket/add-to-basket.md) 
 * [Checkout](basket/checkout.md) 

@@ -32,13 +32,13 @@ Use this request to confirm a user's order.
 </tr>
 </table>
 
-### Sample responses ###
+### Response
 
-#### JSON ####
+A successful call will receive a `302 Found` response code. The URI for the confirmation endpoint (below) is returned in the `Location` response header, which can be used to verify the confirmation status.
 
 ## Check order confirmation
 
-If the order has been confirmed, this endpoint will return information on that order's confirmation.
+This endpoint will return the confirmation status for the requested order.
 
 ### Resource URL ###
 

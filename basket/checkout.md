@@ -41,3 +41,7 @@ See also
 <td><b>Allowable Values:</b> PurchaseOrder</td>
 </tr>
 </table>
+
+## Response ##
+
+A successful call will receive a `302 Found` response code. The URI for the [subsequent endpoint](../mygazette/order/assign-po-number.md) (including the order number) is returned in the `Location` response header.
