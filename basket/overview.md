@@ -24,7 +24,7 @@ The following are the steps required to place a notice and complete the checkout
 
 The first step is to upload the details of the notice(s) to be published. 
 
-Details: [Place notice](../my-gazette/create-bundle.md)
+Details: [Place notice](../mygazette/create-bundle.md)
 
 ### Check processing status 
 
@@ -33,7 +33,7 @@ Once the notice details have been uploaded, the processing of the notice bundle 
 It is only possible to proceed with the checkout process if all notices in the uploaded bundle have been processed without any validation errors.
 As such, it is necessary to periodically check whether the notice(s) have been processed successfully.
 
-Details: [Bundle status](../my-gazette/bundle-status.md)
+Details: [Bundle status](../mygazette/bundle-status.md)
 
 ### Add notice / bundle to the basket
 
@@ -51,10 +51,10 @@ Details: [Checkout](checkout.md)
 
 A purchase order number will need to be assigned to the order before it can be finalised. This can be any number up to 10 digits in length.
 
-Details: [Assign purchase order number](../my-gazette/order/assign-po-number.md)
+Details: [Assign purchase order number](../mygazette/order/assign-po-number.md)
 
 ### Confirm
 
 The final step is to confirm the submission of the order.
 
-Details: [Confirm order](../my-gazette/order/confirm.md)
+Details: [Confirm order](../mygazette/order/confirm.md)

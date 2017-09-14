@@ -42,4 +42,4 @@ See also
 
 ## Response
 
-A successful call will receive a `302 Found` response code. The URI for the [confirmation endpoint](../mygazette/order/confirm.md) (including the order number) is returned in the `Location` response header.
+A successful call will receive a `302 Found` response code. The URI for the [confirmation endpoint](confirm.md) (including the order number) is returned in the `Location` response header.
