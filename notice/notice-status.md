@@ -1,7 +1,8 @@
 [Home](../home.md)
+
 # The Gazette Notice  - Status #
 
-The users can change the status of their unpublished notices, in order to do this they must be authenticated. For more info, please refer to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
+The users can change the status of their unpublished notices. In order to do this, they must be authenticated. For more info, please refer to [create an account](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
 ## Resource URL ##
 

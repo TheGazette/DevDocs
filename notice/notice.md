@@ -1,7 +1,7 @@
 [Home](../home.md)
+
 # The Gazette Notice #
-Notice content can be retrieved using following URIs, content will be for a particular notice (notice-id).
-The user can optionally be registered for this endpoint, being authenticated will allow users to retrieve their unpublished notices. To be authenticated users must [register](../authentication/registration.md) and then [sign-in](../authentication/sign-in.md).
+Notice content can be retrieved using following URIs, content will be for a particular notice (notice-id). The user can optionally be registered for this endpoint, being authenticated will allow users to retrieve their unpublished notices. To be authenticated users must [create an account](../authentication/registration.md) and then [sign-in](../authentication/sign-in.md).
 
 Other related endpoints which give further information about the notice:
 

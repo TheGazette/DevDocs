@@ -1,4 +1,5 @@
 [Home](../home.md)
+
 # REST API: Sign In
 
 User Authentication in The Gazette REST API works based on the [OAuth2.0](http://tools.ietf.org/html/rfc6749) principles using '[Resource Owner Password Credentials](http://tools.ietf.org/html/rfc6749#page-38)’ grant type, which allows the client to exchange a user’s username and password for an access token.
@@ -7,7 +8,7 @@ In order to access secured resources in The Gazette, REST clients must obtain OA
 
 ## Prerequisites
 
-To access the Gazette OAuth token endpoint, your API client must use an appropriate Basic authentication token. Please contact TSO customer service to get the Basic authentication token for accessing the token endpoint.
+To access the Gazette OAuth token endpoint, your API client must use an appropriate Basic authentication token. Please contact TSO customer service to get the Basic authentication token for accessing the token endpoint. This is only required to access secured resources and to place notices using The Gazette RESTful API.
 
 ## Resource URL ##
 

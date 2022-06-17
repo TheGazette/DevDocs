@@ -1,3 +1,4 @@
+
 # The Gazette Web Service Interface # 
 
 The Gazette REST API allows you to access The Gazette notice feeds, notice documents, PDF publications and various other public resources. The API also allows clients to Place notices in The Gazette using a registered user account.
@@ -29,7 +30,7 @@ Gazettes have the following resources. Click on a link to read the API documenta
  
 **Registration and user authentication**
 
-* [Register to access The Gazette API](authentication/registration.md)
+* [Create an account to access The Gazette API](authentication/registration.md)
 * [Sign-In to The Gazette API](authentication/sign-in.md)
 
 **Place notice in The Gazette**
@@ -51,8 +52,7 @@ Gazettes have the following resources. Click on a link to read the API documenta
 
 ## Support ##
 
-A Technical Services Helpdesk during Business Hours to deal with issues identified in The Gazette API. 
-The helpdesk can be contacted by emailing [cssup@tso.co.uk](mailto:cssup@tso.co.uk).
+For support using The Gazette API please contact TSO customer services by emailing [customer.services@thegazette.co.uk](mailto:customer.services@thegazette.co.uk).
 
 ## License ##
 

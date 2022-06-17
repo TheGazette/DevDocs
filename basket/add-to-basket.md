@@ -1,7 +1,8 @@
 [Home](../home.md)
+
 # The Gazette Add To Basket #
 
-These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
+These end points are only available to authenticated Users, user needs  to [create an account](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
 User must have the appropriate access to see the basket details. See also [Checkout](checkout.md).
 

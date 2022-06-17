@@ -1,10 +1,11 @@
 [Home](../home.md)
+
 # Bundle Status #
 Once a [bundle has been submitted](create-bundle.md) this starts an asynchronous process whereby the bundle is transformed into notices and validated as containing the correct information.
 
-These end points are only available to authenticated users with permission to place notices, user needs  to [register](../authentication/registration.md) as either an individual or an organisation and then [sign-in](../authentication/sign-in.md).
+These end points are only available to authenticated users with permission to place notices, user needs  to [create an account](../authentication/registration.md) as either an individual or an organisation and then [sign-in](../authentication/sign-in.md).
 
-The registered user is only able to check the status of their own bundles.
+The user is only able to check the status of their own bundles.
 
 See also
 

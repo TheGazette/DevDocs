@@ -1,7 +1,7 @@
 [Home](../home.md)
 # Saved notice #
 
-Authenticated users can save notices to the My Gazette area for future reference. For more info, please refer to [registration](../authentication/registration.md) and [signing-in](../authentication/sign-in.md).
+Authenticated users can save notices to the My Gazette area for future reference. For more info, please refer to [creating an account](../authentication/registration.md) and [signing-in](../authentication/sign-in.md).
 
 ## Related Resources ##
 

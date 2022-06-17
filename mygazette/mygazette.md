@@ -1,7 +1,8 @@
 [Home](../home.md)
+
 # My Gazette #
 
-These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
+These end points are only available to authenticated Users, user needs  to [create an account](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
 ## My Notices ##
 

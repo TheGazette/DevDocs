@@ -1,7 +1,8 @@
 [Home](../home.md)
+
 # Delete a saved notice #
 
-Authenticated users can delete notices previously saved to the My Gazette area. For more info, please refer to [registration](../authentication/registration.md) and [signing-in](../authentication/sign-in.md).
+Authenticated users can delete notices previously saved to the My Gazette area. For more info, please refer to [creating an account](../authentication/registration.md) and [signing-in](../authentication/sign-in.md).
 
 ## Related Resources ##
 

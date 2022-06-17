@@ -1,10 +1,11 @@
 [Home](../home.md)
+
 # Create Bundle #
 For submission routes which allow multiple notice to be submitted at once (XML, JSON, Excel) the submission is made in the form of a bundle. 
 
-These end points are only available to authenticated users with permission to place notices, user needs  to [register](../authentication/registration.md) as either an individual or an organisation and then [sign-in](../authentication/sign-in.md).
+These end points are only available to authenticated users with permission to place notices, user needs to [create an account](../authentication/registration.md) as either an individual or an organisation and then [sign-in](../authentication/sign-in.md).
 
-The type of user registered will affect the ability of that user to place notices of different types and also the ability to place notice utilising different routes.
+The type of user will affect the ability of that user to place notices of different types and also the ability to place notice utilising different routes.
 
 Once a bundle has been submitted, you are able to [check on it's status](bundle-status.md).
 

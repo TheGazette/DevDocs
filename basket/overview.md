@@ -1,13 +1,16 @@
 [Home](../home.md)
 
+
 # Placing an order: overview
 
-Via the Gazette APIs, it is possible to place notices and arrange for the payment of their publication.
+Via The Gazette API, it is possible to place notices and arrange for the payment of their publication.
+
+For assistance, including access to a Staging API environment for testing and development, please contact TSO customer service.
 
 ## Prerequisites
 
-### Register an account
-These end points are only available to authenticated Users, user needs  to [register](../authentication/registration.html) and [sign-in](../authentication/sign-in.html).
+### Create an account
+These end points are only available to authenticated Users, user needs  to [create an account](../authentication/registration.html) and [sign-in](../authentication/sign-in.html).
 
 ### User associated with a credit account
 

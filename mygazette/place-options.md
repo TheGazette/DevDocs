@@ -1,7 +1,8 @@
 [Home](../home.md)
+
 # Place notice options #
 
-This end points is only available to authenticated Users, user needs  to [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
+This end points is only available to authenticated Users, user needs to [create an account](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
 ## Options to place notices ##
 

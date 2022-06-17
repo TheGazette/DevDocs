@@ -1,8 +1,11 @@
 [Home](../home.md)
 
+
 # The Gazette Notice - Provenance #
 
-The provenance of a notice can be retrieved using following URIs, content will be for a particular notice (notice-id). The user can optionally be registered for this endpoint. Being authenticated will allow users to retrieve their unpublished notices. For further info, see [register](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
+The provenance of a notice can be retrieved using following URIs, content will be for a particular notice (notice-id). The user can optionally be registered for this endpoint. Being authenticated will allow users to retrieve their unpublished notices.
+
+For further info, see [create an account](../authentication/registration.md) and [sign-in](../authentication/sign-in.md).
 
 Other related endpoints which give further information about the notice:
 

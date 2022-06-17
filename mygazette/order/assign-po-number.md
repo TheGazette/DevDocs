@@ -1,8 +1,9 @@
 [Home](../home.md)
+
 # Assign Purchase Order Number #
 Once an order has been placed, a purchase order number can be assigned.
 
-These end points are only available to authenticated users with permission to place notices, user needs  to [register](../authentication/registration.md) as either an individual or an organisation and then [sign-in](../authentication/sign-in.md).
+These end points are only available to authenticated users with permission to place notices, user needs  to [create an account](../authentication/registration.md) as either an individual or an organisation and then [sign-in](../authentication/sign-in.md).
 
 ## Resource URL ##
 

@@ -1,5 +1,6 @@
 # Account - Change Address #
-This allows a user to change the address which their account is registered to requires the user to be authenticated. To be authenticated users must [register](../authentication/registration.md) and then [sign-in](../authentication/sign-in.md).
+
+This allows a user to change the address which their account is registered to requires the user to be authenticated. To be authenticated users must [create an account](../authentication/registration.md) and then [sign-in](../authentication/sign-in.md).
 
 ## Resource URL ##
 
