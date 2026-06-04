@@ -97,7 +97,7 @@ In each instance the base URI can be either `/{service}/notice` or  `/{service}/
 ## Parameters ##
 <table>
 <tr>
-<td rowspan=2 style="width:12em">noticetype</td>
+<td rowspan=2 style="width:12em">noticetypes</td>
 <td>1 or more 4 digit notice code(s) separated by +. <a href="notice-taxonomy.md">Complete notice taxonomy</a>
 </td>
 </tr>
